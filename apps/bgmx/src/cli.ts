@@ -39,16 +39,30 @@ const cli = breadc('bgmx', { version })
 
 cli
   .command('sync subject', '拉取所有 bgmx 条目数据')
-  .option('--update', '是否更新数据, 默认值: true', { default: true })
-  .option('--log <file>', '日志文件, 默认值: sync-subject.md')
   .option('--out-dir <directory>', '输出目录, 默认值: data/subject')
-  .option('--concurrency <number>', '并发数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
   .option('--retry <number>', '重试次数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
   .action(async (options) => {
-    const secret = options.secret ?? process.env.SECRET;
-    if (!secret && options.update) {
-      console.warn('未提供 API 密钥，将无法更新数据');
+    const subjects: DatabaseSubject[] = [];
+
+    for await (const subject of fetchSubjects({ baseURL: options.baseUrl, retry: options.retry })) {
+      console.info(`${subject.title} (id: ${subject.id})`);
+      subjects.push(subject);
     }
+
+    await dumpDataBy(
+      options.outDir ?? 'data/subject',
+      subjects,
+      (item) => {
+        const date = item.data.onair_date;
+        if (date) {
+          const [year, month] = date.split('-');
+          return `${year}/${month}`;
+        } else {
+          return 'tbd';
+        }
+      },
+      (a, b) => a.id - b.id
+    );
   });
 
 cli
@@ -304,13 +318,14 @@ cli
 cli
   .command('calendar', '拉取当前周历数据')
   .option('--out <file>', '输出目标文件')
+  .option('--full', '输出完整 subject 条目')
   .action(async (options) => {
     const resp = await fetchCalendar({ baseURL: options.baseUrl });
 
     printCalendar(resp.calendar, resp.web);
 
     if (options.out) {
-      await dumpCalendar(options.out, resp.calendar, resp.web);
+      await dumpCalendar(options.out, resp.calendar, resp.web, { full: options.full });
     }
   });
 
