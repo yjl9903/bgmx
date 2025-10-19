@@ -32,6 +32,7 @@ import {
   fetchCalendar,
   updateCalendar
 } from './client';
+import { transformDatabaseSubject } from './transform';
 
 const cli = breadc('bgmx', { version })
   .option('--base-url <url>', 'API 地址, 默认值: https://bgm.animes.garden')
@@ -42,18 +43,20 @@ cli
   .option('--out-dir <directory>', '输出目录, 默认值: data/subject')
   .option('--retry <number>', '重试次数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
   .action(async (options) => {
-    const subjects: DatabaseSubject[] = [];
+    const subjects: ReturnType<typeof transformDatabaseSubject>[] = [];
 
     for await (const subject of fetchSubjects({ baseURL: options.baseUrl, retry: options.retry })) {
-      console.info(`${subject.title} (id: ${subject.id})`);
-      subjects.push(subject);
+      // console.info(`${subject.title} (id: ${subject.id})`);
+      subjects.push(transformDatabaseSubject(subject, { full: true }));
     }
+
+    consola.success(`成功拉取 ${subjects.length} 条数据`);
 
     await dumpDataBy(
       options.outDir ?? 'data/subject',
       subjects,
       (item) => {
-        const date = item.data.onair_date;
+        const date = item.onair_date;
         if (date) {
           const [year, month] = date.split('-');
           return `${year}/${month}`;

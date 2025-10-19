@@ -1,4 +1,10 @@
-import { decodeSubjectTitle, getSubjectAlias, getSubjectDisplayName, normalizeTags } from 'bgmt';
+import {
+  decodeSubjectTitle,
+  getSubjectAlias,
+  getSubjectDisplayName,
+  normalizeSummary,
+  normalizeTags
+} from 'bgmt';
 
 import type { Bangumi as DatabaseBangumi, Revision, Subject, SubjectImage } from '../schema';
 
@@ -24,7 +30,7 @@ export function createDatabaseSubject(bangumi: DatabaseBangumi, revisions: Revis
         score: bangumi.data.rating.score,
         rank: bangumi.data.rating.rank
       },
-      summary: bangumi.data.summary,
+      summary: normalizeSummary(bangumi.data.summary),
       poster: bangumi.data.images.large,
       images: getSubjectImages(bangumi),
       tags: normalizeTags(bangumi.data.tags, { count: 10 })
