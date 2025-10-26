@@ -28,7 +28,7 @@
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.5",
     "prettier": "^3.6.2",
-    "release-it": "^16.2.1",
+    "release-it": "^16.3.0",
     "rimraf": "^6.0.1",
     "tsdown": "^0.15.10",
     "tsx": "^4.20.6",
