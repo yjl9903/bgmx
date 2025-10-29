@@ -35,7 +35,7 @@
     "turbo": "^2.5.8",
     "typescript": "^5.9.3",
     "vite": "^7.1.12",
-    "vitest": "^4.0.4",
+    "vitest": "^4.0.5",
     "wrangler": "^4.45.1"
   },
   "packageManager": "pnpm@10.20.0",
