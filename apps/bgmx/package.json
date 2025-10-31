@@ -52,7 +52,7 @@
     "fs-extra": "^11.3.2",
     "jsdom": "^27.0.1",
     "p-limit": "7.2.0",
-    "rimraf": "^6.0.1",
+    "rimraf": "^6.1.0",
     "tmdbc": "workspace:*",
     "undici": "^7.16.0",
     "yaml": "^2.8.1"
