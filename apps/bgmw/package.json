@@ -47,7 +47,7 @@
     "test:ci": "vitest --run && wrangler deploy --dry-run"
   },
   "dependencies": {
-    "@hono/node-server": "1.19.5",
+    "@hono/node-server": "1.19.6",
     "@hono/zod-validator": "0.7.4",
     "bgmc": "workspace:*",
     "bgmt": "workspace:*",
