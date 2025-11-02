@@ -41,7 +41,7 @@
     "@animegarden/client": "^0.5.2",
     "@breadc/color": "^0.9.7",
     "@onekuma/map": "^0.1.10",
-    "bangumi-data": ">=0.3.184",
+    "bangumi-data": ">=0.3.185",
     "bgmc": "workspace:*",
     "bgmt": "workspace:*",
     "breadc": "^0.9.7",
