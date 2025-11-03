@@ -77,7 +77,7 @@
     "bgmc": "workspace:*",
     "bgmt": "workspace:*",
     "tmdbc": "workspace:*",
-    "type-fest": "^5.1.0"
+    "type-fest": "^5.2.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
