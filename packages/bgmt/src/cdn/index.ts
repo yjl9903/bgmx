@@ -1,5 +1,7 @@
 import type { BasicSubject, FullSubject } from '../types';
 
+export * from '../types';
+
 export interface CdnOptions {
   /**
    * bgmd version
@@ -16,8 +18,9 @@ export interface CdnOptions {
   baseURL?: string;
 }
 
-export async function fetchBasicSubjects(): Promise<BasicSubject[]> {
-  const resp = await fetch(`https://unpkg.com/bgmd@0/dist/index.json`);
+export async function fetchBasicSubjects(options: CdnOptions = {}): Promise<BasicSubject[]> {
+  const { version = '0', baseURL = 'https://unpkg.com' } = options;
+  const resp = await fetch(`${baseURL}/bgmd@${version}/dist/index.json`);
   if (!resp.ok) {
     throw new Error(`Fetch bgmd index.json failed`, { cause: resp });
   }
@@ -25,8 +28,9 @@ export async function fetchBasicSubjects(): Promise<BasicSubject[]> {
   return data.bangumis;
 }
 
-export async function fetchFullSubjects(): Promise<FullSubject[]> {
-  const resp = await fetch(`https://unpkg.com/bgmd@0/dist/full.json`);
+export async function fetchFullSubjects(options: CdnOptions = {}): Promise<FullSubject[]> {
+  const { version = '0', baseURL = 'https://unpkg.com' } = options;
+  const resp = await fetch(`${baseURL}/bgmd@${version}/dist/full.json`);
   if (!resp.ok) {
     throw new Error(`Fetch bgmd full.json failed`, { cause: resp });
   }
@@ -34,7 +38,7 @@ export async function fetchFullSubjects(): Promise<FullSubject[]> {
   return data.bangumis;
 }
 
-export async function fetchCalendarSubjects(): Promise<{
+export async function fetchCalendarSubjects(options: CdnOptions): Promise<{
   calendar: [
     BasicSubject[],
     BasicSubject[],
@@ -46,7 +50,8 @@ export async function fetchCalendarSubjects(): Promise<{
   ];
   web: BasicSubject[];
 }> {
-  const resp = await fetch(`https://unpkg.com/bgmd@0/dist/calendar.json`);
+  const { version = '0', baseURL = 'https://unpkg.com' } = options;
+  const resp = await fetch(`${baseURL}/bgmd@${version}/dist/calendar.json`);
   if (!resp.ok) {
     throw new Error(`Fetch bgmd calendar.json failed`, { cause: resp });
   }
