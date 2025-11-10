@@ -18,27 +18,33 @@ export interface CdnOptions {
   baseURL?: string;
 }
 
-export async function fetchBasicSubjects(options: CdnOptions = {}): Promise<BasicSubject[]> {
+export async function fetchBasicSubjects(
+  options: CdnOptions = {}
+): Promise<{ version: string; subjects: BasicSubject[] }> {
   const { version = '0', baseURL = 'https://unpkg.com' } = options;
   const resp = await fetch(`${baseURL}/bgmd@${version}/dist/index.json`);
   if (!resp.ok) {
     throw new Error(`Fetch bgmd index.json failed`, { cause: resp });
   }
   const data = (await resp.json()) as any;
-  return data.bangumis;
+  return data;
 }
 
-export async function fetchFullSubjects(options: CdnOptions = {}): Promise<FullSubject[]> {
+export async function fetchFullSubjects(options: CdnOptions = {}): Promise<{
+  version: string;
+  subjects: FullSubject[];
+}> {
   const { version = '0', baseURL = 'https://unpkg.com' } = options;
   const resp = await fetch(`${baseURL}/bgmd@${version}/dist/full.json`);
   if (!resp.ok) {
     throw new Error(`Fetch bgmd full.json failed`, { cause: resp });
   }
   const data = (await resp.json()) as any;
-  return data.bangumis;
+  return data;
 }
 
-export async function fetchCalendarSubjects(options: CdnOptions): Promise<{
+export async function fetchCalendarSubjects(options: CdnOptions = {}): Promise<{
+  version: string;
   calendar: [
     BasicSubject[],
     BasicSubject[],
@@ -56,5 +62,5 @@ export async function fetchCalendarSubjects(options: CdnOptions): Promise<{
     throw new Error(`Fetch bgmd calendar.json failed`, { cause: resp });
   }
   const data = (await resp.json()) as any;
-  return data.calendar;
+  return data;
 }
