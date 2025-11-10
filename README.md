@@ -46,7 +46,7 @@ If you don't want to download this large package, you can just use the following
 
 [![version](https://img.shields.io/npm/v/bgmt?label=bgmt)](https://www.npmjs.com/package/bgmt)
 
-Some shared bangumi helper functions.
+Shared bangumi helper functions used by [bgmx](https://github.com/yjl9903/bgmx).
 
 ```bash
 npm i bgmt

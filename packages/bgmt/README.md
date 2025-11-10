@@ -1,7 +1,9 @@
-# Bangumi Data Toolkit
+# bgmt
 
 [![version](https://img.shields.io/npm/v/bgmt?label=bgmt)](https://www.npmjs.com/package/bgmt)
 [![CI](https://github.com/yjl9903/bgmc/actions/workflows/ci.yml/badge.svg)](https://github.com/yjl9903/bgmc/actions/workflows/ci.yml)
+
+Shared bangumi helper functions used by [bgmx](https://github.com/yjl9903/bgmx).
 
 ## Installation
 
