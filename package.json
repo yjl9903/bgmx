@@ -47,7 +47,8 @@
       "release-it@16.2.1": "patches/release-it@16.2.1.patch"
     },
     "onlyBuiltDependencies": [
-      "esbuild"
+      "esbuild",
+      "workerd"
     ]
   }
 }

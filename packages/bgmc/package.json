@@ -21,22 +21,22 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
     "./data": {
       "types": "./dist/data.d.ts",
-      "import": "./dist/data.js",
+      "import": "./dist/data.mjs",
       "require": "./dist/data.cjs"
     },
     "./types": {
       "types": "./dist/types.d.ts",
-      "import": "./dist/types.js",
+      "import": "./dist/types.mjs",
       "require": "./dist/types.cjs"
     }
   },
   "main": "dist/index.cjs",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "typesVersions": {
     "*": {
