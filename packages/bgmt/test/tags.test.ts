@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { normalizeTags } from '../src/tags';
+import { normalizeTags } from '../src/utils/tags';
 
 describe('tags', () => {
   it.each([

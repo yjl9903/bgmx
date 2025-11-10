@@ -1,7 +1,9 @@
-export * from './tags';
+export * from './utils/tags';
 
-export * from './season';
+export * from './utils/season';
 
-export * from './title';
+export * from './utils/title';
 
-export * from './summary';
+export * from './utils/summary';
+
+export * from './types';

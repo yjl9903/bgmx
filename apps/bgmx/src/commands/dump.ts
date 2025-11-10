@@ -39,11 +39,12 @@ export async function dumpCalendar(
   file: string,
   calendar: CalendarSubject[][],
   web: CalendarSubject[],
-  options: { full?: boolean } = {}
+  options: { full?: boolean; version?: string } = {}
 ) {
   await writeFile(
     file,
     JSON.stringify({
+      version: options.version,
       calendar: calendar.map((r) => r.map((t) => transformCalendarSubject(t, options))),
       web: web.map((t) => transformCalendarSubject(t, options))
     }),

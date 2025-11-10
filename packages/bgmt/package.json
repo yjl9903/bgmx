@@ -23,6 +23,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./cdn": {
+      "types": "./dist/cdn.d.ts",
+      "import": "./dist/cdn.mjs",
+      "require": "./dist/cdn.cjs"
     }
   },
   "main": "dist/index.cjs",

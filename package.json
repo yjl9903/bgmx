@@ -10,7 +10,6 @@
     "dev": "turbo run dev --parallel",
     "format": "turbo run format --parallel",
     "release:bgmc": "pnpm -C packages/bgmc release",
-    "release:bgmd": "pnpm -C packages/bgmd release",
     "release:bgmt": "pnpm -C packages/bgmt release",
     "release:bgmx": "pnpm -C apps/bgmx release",
     "release:tmdbc": "pnpm -C packages/tmdbc release",

@@ -321,6 +321,7 @@ cli
 cli
   .command('calendar', '拉取当前周历数据')
   .option('--out <file>', '输出目标文件')
+  .option('--version <version>', '输出文件版本号')
   .option('--full', '输出完整 subject 条目')
   .action(async (options) => {
     const resp = await fetchCalendar({ baseURL: options.baseUrl });
@@ -328,7 +329,10 @@ cli
     printCalendar(resp.calendar, resp.web);
 
     if (options.out) {
-      await dumpCalendar(options.out, resp.calendar, resp.web, { full: options.full });
+      await dumpCalendar(options.out, resp.calendar, resp.web, {
+        full: options.full,
+        version: options.version
+      });
     }
   });
 
