@@ -29,7 +29,7 @@
     "prettier": "^3.6.2",
     "release-it": "^16.2.1",
     "rimraf": "^6.1.0",
-    "tsdown": "^0.16.1",
+    "tsdown": "^0.16.2",
     "tsx": "^4.20.6",
     "turbo": "^2.6.1",
     "typescript": "^5.9.3",
