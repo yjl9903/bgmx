@@ -65,11 +65,11 @@ importers:
   apps/bgmw:
     dependencies:
       '@hono/node-server':
-        specifier: 1.19.6
-        version: 1.19.6(hono@4.10.4)
+        specifier: 1.19.7
+        version: 1.19.7(hono@4.11.3)
       '@hono/zod-validator':
-        specifier: 0.7.4
-        version: 0.7.4(hono@4.10.4)(zod@4.1.12)
+        specifier: 0.7.6
+        version: 0.7.6(hono@4.11.3)(zod@4.1.12)
       bgmc:
         specifier: workspace:*
         version: link:../../packages/bgmc
@@ -83,8 +83,8 @@ importers:
         specifier: 0.44.7
         version: 0.44.7(@cloudflare/workers-types@4.20251111.0)
       hono:
-        specifier: 4.10.4
-        version: 4.10.4
+        specifier: 4.11.3
+        version: 4.11.3
       p-limit:
         specifier: 7.2.0
         version: 7.2.0
@@ -777,14 +777,14 @@ packages:
       '@exodus/crypto':
         optional: true
 
-  '@hono/node-server@1.19.6':
-    resolution: {integrity: sha512-Shz/KjlIeAhfiuE93NDKVdZ7HdBVLQAfdbaXEaoAVO3ic9ibRSLGIQGkcBbFyuLr+7/1D5ZCINM8B+6IvXeMtw==}
+  '@hono/node-server@1.19.7':
+    resolution: {integrity: sha512-vUcD0uauS7EU2caukW8z5lJKtoGMokxNbJtBiwHgpqxEXokaHCBkQUmCHhjFB1VUTWdqj25QoMkMKzgjq+uhrw==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
 
-  '@hono/zod-validator@0.7.4':
-    resolution: {integrity: sha512-biKGn3BRJVaftZlIPMyK+HCe/UHAjJ6sH0UyXe3+v0OcgVr9xfImDROTJFLtn9e3XEEAHGZIM9U6evu85abm8Q==}
+  '@hono/zod-validator@0.7.6':
+    resolution: {integrity: sha512-Io1B6d011Gj1KknV4rXYz4le5+5EubcWEU/speUjuw9XMMIaP3n78yXLhjd2A3PXaXaUwEAluOiAyLqhBEJgsw==}
     peerDependencies:
       hono: '>=3.9.0'
       zod: ^3.25.0 || ^4.0.0
@@ -2131,8 +2131,8 @@ packages:
     resolution: {integrity: sha512-vUptKVTpIJhcczKBbgnS+RtcuYMB8+oNzPK2/Hp3hanz8JmpATdmmgLgSaadVREkDm+e2giHwY3ZRkyjSIDDFA==}
     engines: {node: '>= 0.4'}
 
-  hono@4.10.4:
-    resolution: {integrity: sha512-YG/fo7zlU3KwrBL5vDpWKisLYiM+nVstBQqfr7gCPbSYURnNEP9BDxEMz8KfsDR9JX0lJWDRNc6nXX31v7ZEyg==}
+  hono@4.11.3:
+    resolution: {integrity: sha512-PmQi306+M/ct/m5s66Hrg+adPnkD5jiO6IjA7WhWw0gSBSo1EcRegwuI1deZ+wd5pzCGynCcn2DprnE4/yEV4w==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -3944,13 +3944,13 @@ snapshots:
 
   '@exodus/bytes@1.8.0': {}
 
-  '@hono/node-server@1.19.6(hono@4.10.4)':
+  '@hono/node-server@1.19.7(hono@4.11.3)':
     dependencies:
-      hono: 4.10.4
+      hono: 4.11.3
 
-  '@hono/zod-validator@0.7.4(hono@4.10.4)(zod@4.1.12)':
+  '@hono/zod-validator@0.7.6(hono@4.11.3)(zod@4.1.12)':
     dependencies:
-      hono: 4.10.4
+      hono: 4.11.3
       zod: 4.1.12
 
   '@iarna/toml@2.2.5': {}
@@ -5293,7 +5293,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.10.4: {}
+  hono@4.11.3: {}
 
   hookable@5.5.3: {}
 
