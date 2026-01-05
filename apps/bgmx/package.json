@@ -49,7 +49,7 @@
     "dotenv": "^17.2.3",
     "fastest-levenshtein": "^1.0.16",
     "fs-extra": "^11.3.2",
-    "jsdom": "^27.1.0",
+    "jsdom": "^27.4.0",
     "p-limit": "7.2.0",
     "rimraf": "^6.1.0",
     "tmdbc": "workspace:*",
