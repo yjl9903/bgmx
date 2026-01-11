@@ -70,14 +70,14 @@ cli
 
 cli
   .command('sync bangumi', '拉取并更新所有 bangumi 条目数据')
-  .option('--update', '是否更新数据, 默认值: true', { default: true })
+  .option('--update-server', '是否更新服务端数据, 默认值: true', { default: true })
   .option('--log <file>', '日志文件, 默认值: sync-bangumi.md')
   .option('--out-dir <directory>', '输出目录, 默认值: data/bangumi')
   .option('--concurrency <number>', '并发数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
   .option('--retry <number>', '重试次数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
   .action(async (options) => {
     const secret = options.secret ?? process.env.SECRET;
-    if (!secret && options.update) {
+    if (!secret && options.updateServer) {
       console.warn('未提供 API 密钥，将无法更新数据');
     }
 
@@ -116,7 +116,7 @@ cli
 
       executing.add(subject.id);
 
-      if (options.update && secret) {
+      if (options.updateServer && secret) {
         tasks.push(limit(() => doUpdate(subject.id)));
       } else {
         updated.set(subject.id, subject);
@@ -134,7 +134,7 @@ cli
 
           executing.add(+bgmId);
 
-          if (options.update && secret) {
+          if (options.updateServer && secret) {
             tasks.push(limit(() => doUpdate(+bgmId)));
           }
         }
@@ -199,7 +199,7 @@ cli
       await writeFile(logFile, content.join('\n'), 'utf-8');
     }
 
-    if (options.update) {
+    if (options.updateServer && secret) {
       console.info(`更新结束, 成功更新 ${updated.size} 条，失败 ${errors.size} 条`);
     } else {
       console.info(`成功拉取 ${updated.size} 条数据`);
@@ -208,28 +208,29 @@ cli
 
 cli
   .command('sync tmdb', '拉取并更新所有 tmdb 条目数据')
-  .option('--update', '是否更新数据, 默认值: true', { default: true })
+  .option('--update-server', '是否更新服务端数据, 默认值: true', { default: true })
   .option('--log <file>', '日志文件, 默认值: sync-tmdb.md')
   .option('--out-dir <directory>', '输出目录, 默认值: data/tmdb')
   .option('--concurrency <number>', '并发数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
   .option('--retry <number>', '重试次数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
   .action(async (options) => {
     const secret = options.secret ?? process.env.SECRET;
-    if (!secret && options.update) {
+    if (!secret && options.updateServer) {
       console.warn('未提供 API 密钥，将无法更新数据');
     }
   });
 
 cli
   .command('sync yuc', '拉取并更新 yuc.wiki 周历数据')
-  .option('--update', '是否更新数据, 默认值: true', { default: true })
+  .option('--update-server', '是否更新服务端数据, 默认值: true', { default: true })
   .option('--session <file>', `会话文件, 默认值: yuc-{year}-{month}.yaml`)
-  .option('--force', '强制更新数据, 默认值: false')
+  .option('--force-overwrite', '强制覆盖会话文件数据, 默认值: false')
   .option('--year <year>', '年份, 默认值: ' + new Date().getFullYear())
   .option('--month <month>', '月份, 可选值: 1, 4, 7, 10')
+  .option('--retry <number>', '重试次数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
   .action(async (options) => {
     const secret = options.secret ?? process.env.SECRET;
-    if (!secret && options.update) {
+    if (!secret && options.updateServer) {
       console.warn('未提供 API 密钥，将无法更新数据');
     }
 
@@ -237,7 +238,7 @@ cli
       year: options.year ? +options.year : undefined,
       month: options.month ? +options.month : undefined,
       session: options.session,
-      force: options.force
+      force: options.forceOverwrite
     });
 
     if (!data.valid) {
@@ -264,10 +265,10 @@ cli
               `${names[0]} -> ${subject.title} (id: ${subject.id}, ${subject.data.onair_date ?? '?'})`
             );
           } else {
-            console.error(`unknown subject ${item.id}`);
+            console.error(`未知 subject ${item.id}`);
           }
 
-          if (secret && options.update) {
+          if (secret && options.updateServer) {
             await fetchAndUpdateBangumiSubject(item.id, {
               baseURL: options.baseUrl,
               secret
@@ -312,7 +313,46 @@ cli
         weekday: null
       });
     }
-    if (secret && options.update) {
+
+    if (secret && options.updateServer) {
+      {
+        // 补齐未抓取过的 subject
+        const allSubjects = new Set<number>();
+        for await (const subject of fetchSubjects({
+          baseURL: options.baseUrl,
+          retry: options.retry
+        })) {
+          allSubjects.add(subject.id);
+        }
+        const missing = [];
+        for (let i = 0; i < data.calendar.length; i++) {
+          const row = data.calendar[i];
+          for (const item of row) {
+            if (item.id === -1) {
+              throw new Error(`存在位置 subject ${item.name}`);
+            }
+            if (!allSubjects.has(item.id)) {
+              missing.push(item.id);
+            }
+          }
+        }
+        for (let i = 0; i < data.web.length; i++) {
+          const item = data.web[i];
+          if (item.id === -1) {
+            throw new Error(`存在位置 subject ${item.name}`);
+          }
+          if (!allSubjects.has(item.id)) {
+            missing.push(item.id);
+          }
+        }
+        for (const id of missing) {
+          await fetchAndUpdateBangumiSubject(id, {
+            baseURL: options.baseUrl,
+            secret
+          });
+        }
+      }
+
       await updateCalendar(calendar, { baseURL: options.baseUrl, secret });
       consola.success('更新周历数据成功');
     }

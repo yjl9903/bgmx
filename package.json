@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260103.0",
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.10.4",
     "bangumi-data": ">=0.3.193",
     "bumpp": "latest",

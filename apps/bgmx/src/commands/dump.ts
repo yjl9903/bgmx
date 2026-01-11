@@ -43,11 +43,15 @@ export async function dumpCalendar(
 ) {
   await writeFile(
     file,
-    JSON.stringify({
-      version: options.version,
-      calendar: calendar.map((r) => r.map((t) => transformCalendarSubject(t, options))),
-      web: web.map((t) => transformCalendarSubject(t, options))
-    }),
+    JSON.stringify(
+      {
+        version: options.version,
+        calendar: calendar.map((r) => r.map((t) => transformCalendarSubject(t, options))),
+        web: web.map((t) => transformCalendarSubject(t, options))
+      },
+      null,
+      2
+    ),
     'utf-8'
   );
 }

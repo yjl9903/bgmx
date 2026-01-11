@@ -95,6 +95,7 @@ export async function updateCalendar(ctx: Context, calendarInput: CalendarInput[
 
     for (let i = 0; i < calendar.length; i += batchSize) {
       const chunk = calendar.slice(i, i + batchSize);
+
       await database
         .insert(calendarsSchema)
         .values(chunk)
