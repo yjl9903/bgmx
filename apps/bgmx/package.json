@@ -54,7 +54,7 @@
     "rimraf": "^6.1.2",
     "tmdbc": "workspace:*",
     "undici": "^7.18.2",
-    "yaml": "^2.8.1"
+    "yaml": "^2.8.2"
   },
   "devDependencies": {
     "@types/jsdom": "^27.0.0"
