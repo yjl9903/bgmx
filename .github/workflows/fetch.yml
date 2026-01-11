@@ -39,7 +39,7 @@ jobs:
       - name: Set Timezone
         run: sudo timedatectl set-timezone "Asia/Shanghai"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Prepare branch
         id: branch
@@ -66,7 +66,7 @@ jobs:
       - name: Set Timezone
         run: sudo timedatectl set-timezone "Asia/Shanghai"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.branch }}
 
@@ -149,7 +149,7 @@ jobs:
       - name: Set Timezone
         run: sudo timedatectl set-timezone "Asia/Shanghai"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.branch }}
 
@@ -231,7 +231,7 @@ jobs:
       - name: Set Timezone
         run: sudo timedatectl set-timezone "Asia/Shanghai"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.branch }}
 
@@ -320,7 +320,7 @@ jobs:
       - name: Set Timezone
         run: sudo timedatectl set-timezone "Asia/Shanghai"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.branch }}
           fetch-depth: 0
