@@ -20,7 +20,7 @@
     "postversion": "turbo run build"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260115.0",
+    "@cloudflare/workers-types": "^4.20260116.0",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.10.9",
     "bangumi-data": ">=0.3.195",
