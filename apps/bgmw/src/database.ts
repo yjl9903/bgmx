@@ -12,11 +12,6 @@ const createDatabase = (database: D1Database) =>
     logger: false
   });
 
-let cachedDb: Database | undefined;
-
 export const connectDatabase = async (database: D1Database) => {
-  if (!cachedDb) {
-    cachedDb = createDatabase(database);
-  }
-  return cachedDb;
+  return createDatabase(database);
 };
