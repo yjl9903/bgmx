@@ -51,6 +51,9 @@ export function printSubject(data: { subject: DatabaseSubject; revisions: Databa
   console.log(`${label('platform')}  ${subject.platform}`);
   console.log(`${label('date')}  ${subject.onair_date}`);
   console.log(`${label('rating')}  ${subject.rating.score} #${subject.rating.rank}`);
+  console.log(`${label('updated')}  ${formatDatetime(new Date(data.subject.updatedAt))}`);
+
+  console.log('');
 
   const include = data.subject.search.include;
   if (include.length > 0) {
@@ -67,7 +70,15 @@ export function printSubject(data: { subject: DatabaseSubject; revisions: Databa
     }
   }
 
-  console.log(`${label('updated')}  ${formatDatetime(new Date(data.subject.updatedAt))}`);
+  if (data.revisions.length > 0) {
+    console.log('');
+    console.log(`${label('revisions')}  x${data.revisions.length}`);
+    for (const revision of data.revisions) {
+      console.log(
+        `  - ${revision.id}: ${revision.detail.operation} ${revision.detail.path} ${revision.detail.value}`
+      );
+    }
+  }
 
   // console.log(subject);
 }

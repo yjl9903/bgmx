@@ -6,13 +6,14 @@ export function applyRevisions(sourceSubject: Subject, revisions: Revision[]) {
   let ok = true;
   const subject = sourceSubject;
   for (const revision of revisions) {
-    const path = getSubjectPathValue(subject, revision.detail.path);
-    if (!path.found) {
-      ok = false;
-      break;
-    }
     if (revision.detail.operation === 'set.add' || revision.detail.operation === 'set.delete') {
+      const path = getSubjectPathValue<string[]>(subject, revision.detail.path);
+      if (!path.found) {
+        ok = false;
+        break;
+      }
       const prev = path.get();
+      console.log('debug pre', prev);
       if (prev === undefined || prev === null) {
         if (revision.detail.operation === 'set.add') {
           path.set([...revision.detail.value]);
@@ -24,7 +25,13 @@ export function applyRevisions(sourceSubject: Subject, revisions: Revision[]) {
           path.set(prev.filter((item) => !(revision.detail.value as string[]).includes(item)));
         }
       }
+      console.log('debug post', subject, revision.detail);
     } else if (revision.detail.operation === 'field.set') {
+      const path = getSubjectPathValue<unknown>(subject, revision.detail.path);
+      if (!path.found) {
+        ok = false;
+        break;
+      }
       path.set(revision.detail.value);
     }
   }
@@ -32,7 +39,7 @@ export function applyRevisions(sourceSubject: Subject, revisions: Revision[]) {
   return { ok, subject };
 }
 
-function getSubjectPathValue(subject: Subject, path: string) {
+function getSubjectPathValue<T>(subject: Subject, path: string) {
   const pieces = path.split('.');
   if (pieces.length > 0) {
     if (pieces[0] === 'data') {
@@ -44,8 +51,8 @@ function getSubjectPathValue(subject: Subject, path: string) {
         return {
           found: true,
           // @ts-ignore
-          get: () => subject.search[pieces[1]],
-          set: (value: any) => {
+          get: () => subject.search[pieces[1]] as T,
+          set: (value: T) => {
             // @ts-ignore
             subject.search[pieces[1]] = value;
           }
@@ -53,5 +60,5 @@ function getSubjectPathValue(subject: Subject, path: string) {
       }
     }
   }
-  return { found: false, get: () => undefined, set: () => {} };
+  return { found: false, get: (): T | undefined => undefined, set: (_: T) => {} };
 }

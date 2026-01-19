@@ -22,17 +22,17 @@ import {
   printCalendar
 } from './commands';
 import {
-  type DatabaseBangumi,
   type DatabaseSubject,
   type CalendarInput,
   fetchAndUpdateBangumiSubject,
-  fetchBangumiSubjects,
   fetchSubject,
   fetchSubjects,
   fetchCalendar,
   updateCalendar
 } from './client';
 import { transformDatabaseSubject } from './transform';
+import { syncBangumi } from './commands/bangumi';
+import { createRevision } from './commands/revision';
 
 const cli = breadc('bgmx', { version })
   .option('--base-url <url>', 'API 地址, 默认值: https://bgm.animes.garden')
@@ -81,78 +81,7 @@ cli
       console.warn('未提供 API 密钥，将无法更新数据');
     }
 
-    const executing = new Set<number>();
-    const updated = new Map<number, DatabaseBangumi>();
-    const unknown: typeof bangumiData.items = [];
-    const errors = new Map<number, any>();
-
-    const limit = pLimit(options.concurrency);
-    const tasks: Promise<DatabaseBangumi | undefined>[] = [];
-
-    const doUpdate = async (bgmId: number) => {
-      try {
-        const resp = await fetchAndUpdateBangumiSubject(bgmId, {
-          baseURL: options.baseUrl,
-          secret
-        });
-
-        updated.set(bgmId, resp);
-        errors.delete(bgmId);
-
-        return resp;
-      } catch (error) {
-        console.error(`更新 ${bgmId} 失败:`, error);
-
-        executing.delete(bgmId);
-        errors.set(bgmId, error);
-
-        return undefined;
-      }
-    };
-
-    // 1. 更新服务端的所有 bangumi 条目
-    for await (const subject of fetchBangumiSubjects({ baseURL: options.baseUrl })) {
-      console.info(`${getSubjectDisplayName(subject.data)} (id: ${subject.id})`);
-
-      executing.add(subject.id);
-
-      if (options.updateServer && secret) {
-        tasks.push(limit(() => doUpdate(subject.id)));
-      } else {
-        updated.set(subject.id, subject);
-      }
-    }
-
-    await Promise.all(tasks);
-
-    // 2. 更新 bangumi-data 出现的条目
-    for (const item of bangumiData.items) {
-      const bgmId = item.sites.find((site) => site.site === 'bangumi')?.id;
-      if (bgmId) {
-        if (!executing.has(+bgmId)) {
-          console.info(`${item.title} (id: ${bgmId})`);
-
-          executing.add(+bgmId);
-
-          if (options.updateServer && secret) {
-            tasks.push(limit(() => doUpdate(+bgmId)));
-          }
-        }
-      } else {
-        console.error(`缺失 bangumi 信息:`, item.title);
-        unknown.push(item);
-      }
-    }
-
-    await Promise.all(tasks);
-
-    // 3. 重试
-    for (let turn = 0; turn < options.retry && errors.size > 0; turn++) {
-      for (const bgmId of errors.keys()) {
-        tasks.push(limit(() => doUpdate(bgmId)));
-      }
-      await Promise.all(tasks);
-    }
+    const { updated, unknown, errors } = await syncBangumi({ ...options, secret });
 
     // 4. 数据持久化
     const bangumis = [...updated.values()];
@@ -376,10 +305,10 @@ cli
     }
   });
 
-cli.command('subject <id>', '查询 bgmx 条目').action(async (id, options) => {
+cli.command('subject <subject_id>', '查询 bgmx 条目').action(async (subjectId, options) => {
   const secret = options.secret ?? process.env.SECRET;
 
-  const resp = await fetchSubject(+id, {
+  const resp = await fetchSubject(+subjectId, {
     baseURL: options.baseUrl,
     secret
   });
@@ -389,7 +318,25 @@ cli.command('subject <id>', '查询 bgmx 条目').action(async (id, options) => 
 
 cli
   .command('subject revision <subject_id>', '创建 bgmx 条目的修订')
-  .action((subjectId, options) => {});
+  .action(async (subjectId, options) => {
+    const secret = options.secret ?? process.env.SECRET;
+
+    const resp = await fetchSubject(+subjectId, {
+      baseURL: options.baseUrl,
+      secret
+    });
+
+    if (resp) {
+      const updated = await createRevision(resp.subject, {
+        baseURL: options.baseUrl,
+        secret
+      });
+
+      if (updated) {
+        printSubject(resp);
+      }
+    }
+  });
 
 cli
   .command('subject revision disable <subject_id> <revision_id>', '禁用某个 bgmx 条目的修订')
