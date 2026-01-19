@@ -34,4 +34,7 @@ export type SubjectImage = {
 export type SubjectSearch = {
   include: string[];
   exclude?: string[];
+  keywords?: string[];
+  after?: Date;
+  before?: Date;
 };

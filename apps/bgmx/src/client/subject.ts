@@ -1,13 +1,71 @@
-import type { FetchOptions, DatabaseSubject, CalendarInput, CalendarSubject } from './types';
+import type {
+  FetchOptions,
+  DatabaseSubject,
+  CalendarInput,
+  CalendarSubject,
+  RevisionDetail,
+  DatabaseRevision
+} from './types';
 
 import { fetchAPI } from './base';
 
-export async function fetchSubject(bgmId: number, options: FetchOptions): Promise<DatabaseSubject> {
-  const resp = await fetchAPI<any>(`/subject/${bgmId}`, {}, options);
+export async function fetchSubject(
+  subjectId: number,
+  options: FetchOptions
+): Promise<{ subject: DatabaseSubject; revisions: DatabaseRevision[] }> {
+  const resp = await fetchAPI<any>(`/subject/${subjectId}`, {}, options);
   if (resp.ok) {
     return resp.data;
   }
   throw new Error(`Fetch subject failed`, { cause: resp });
+}
+
+export async function createRevision(
+  subjectId: number,
+  detail: RevisionDetail,
+  options: FetchOptions
+): Promise<{ subject: DatabaseSubject; revisions: DatabaseRevision[] }> {
+  const resp = await fetchAPI<any>(
+    `/subject/${subjectId}/revision`,
+    { method: 'POST', body: JSON.stringify({ detail }) },
+    options
+  );
+  if (resp.ok) {
+    return resp.data;
+  }
+  throw new Error(`Create subject revision failed`, { cause: resp });
+}
+
+export async function enableRevision(
+  subjectId: number,
+  revisionId: number,
+  options: FetchOptions
+): Promise<{ subject: DatabaseSubject; revisions: DatabaseRevision[] }> {
+  const resp = await fetchAPI<any>(
+    `/subject/${subjectId}/revision/${revisionId}`,
+    { method: 'PUT' },
+    options
+  );
+  if (resp.ok) {
+    return resp.data;
+  }
+  throw new Error(`Create subject revision failed`, { cause: resp });
+}
+
+export async function disableRevision(
+  subjectId: number,
+  revisionId: number,
+  options: FetchOptions
+): Promise<{ subject: DatabaseSubject; revisions: DatabaseRevision[] }> {
+  const resp = await fetchAPI<any>(
+    `/subject/${subjectId}/revision/${revisionId}`,
+    { method: 'DELETE' },
+    options
+  );
+  if (resp.ok) {
+    return resp.data;
+  }
+  throw new Error(`Create subject revision failed`, { cause: resp });
 }
 
 export async function* fetchSubjects(options: FetchOptions = {}): AsyncGenerator<DatabaseSubject> {

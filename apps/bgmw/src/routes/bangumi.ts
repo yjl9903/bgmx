@@ -16,12 +16,10 @@ const router = new Hono<AppEnv>();
 
 // 查询 bangumi calendar
 router.get('/bangumi/calendar', async (c) => {
-  const timestamp = new Date();
   const calendar = await client.calendar();
 
   return c.json({
     ok: true,
-    timestamp,
     data: calendar
   });
 });
@@ -31,7 +29,6 @@ router.get(
   '/bangumi/subject/:id',
   zValidator('param', z.object({ id: z.coerce.number().gt(0) })),
   async (c) => {
-    const timestamp = new Date();
     const requestId = c.get('requestId');
     const subjectId = c.req.valid('param').id;
 
@@ -41,7 +38,6 @@ router.get(
       return c.json(
         {
           ok: true,
-          timestamp,
           data
         },
         200
@@ -51,7 +47,6 @@ router.get(
         return c.json(
           {
             ok: false,
-            timestamp,
             error: 'Subject not found'
           },
           404
@@ -66,7 +61,6 @@ router.get(
       return c.json(
         {
           ok: false,
-          timestamp,
           error: 'Failed to fetch subject'
         },
         502
@@ -100,7 +94,6 @@ router.get(
     })
   ),
   async (c) => {
-    const timestamp = new Date();
     const requestId = c.get('requestId');
 
     try {
@@ -121,7 +114,6 @@ router.get(
       return c.json(
         {
           ok: true,
-          timestamp,
           data,
           nextCursor
         },
@@ -133,7 +125,6 @@ router.get(
       return c.json(
         {
           ok: false,
-          timestamp,
           error: 'Failed to fetch bangumi list'
         },
         502

@@ -5,6 +5,11 @@ export type {
   CalendarSubject
 } from '../../../bgmw/src/schema/subject';
 
+export type {
+  Revision as DatabaseRevision,
+  RevisionDetail
+} from '../../../bgmw/src/schema/revision';
+
 export type FetchOptions = {
   /**
    * Fetch method

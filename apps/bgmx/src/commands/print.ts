@@ -2,7 +2,12 @@ import { bold } from '@breadc/color';
 
 import { getSubjectAlias } from 'bgmt';
 
-import type { CalendarSubject, DatabaseBangumi, DatabaseSubject } from '../client';
+import type {
+  CalendarSubject,
+  DatabaseBangumi,
+  DatabaseRevision,
+  DatabaseSubject
+} from '../client';
 
 import { formatDatetime } from '../utils';
 
@@ -34,8 +39,8 @@ export function printBangumiSubject(bangumi: DatabaseBangumi) {
   // console.log(subject);
 }
 
-export function printSubject(data: DatabaseSubject) {
-  const subject = data.data;
+export function printSubject(data: { subject: DatabaseSubject; revisions: DatabaseRevision[] }) {
+  const subject = data.subject.data;
 
   const label = (str: string) => {
     return bold(str.padStart(10, ' '));
@@ -47,14 +52,14 @@ export function printSubject(data: DatabaseSubject) {
   console.log(`${label('date')}  ${subject.onair_date}`);
   console.log(`${label('rating')}  ${subject.rating.score} #${subject.rating.rank}`);
 
-  const include = data.search.include;
+  const include = data.subject.search.include;
   if (include.length > 0) {
     console.log(`${label('include')}  ${include[0]}`);
     for (const a of include.slice(1)) {
       console.log(`${label('')}  ${a}`);
     }
   }
-  const exclude = data.search.exclude;
+  const exclude = data.subject.search.exclude;
   if (exclude && exclude.length > 0) {
     console.log(`${label('exclude')}  ${exclude[0]}`);
     for (const a of exclude.slice(1)) {
@@ -62,7 +67,7 @@ export function printSubject(data: DatabaseSubject) {
     }
   }
 
-  console.log(`${label('updated')}  ${formatDatetime(new Date(data.updatedAt))}`);
+  console.log(`${label('updated')}  ${formatDatetime(new Date(data.subject.updatedAt))}`);
 
   // console.log(subject);
 }

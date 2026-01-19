@@ -387,23 +387,40 @@ cli.command('subject <id>', '查询 bgmx 条目').action(async (id, options) => 
   printSubject(resp);
 });
 
-cli.command('garden <id>', '查询条目对应的 AnimeGarden 资源').action(async (id, options) => {
-  const secret = options.secret ?? process.env.SECRET;
+cli
+  .command('subject revision <subject_id>', '创建 bgmx 条目的修订')
+  .action((subjectId, options) => {});
 
-  const subject = await fetchSubject(+id, {
-    baseURL: options.baseUrl,
-    secret
+cli
+  .command('subject revision disable <subject_id> <revision_id>', '禁用某个 bgmx 条目的修订')
+  .action((subjectId, revisionId, options) => {});
+
+cli
+  .command('subject revision enable <subject_id> <revision_id>', '启用某个 bgmx 条目的修订')
+  .action((subjectId, revisionId, options) => {});
+
+cli
+  .command('garden <subject_id>', '查询条目对应的 AnimeGarden 资源')
+  .action(async (subjectId, options) => {
+    const secret = options.secret ?? process.env.SECRET;
+
+    const { subject } = await fetchSubject(+subjectId, {
+      baseURL: options.baseUrl,
+      secret
+    });
+
+    const resp = await fetchResources({
+      include: subject.search.include,
+      exclude: subject.search.exclude,
+      keywords: subject.search.keywords,
+      after: subject.search.after,
+      before: subject.search.before
+    });
+
+    for (const resource of resp.resources) {
+      console.log(`${resource.title} ${formatDatetime(resource.createdAt)}`);
+    }
   });
-
-  const resp = await fetchResources({
-    include: subject.search.include,
-    exclude: subject.search.exclude
-  });
-
-  for (const resource of resp.resources) {
-    console.log(`${resource.title} ${formatDatetime(resource.createdAt)}`);
-  }
-});
 
 cli.command('bangumi subject <id>', '查询并更新 bangumi 条目').action(async (id, options) => {
   const secret = options.secret ?? process.env.SECRET;

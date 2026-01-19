@@ -1,11 +1,22 @@
 import { z } from 'zod';
 import { Hono } from 'hono';
-import { asc, gt, eq } from 'drizzle-orm';
 
 import type { AppEnv } from '../env';
 
-import { updateCalendar } from '../subject';
-import { type CalendarSubject, calendars, subjects } from '../schema';
+import {
+  createSubjectRevision,
+  disableSubjectRevision,
+  enableSubjectRevision,
+  fetchActiveCalendarRows,
+  fetchBangumiById,
+  fetchSubjectById,
+  fetchSubjectRevision,
+  fetchSubjectRevisions,
+  fetchSubjectsAfterCursor,
+  updateCalendar,
+  updateSubject
+} from '../subject/database';
+import { type CalendarSubject } from '../schema';
 
 import { zValidator } from './middlewares/zod';
 import { authorization } from './middlewares/auth';
@@ -17,21 +28,17 @@ router.get(
   '/subject/:id',
   zValidator('param', z.object({ id: z.coerce.number().int().gt(0) })),
   async (c) => {
-    const timestamp = new Date();
     const requestId = c.get('requestId');
     const subjectId = c.req.valid('param').id;
 
     try {
-      const database = c.get('database');
-      const subject = await database.query.subjects.findFirst({
-        where: (table, { eq }) => eq(table.id, subjectId)
-      });
+      const subject = await fetchSubjectById(c, subjectId);
+      const revisions = await fetchSubjectRevisions(c, subjectId);
 
       if (!subject) {
         return c.json(
           {
             ok: false,
-            timestamp,
             error: 'Subject not found'
           },
           404
@@ -41,8 +48,10 @@ router.get(
       return c.json(
         {
           ok: true,
-          timestamp,
-          data: subject
+          data: {
+            revisions,
+            subject
+          }
         },
         200
       );
@@ -55,8 +64,236 @@ router.get(
       return c.json(
         {
           ok: false,
-          timestamp,
           error: 'Failed to fetch subject'
+        },
+        500
+      );
+    }
+  }
+);
+
+// 创建 revision 更新单个 subject
+router.post(
+  '/subject/:id/revision',
+  authorization,
+  zValidator('param', z.object({ id: z.coerce.number().int().gt(0) })),
+  zValidator(
+    'json',
+    z.object({
+      detail: z.discriminatedUnion('operation', [
+        z.object({
+          operation: z.literal('set.add'),
+          path: z.string().min(1),
+          value: z.array(z.string())
+        }),
+        z.object({
+          operation: z.literal('set.delete'),
+          path: z.string().min(1),
+          value: z.array(z.string())
+        }),
+        z.object({
+          operation: z.literal('field.set'),
+          path: z.string().min(1),
+          value: z.unknown()
+        })
+      ])
+    })
+  ),
+  async (c) => {
+    const requestId = c.get('requestId');
+    const subjectId = c.req.valid('param').id;
+    const { detail } = c.req.valid('json');
+
+    try {
+      const bangumi = await fetchBangumiById(c, subjectId);
+
+      if (!bangumi) {
+        return c.json(
+          {
+            ok: false,
+            error: 'Subject not found'
+          },
+          404
+        );
+      }
+
+      const revision = await createSubjectRevision(c, subjectId, detail);
+
+      if (!revision) {
+        return c.json(
+          {
+            ok: false,
+            error: 'Failed to create revision'
+          },
+          500
+        );
+      }
+
+      const revisions = await fetchSubjectRevisions(c, subjectId);
+      const updated = await updateSubject(c, bangumi, revisions);
+
+      return c.json(
+        {
+          ok: true,
+          data: {
+            revisions,
+            subject: updated.data
+          }
+        },
+        200
+      );
+    } catch (error) {
+      console.error('[bgmw] failed to create revision', error, {
+        requestId,
+        subjectId
+      });
+
+      return c.json(
+        {
+          ok: false,
+          error: 'Failed to create revision'
+        },
+        500
+      );
+    }
+  }
+);
+
+// 禁用该 subject 下的某一条 revision
+router.delete(
+  '/subject/:id/revision/:rid',
+  authorization,
+  zValidator(
+    'param',
+    z.object({ id: z.coerce.number().int().gt(0), rid: z.coerce.number().int().gte(0) })
+  ),
+  async (c) => {
+    const requestId = c.get('requestId');
+    const subjectId = c.req.valid('param').id;
+    const revisionId = c.req.valid('param').rid;
+
+    try {
+      const bangumi = await fetchBangumiById(c, subjectId);
+
+      if (!bangumi) {
+        return c.json(
+          {
+            ok: false,
+            error: 'Subject not found'
+          },
+          404
+        );
+      }
+
+      const revision = await fetchSubjectRevision(c, subjectId, revisionId);
+
+      if (!revision) {
+        return c.json(
+          {
+            ok: false,
+            error: 'Revision not found'
+          },
+          404
+        );
+      }
+
+      await disableSubjectRevision(c, subjectId, revisionId);
+
+      const revisions = await fetchSubjectRevisions(c, subjectId);
+      const updated = await updateSubject(c, bangumi, revisions);
+
+      return c.json(
+        {
+          ok: true,
+          data: {
+            revisions,
+            subject: updated.data
+          }
+        },
+        200
+      );
+    } catch (error) {
+      console.error('[bgmw] failed to disable revision', error, {
+        requestId,
+        subjectId,
+        revisionId
+      });
+
+      return c.json(
+        {
+          ok: false,
+          error: 'Failed to disable revision'
+        },
+        500
+      );
+    }
+  }
+);
+
+// 启用该 subject 下的某一条 revision
+router.put(
+  '/subject/:id/revision/:rid',
+  authorization,
+  zValidator(
+    'param',
+    z.object({ id: z.coerce.number().int().gt(0), rid: z.coerce.number().int().gte(0) })
+  ),
+  async (c) => {
+    const requestId = c.get('requestId');
+    const subjectId = c.req.valid('param').id;
+    const revisionId = c.req.valid('param').rid;
+
+    try {
+      const bangumi = await fetchBangumiById(c, subjectId);
+
+      if (!bangumi) {
+        return c.json(
+          {
+            ok: false,
+            error: 'Subject not found'
+          },
+          404
+        );
+      }
+
+      const revision = await fetchSubjectRevision(c, subjectId, revisionId);
+
+      if (!revision) {
+        return c.json(
+          {
+            ok: false,
+            error: 'Revision not found'
+          },
+          404
+        );
+      }
+
+      await enableSubjectRevision(c, subjectId, revisionId);
+
+      const revisions = await fetchSubjectRevisions(c, subjectId);
+      const updated = await updateSubject(c, bangumi, revisions);
+
+      return c.json(
+        {
+          ok: true,
+          data: {
+            revisions,
+            subject: updated.data
+          }
+        },
+        200
+      );
+    } catch (error) {
+      console.error('[bgmw] failed to enable revision', error, {
+        requestId,
+        subjectId,
+        revisionId
+      });
+
+      return c.json(
+        {
+          ok: false,
+          error: 'Failed to disable revision'
         },
         500
       );
@@ -75,19 +312,12 @@ router.get(
     })
   ),
   async (c) => {
-    const timestamp = new Date();
     const requestId = c.get('requestId');
 
     try {
       const { cursor, limit } = c.req.valid('query');
 
-      const database = c.get('database');
-      const data = await database
-        .select()
-        .from(subjects)
-        .where(gt(subjects.id, cursor))
-        .orderBy(asc(subjects.id))
-        .limit(limit);
+      const data = await fetchSubjectsAfterCursor(c, cursor, limit);
 
       const nextCursor =
         data.length === limit && data.length > 0 ? (data[data.length - 1]?.id ?? null) : null;
@@ -95,7 +325,6 @@ router.get(
       return c.json(
         {
           ok: true,
-          timestamp,
           data,
           nextCursor
         },
@@ -107,7 +336,6 @@ router.get(
       return c.json(
         {
           ok: false,
-          timestamp,
           error: 'Failed to fetch subject list'
         },
         500
@@ -118,17 +346,10 @@ router.get(
 
 // 查询 calendar
 router.get('/calendar', async (c) => {
-  const timestamp = new Date();
   const requestId = c.get('requestId');
-  const database = c.get('database');
 
   try {
-    const resp = await database
-      .select()
-      .from(calendars)
-      .where(eq(calendars.isActive, true))
-      .innerJoin(subjects, eq(calendars.id, subjects.id))
-      .orderBy(asc(calendars.id));
+    const resp = await fetchActiveCalendarRows(c);
 
     const calendar: CalendarSubject[][] = [[], [], [], [], [], [], []];
     const web: CalendarSubject[] = [];
@@ -148,7 +369,6 @@ router.get('/calendar', async (c) => {
 
     return c.json({
       ok: true,
-      timestamp,
       data: {
         calendar,
         web
@@ -160,7 +380,6 @@ router.get('/calendar', async (c) => {
     return c.json(
       {
         ok: false,
-        timestamp,
         error: 'Failed to fetch calendar'
       },
       500
@@ -185,7 +404,6 @@ router.post(
     })
   ),
   async (c) => {
-    const timestamp = new Date();
     const requestId = c.get('requestId');
 
     try {
@@ -195,7 +413,6 @@ router.post(
         return c.json(
           {
             ok: true,
-            timestamp,
             data: resp.data
           },
           200
@@ -204,7 +421,6 @@ router.post(
         return c.json(
           {
             ok: false,
-            timestamp,
             error: resp.error?.message ?? 'Unknown error'
           },
           500
@@ -216,7 +432,6 @@ router.post(
       return c.json(
         {
           ok: false,
-          timestamp,
           error: 'Failed to update calendar'
         },
         500

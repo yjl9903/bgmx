@@ -8,7 +8,7 @@ router.get('/health', (c) => {
   return c.json(
     {
       ok: true,
-      timestamp: new Date()
+      message: 'bgmx'
     },
     200
   );

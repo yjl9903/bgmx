@@ -11,6 +11,7 @@ export type ServiceBindings = {
 
 export type AppVariables = {
   requestId: string;
+  responseTimestamp: Date;
   database: Database;
 };
 

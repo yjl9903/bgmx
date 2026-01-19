@@ -14,6 +14,7 @@ export const createApp = () => {
   app.use('*', logger());
 
   app.use('*', async (c, next) => {
+    const responseTimestamp = new Date();
     const requestId = crypto.randomUUID();
     c.set('requestId', requestId);
 
@@ -23,6 +24,7 @@ export const createApp = () => {
     await next();
 
     c.res.headers.set('X-Request-Id', requestId);
+    c.res.headers.set('X-Response-Timestamp', responseTimestamp.toISOString());
   });
 
   app.route('/', healthRoute);

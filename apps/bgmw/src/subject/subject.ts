@@ -40,7 +40,8 @@ export function createDatabaseSubject(bangumi: DatabaseBangumi, revisions: Revis
     },
     updatedAt: new Date()
   };
-  return applyRevisions(subject, revisions);
+
+  return applyRevisions(subject, revisions).subject;
 }
 
 function getSubjectImages(bangumi: DatabaseBangumi): SubjectImage[] {
