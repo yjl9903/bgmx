@@ -13,7 +13,7 @@ export function applyRevisions(sourceSubject: Subject, revisions: Revision[]) {
         break;
       }
       const prev = path.get();
-      console.log('debug pre', prev);
+      console.log('debug pre', subject, { target: path.get() });
       if (prev === undefined || prev === null) {
         if (revision.detail.operation === 'set.add') {
           path.set([...revision.detail.value]);

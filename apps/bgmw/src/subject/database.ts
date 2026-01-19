@@ -63,34 +63,57 @@ export async function createSubjectRevision(
   detail: RevisionDetail
 ) {
   const database = ctx.get('database');
-  const created = await database
-    .insert(revisionsSchema)
-    .values({
-      targetId: subjectId,
-      enabled: true,
-      detail
-    })
-    .returning();
 
-  return created[0];
+  const [, revisions] = await database.batch([
+    database
+      .insert(revisionsSchema)
+      .values({
+        targetId: subjectId,
+        enabled: true,
+        detail
+      })
+      .returning(),
+    database.query.revisions.findMany({
+      where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.targetId, subjectId)),
+      orderBy: (table, { asc }) => asc(table.id)
+    })
+  ]);
+
+  return revisions;
 }
 
 export async function enableSubjectRevision(ctx: Context, subjectId: number, revisionId: number) {
   const database = ctx.get('database');
 
-  await database
-    .update(revisionsSchema)
-    .set({ enabled: true })
-    .where(and(eq(revisionsSchema.id, revisionId), eq(revisionsSchema.targetId, subjectId)));
+  const [, revisions] = await database.batch([
+    database
+      .update(revisionsSchema)
+      .set({ enabled: true })
+      .where(and(eq(revisionsSchema.id, revisionId), eq(revisionsSchema.targetId, subjectId))),
+    database.query.revisions.findMany({
+      where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.targetId, subjectId)),
+      orderBy: (table, { asc }) => asc(table.id)
+    })
+  ]);
+
+  return revisions;
 }
 
 export async function disableSubjectRevision(ctx: Context, subjectId: number, revisionId: number) {
   const database = ctx.get('database');
 
-  await database
-    .update(revisionsSchema)
-    .set({ enabled: false })
-    .where(and(eq(revisionsSchema.id, revisionId), eq(revisionsSchema.targetId, subjectId)));
+  const [, revisions] = await database.batch([
+    database
+      .update(revisionsSchema)
+      .set({ enabled: false })
+      .where(and(eq(revisionsSchema.id, revisionId), eq(revisionsSchema.targetId, subjectId))),
+    database.query.revisions.findMany({
+      where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.targetId, subjectId)),
+      orderBy: (table, { asc }) => asc(table.id)
+    })
+  ]);
+
+  return revisions;
 }
 
 export async function fetchSubjectsAfterCursor(ctx: Context, cursor: number, limit: number) {

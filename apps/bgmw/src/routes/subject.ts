@@ -118,19 +118,7 @@ router.post(
         );
       }
 
-      const revision = await createSubjectRevision(c, subjectId, detail);
-
-      if (!revision) {
-        return c.json(
-          {
-            ok: false,
-            error: 'Failed to create revision'
-          },
-          500
-        );
-      }
-
-      const revisions = await fetchSubjectRevisions(c, subjectId);
+      const revisions = await createSubjectRevision(c, subjectId, detail);
       const updated = await updateSubject(c, bangumi, revisions);
 
       return c.json(
@@ -238,9 +226,7 @@ router.delete(
         );
       }
 
-      await disableSubjectRevision(c, subjectId, revisionId);
-
-      const revisions = await fetchSubjectRevisions(c, subjectId);
+      const revisions = await disableSubjectRevision(c, subjectId, revisionId);
       const updated = await updateSubject(c, bangumi, revisions);
 
       return c.json(
@@ -296,9 +282,7 @@ router.put(
         );
       }
 
-      await enableSubjectRevision(c, subjectId, revisionId);
-
-      const revisions = await fetchSubjectRevisions(c, subjectId);
+      const revisions = await enableSubjectRevision(c, subjectId, revisionId);
       const updated = await updateSubject(c, bangumi, revisions);
 
       return c.json(
