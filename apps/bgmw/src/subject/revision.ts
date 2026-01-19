@@ -13,7 +13,6 @@ export function applyRevisions(sourceSubject: Subject, revisions: Revision[]) {
         break;
       }
       const prev = path.get();
-      console.log('debug pre', subject, { target: path.get() });
       if (prev === undefined || prev === null) {
         if (revision.detail.operation === 'set.add') {
           path.set([...revision.detail.value]);
@@ -25,7 +24,6 @@ export function applyRevisions(sourceSubject: Subject, revisions: Revision[]) {
           path.set(prev.filter((item) => !(revision.detail.value as string[]).includes(item)));
         }
       }
-      console.log('debug post', subject, revision.detail);
     } else if (revision.detail.operation === 'field.set') {
       const path = getSubjectPathValue<unknown>(subject, revision.detail.path);
       if (!path.found) {

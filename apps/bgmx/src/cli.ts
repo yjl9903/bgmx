@@ -336,7 +336,7 @@ cli
       });
 
       if (updated) {
-        printSubject(resp);
+        printSubject(updated);
       }
     }
   });
@@ -373,7 +373,7 @@ cli
       });
 
       if (updated) {
-        printSubject(resp);
+        printSubject(updated);
       }
     }
   });
@@ -395,7 +395,7 @@ cli
       });
 
       if (updated) {
-        printSubject(resp);
+        printSubject(updated);
       }
     }
   });
