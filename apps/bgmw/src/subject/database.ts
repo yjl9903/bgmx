@@ -30,6 +30,15 @@ export async function fetchBangumiById(ctx: Context, subjectId: number) {
   });
 }
 
+export async function fetchSubjectAllRevisions(ctx: Context, subjectId: number) {
+  const database = ctx.get('database');
+
+  return database.query.revisions.findMany({
+    where: (table, { and, eq }) => and(eq(table.targetId, subjectId)),
+    orderBy: (table, { asc }) => asc(table.id)
+  });
+}
+
 export async function fetchSubjectRevisions(ctx: Context, subjectId: number) {
   const database = ctx.get('database');
 

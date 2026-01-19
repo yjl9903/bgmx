@@ -20,6 +20,17 @@ export async function fetchSubject(
   throw new Error(`Fetch subject failed`, { cause: resp });
 }
 
+export async function fetchRevisions(
+  subjectId: number,
+  options?: FetchOptions
+): Promise<{ subject: DatabaseSubject; revisions: DatabaseRevision[] }> {
+  const resp = await fetchAPI<any>(`/subject/${subjectId}/revisions`, {}, options);
+  if (resp.ok) {
+    return resp.data;
+  }
+  throw new Error(`Fetch subject failed`, { cause: resp });
+}
+
 export async function createRevision(
   subjectId: number,
   detail: RevisionDetail,

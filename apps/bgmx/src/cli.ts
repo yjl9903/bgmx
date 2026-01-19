@@ -28,7 +28,10 @@ import {
   fetchSubject,
   fetchSubjects,
   fetchCalendar,
-  updateCalendar
+  updateCalendar,
+  enableRevision,
+  disableRevision,
+  fetchRevisions
 } from './client';
 import { transformDatabaseSubject } from './transform';
 import { syncBangumi } from './commands/bangumi';
@@ -339,12 +342,63 @@ cli
   });
 
 cli
+  .command('subject revision list <subject_id>', '创建 bgmx 条目的修订')
+  .action(async (subjectId, options) => {
+    const secret = options.secret ?? process.env.SECRET;
+
+    const resp = await fetchRevisions(+subjectId, {
+      baseURL: options.baseUrl,
+      secret
+    });
+
+    if (resp) {
+      printSubject(resp);
+    }
+  });
+
+cli
   .command('subject revision disable <subject_id> <revision_id>', '禁用某个 bgmx 条目的修订')
-  .action((subjectId, revisionId, options) => {});
+  .action(async (subjectId, revisionId, options) => {
+    const secret = options.secret ?? process.env.SECRET;
+
+    const resp = await fetchSubject(+subjectId, {
+      baseURL: options.baseUrl,
+      secret
+    });
+
+    if (resp) {
+      const updated = await disableRevision(+subjectId, +revisionId, {
+        baseURL: options.baseUrl,
+        secret
+      });
+
+      if (updated) {
+        printSubject(resp);
+      }
+    }
+  });
 
 cli
   .command('subject revision enable <subject_id> <revision_id>', '启用某个 bgmx 条目的修订')
-  .action((subjectId, revisionId, options) => {});
+  .action(async (subjectId, revisionId, options) => {
+    const secret = options.secret ?? process.env.SECRET;
+
+    const resp = await fetchSubject(+subjectId, {
+      baseURL: options.baseUrl,
+      secret
+    });
+
+    if (resp) {
+      const updated = await enableRevision(+subjectId, +revisionId, {
+        baseURL: options.baseUrl,
+        secret
+      });
+
+      if (updated) {
+        printSubject(resp);
+      }
+    }
+  });
 
 cli
   .command('garden <subject_id>', '查询条目对应的 AnimeGarden 资源')

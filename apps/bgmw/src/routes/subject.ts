@@ -9,6 +9,7 @@ import {
   enableSubjectRevision,
   fetchActiveCalendarRows,
   fetchBangumiById,
+  fetchSubjectAllRevisions,
   fetchSubjectById,
   fetchSubjectRevision,
   fetchSubjectRevisions,
@@ -159,6 +160,58 @@ router.post(
   }
 );
 
+// 获取 subject 的所有 revisions
+router.get(
+  '/subject/:id/revisions',
+  authorization,
+  zValidator('param', z.object({ id: z.coerce.number().int().gt(0) })),
+  async (c) => {
+    const requestId = c.get('requestId');
+    const subjectId = c.req.valid('param').id;
+
+    try {
+      const bangumi = await fetchBangumiById(c, subjectId);
+
+      if (!bangumi) {
+        return c.json(
+          {
+            ok: false,
+            error: 'Subject not found'
+          },
+          404
+        );
+      }
+
+      const subject = await fetchSubjectById(c, subjectId);
+      const revisions = await fetchSubjectAllRevisions(c, subjectId);
+
+      return c.json(
+        {
+          ok: true,
+          data: {
+            revisions,
+            subject
+          }
+        },
+        200
+      );
+    } catch (error) {
+      console.error('[bgmw] failed to list revision', error, {
+        requestId,
+        subjectId
+      });
+
+      return c.json(
+        {
+          ok: false,
+          error: 'Failed to list revision'
+        },
+        500
+      );
+    }
+  }
+);
+
 // 禁用该 subject 下的某一条 revision
 router.delete(
   '/subject/:id/revision/:rid',
@@ -185,18 +238,6 @@ router.delete(
         );
       }
 
-      const revision = await fetchSubjectRevision(c, subjectId, revisionId);
-
-      if (!revision) {
-        return c.json(
-          {
-            ok: false,
-            error: 'Revision not found'
-          },
-          404
-        );
-      }
-
       await disableSubjectRevision(c, subjectId, revisionId);
 
       const revisions = await fetchSubjectRevisions(c, subjectId);
@@ -215,8 +256,7 @@ router.delete(
     } catch (error) {
       console.error('[bgmw] failed to disable revision', error, {
         requestId,
-        subjectId,
-        revisionId
+        subjectId
       });
 
       return c.json(
@@ -256,18 +296,6 @@ router.put(
         );
       }
 
-      const revision = await fetchSubjectRevision(c, subjectId, revisionId);
-
-      if (!revision) {
-        return c.json(
-          {
-            ok: false,
-            error: 'Revision not found'
-          },
-          404
-        );
-      }
-
       await enableSubjectRevision(c, subjectId, revisionId);
 
       const revisions = await fetchSubjectRevisions(c, subjectId);
@@ -286,14 +314,13 @@ router.put(
     } catch (error) {
       console.error('[bgmw] failed to enable revision', error, {
         requestId,
-        subjectId,
-        revisionId
+        subjectId
       });
 
       return c.json(
         {
           ok: false,
-          error: 'Failed to disable revision'
+          error: 'Failed to enable revision'
         },
         500
       );

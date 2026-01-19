@@ -1,4 +1,4 @@
-import { bold } from '@breadc/color';
+import { bold, strikethrough } from '@breadc/color';
 
 import { getSubjectAlias } from 'bgmt';
 
@@ -75,12 +75,10 @@ export function printSubject(data: { subject: DatabaseSubject; revisions: Databa
     console.log(`${label('revisions')}  x${data.revisions.length}`);
     for (const revision of data.revisions) {
       console.log(
-        `  - ${revision.id}: ${revision.detail.operation} ${revision.detail.path} ${revision.detail.value}`
+        `  - ${revision.enabled ? bold(`#${revision.id}`) : strikethrough(`#${revision.id}`)}: ${revision.detail.operation} ${revision.detail.path} ${revision.detail.value}`
       );
     }
   }
-
-  // console.log(subject);
 }
 
 export function printCalendar(calendar: CalendarSubject[][], web: CalendarSubject[]) {
