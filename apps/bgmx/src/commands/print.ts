@@ -74,9 +74,8 @@ export function printSubject(data: { subject: DatabaseSubject; revisions: Databa
     console.log('');
     console.log(`${label('revisions')}  x${data.revisions.length}`);
     for (const revision of data.revisions) {
-      console.log(
-        `  - ${revision.enabled ? bold(`#${revision.id}`) : strikethrough(`#${revision.id}`)}: ${revision.detail.operation} ${revision.detail.path} ${revision.detail.value}`
-      );
+      const text = `${bold(`#${revision.id}`)}: ${revision.detail.operation} ${revision.detail.path} ${revision.detail.value}`;
+      console.log(`   - ${revision.enabled ? text : `${strikethrough(text)}`}`);
     }
   }
 }

@@ -64,7 +64,7 @@ export async function createSubjectRevision(
 ) {
   const database = ctx.get('database');
 
-  const [, revisions] = await database.batch([
+  const [[created], revisions] = await database.batch([
     database
       .insert(revisionsSchema)
       .values({
@@ -78,6 +78,8 @@ export async function createSubjectRevision(
       orderBy: (table, { asc }) => asc(table.id)
     })
   ]);
+
+  console.log('[bgmw]', 'create subject revision', subjectId, created, revisions);
 
   return revisions;
 }
@@ -96,6 +98,8 @@ export async function enableSubjectRevision(ctx: Context, subjectId: number, rev
     })
   ]);
 
+  console.log('[bgmw]', 'enable subject revision', subjectId, revisionId, revisions);
+
   return revisions;
 }
 
@@ -112,6 +116,8 @@ export async function disableSubjectRevision(ctx: Context, subjectId: number, re
       orderBy: (table, { asc }) => asc(table.id)
     })
   ]);
+
+  console.log('[bgmw]', 'disable subject revision', subjectId, revisionId, revisions);
 
   return revisions;
 }

@@ -11,7 +11,6 @@ import {
   fetchBangumiById,
   fetchSubjectAllRevisions,
   fetchSubjectById,
-  fetchSubjectRevision,
   fetchSubjectRevisions,
   fetchSubjectsAfterCursor,
   updateCalendar,

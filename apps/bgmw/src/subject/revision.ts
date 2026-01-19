@@ -20,7 +20,7 @@ export function applyRevisions(sourceSubject: Subject, revisions: Revision[]) {
         }
       } else if (Array.isArray(prev)) {
         if (revision.detail.operation === 'set.add') {
-          path.set([...new Set(...prev, ...revision.detail.value)]);
+          path.set([...new Set([...prev, ...revision.detail.value])]);
         } else if (revision.detail.operation === 'set.delete') {
           path.set(prev.filter((item) => !(revision.detail.value as string[]).includes(item)));
         }
