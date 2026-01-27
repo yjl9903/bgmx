@@ -54,7 +54,7 @@
     "p-limit": "7.2.0",
     "rimraf": "^6.1.2",
     "tmdbc": "workspace:*",
-    "undici": "^7.18.2",
+    "undici": "^7.19.2",
     "yaml": "^2.8.2"
   },
   "devDependencies": {
