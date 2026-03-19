@@ -22,7 +22,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260122.0",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^24.10.9",
+    "@types/node": "^24.12.0",
     "bangumi-data": ">=0.3.201",
     "bumpp": "latest",
     "dotenv": "^17.2.3",
