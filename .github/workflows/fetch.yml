@@ -71,7 +71,7 @@ jobs:
           ref: ${{ needs.prepare.outputs.branch }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.2.0
+        uses: pnpm/action-setup@v4.4.0
 
       - name: Setup node
         uses: actions/setup-node@v6
@@ -154,7 +154,7 @@ jobs:
           ref: ${{ needs.prepare.outputs.branch }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.2.0
+        uses: pnpm/action-setup@v4.4.0
 
       - name: Setup node
         uses: actions/setup-node@v6
@@ -236,7 +236,7 @@ jobs:
           ref: ${{ needs.prepare.outputs.branch }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.2.0
+        uses: pnpm/action-setup@v4.4.0
 
       - name: Setup node
         uses: actions/setup-node@v6
