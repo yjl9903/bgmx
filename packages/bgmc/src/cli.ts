@@ -18,9 +18,14 @@ cli.command('person <id>', 'Get Person').action(async (id, _options) => {
   console.log(person);
 });
 
-cli.command('search <keywords>', 'Search Subject').action(async (keywords, _options) => {
-  const result = await client.search(keywords);
-  console.log(result.list);
-});
+cli
+  .command('search <keywords>', 'Search Subject')
+  .option('--type <number>', 'Subject type, 1 = book, 2 = anime, 3 = music, 4 = game, 6 = real')
+  .action(async (keywords, options) => {
+    const result = await client.search(keywords, {
+      type: options.type ? (+options.type as 1) : undefined
+    });
+    console.log(result.list);
+  });
 
 cli.run(process.argv.slice(2)).catch((err) => console.error(err));
