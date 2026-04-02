@@ -24,14 +24,7 @@ const calendar = await client.calendar();
 console.log(calendar);
 ```
 
-Get the lastest bangumi data from the cdn of [bgmd](https://unpkg.com/bgmd@0/data/index.json).
-
-```ts
-import { getCalendar } from 'bgmc/data';
-
-const calendar = await getCalendar();
-console.log(calendar);
-```
+See full [Bangumi API docs](https://bangumi.github.io/api/).
 
 ## License
 

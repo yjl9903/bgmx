@@ -33,12 +33,12 @@
     "tsdown": "^0.21.4",
     "tsx": "^4.21.0",
     "turbo": "^2.8.20",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.2",
     "vite": "^7.3.1",
     "vitest": "^4.1.0",
     "wrangler": "^4.75.0"
   },
-  "packageManager": "pnpm@10.32.1",
+  "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=v20.8.0"
   },

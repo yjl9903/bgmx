@@ -1,12 +1,8 @@
 import 'dotenv/config';
 
-import pLimit from 'p-limit';
 import { breadc } from 'breadc';
 import { consola } from 'consola';
 import { fetchResources } from '@animegarden/client';
-import bangumiData from 'bangumi-data' with { type: 'json' };
-
-import { getSubjectDisplayName } from 'bgmt';
 
 import { version } from '../package.json';
 

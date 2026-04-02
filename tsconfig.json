@@ -8,7 +8,10 @@
       "ES2022",
       "DOM"
     ],
-    "moduleResolution": "Node",
+    "types": [
+      "node"
+    ],
+    "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "strict": true,
     "strictNullChecks": true,

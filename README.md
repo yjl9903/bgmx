@@ -85,6 +85,8 @@ trimSeason('xxx 第二季')
 
 JavaScript [Bangumi](https://bgm.tv) client bindings.
 
+See full [Bangumi API docs](https://bangumi.github.io/api/).
+
 ```bash
 npm i bgmc
 ```
