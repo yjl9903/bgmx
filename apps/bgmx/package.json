@@ -40,7 +40,7 @@
   "dependencies": {
     "@animegarden/client": "^0.5.3",
     "@breadc/color": "^1.0.0-beta.14",
-    "@clack/prompts": "^0.11.0",
+    "@clack/prompts": "^1.2.0",
     "bangumi-data": ">=0.3.204",
     "bgmc": "workspace:*",
     "bgmt": "workspace:*",
