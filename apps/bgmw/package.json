@@ -52,7 +52,7 @@
     "bgmc": "workspace:*",
     "bgmt": "workspace:*",
     "bgmx": "workspace:*",
-    "drizzle-orm": "0.45.1",
+    "drizzle-orm": "0.45.2",
     "hono": "4.12.9",
     "p-limit": "7.2.0",
     "tmdbc": "workspace:*",
