@@ -1,10 +1,16 @@
-import { paths } from './types';
+import { components, paths } from './types';
+
+type JsonRequestBody<T extends { requestBody?: unknown }> =
+  NonNullable<T['requestBody']> extends {
+    content: { 'application/json': infer TBody };
+  }
+    ? TBody
+    : never;
 
 /** 条目 */
 export namespace BGMSubjectParams {
   /* ============ S - Search ============ */
-  type SearchRequestBody =
-    paths['/v0/search/subjects']['post']['requestBody']['content']['application/json'];
+  type SearchRequestBody = JsonRequestBody<paths['/v0/search/subjects']['post']>;
 
   type SearchQuery = paths['/v0/search/subjects']['post']['parameters']['query'];
 
@@ -19,7 +25,7 @@ export namespace BGMSubjectParams {
 
   export type Information = paths['/v0/subjects/{subject_id}']['get']['parameters'];
 
-  export type Image = paths['/v0/characters/{character_id}/image']['get']['parameters'];
+  export type Image = paths['/v0/subjects/{subject_id}/image']['get']['parameters'];
 
   export type Persons = paths['/v0/subjects/{subject_id}/persons']['get']['parameters'];
 
@@ -75,8 +81,9 @@ export namespace BGMCollectionParams {
   type PatchSubjectPath =
     paths['/v0/users/-/collections/{subject_id}']['patch']['parameters']['path'];
 
-  type PatchSubjectRequestBody =
-    paths['/v0/users/-/collections/{subject_id}']['patch']['requestBody']['content']['application/json'];
+  type PatchSubjectRequestBody = JsonRequestBody<
+    paths['/v0/users/-/collections/{subject_id}']['patch']
+  >;
 
   export type PatchSubject = {
     path: PatchSubjectPath;
@@ -92,8 +99,9 @@ export namespace BGMCollectionParams {
   type PatchEpisodesInSubjectPath =
     paths['/v0/users/-/collections/{subject_id}/episodes']['patch']['parameters']['path'];
 
-  type PatchEpisodesInSubjectRequestBody =
-    paths['/v0/users/-/collections/{subject_id}/episodes']['patch']['requestBody']['content']['application/json'];
+  type PatchEpisodesInSubjectRequestBody = JsonRequestBody<
+    paths['/v0/users/-/collections/{subject_id}/episodes']['patch']
+  >;
 
   export type PatchEpisodesInSubject = {
     path: PatchEpisodesInSubjectPath;
@@ -108,8 +116,9 @@ export namespace BGMCollectionParams {
   type PutEpisodesInEpisodesPath =
     paths['/v0/users/-/collections/-/episodes/{episode_id}']['put']['parameters']['path'];
 
-  type PutEpisodesInEpisodesRequestBody =
-    paths['/v0/users/-/collections/-/episodes/{episode_id}']['put']['requestBody']['content']['application/json'];
+  type PutEpisodesInEpisodesRequestBody = JsonRequestBody<
+    paths['/v0/users/-/collections/-/episodes/{episode_id}']['put']
+  >;
 
   export type PutEpisodesInEpisodes = {
     path: PutEpisodesInEpisodesPath;
@@ -145,8 +154,7 @@ export namespace BGMCategoryParams {
   /* ============== S - PutIndices ================= */
   type PutIndicesPath = paths['/v0/indices/{index_id}']['put']['parameters']['path'];
 
-  type PutIndicesRequestBody =
-    paths['/v0/indices/{index_id}']['put']['requestBody']['content']['application/json'];
+  type PutIndicesRequestBody = JsonRequestBody<paths['/v0/indices/{index_id}']['put']>;
 
   export type PutIndices = {
     path: PutIndicesPath;
@@ -159,8 +167,7 @@ export namespace BGMCategoryParams {
   /* ============== S - AddSubjects ================= */
   type AddSubjectsPath = paths['/v0/indices/{index_id}/subjects']['post']['parameters']['path'];
 
-  type AddSubjectsRequestBody =
-    paths['/v0/indices/{index_id}/subjects']['post']['requestBody']['content']['application/json'];
+  type AddSubjectsRequestBody = JsonRequestBody<paths['/v0/indices/{index_id}/subjects']['post']>;
 
   export type AddSubjects = {
     path: AddSubjectsPath;
@@ -172,8 +179,9 @@ export namespace BGMCategoryParams {
   type PutSubjectPath =
     paths['/v0/indices/{index_id}/subjects/{subject_id}']['put']['parameters']['path'];
 
-  type PutSubjectRequestBody =
-    paths['/v0/indices/{index_id}/subjects/{subject_id}']['put']['requestBody']['content']['application/json'];
+  type PutSubjectRequestBody = JsonRequestBody<
+    paths['/v0/indices/{index_id}/subjects/{subject_id}']['put']
+  >;
 
   export type PutSubject = {
     path: PutSubjectPath;
@@ -192,7 +200,17 @@ export type { BGMCategoryParams as BGMIndicesParams };
 
 /** 搜索 */
 export namespace BGMSearchParams {
-  export type Search = paths['/search/subject/{keywords}']['get']['parameters'];
+  export type Search = {
+    path: {
+      keywords: string;
+    };
+    query: {
+      type?: components['schemas']['Legacy_SubjectType'];
+      responseGroup?: 'small' | 'medium' | 'large';
+      start?: number;
+      max_results?: number;
+    };
+  };
 }
 
 type BGMParams = {

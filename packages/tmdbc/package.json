@@ -56,7 +56,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "breadc": "^0.9.7"
+    "breadc": "^1.0.0-beta.14"
   },
   "engines": {
     "node": ">=v20.8.0"

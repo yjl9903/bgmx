@@ -1,4 +1,4 @@
-import { paths } from './types';
+import { components, paths } from './types';
 
 /** 条目 */
 export namespace BGMSubject {
@@ -14,6 +14,8 @@ export namespace BGMSubject {
 
   export type Information =
     paths['/v0/subjects/{subject_id}']['get']['responses']['200']['content']['application/json'];
+
+  export type Image = paths['/v0/subjects/{subject_id}/image']['get']['responses']['302'];
 
   export type Persons =
     paths['/v0/subjects/{subject_id}/persons']['get']['responses']['200']['content']['application/json'];
@@ -39,6 +41,8 @@ export namespace BGMCharacter {
   export type Information =
     paths['/v0/characters/{character_id}']['get']['responses']['200']['content']['application/json'];
 
+  export type Image = paths['/v0/characters/{character_id}/image']['get']['responses']['302'];
+
   export type Subjects =
     paths['/v0/characters/{character_id}/subjects']['get']['responses']['200']['content']['application/json'];
 
@@ -51,6 +55,8 @@ export namespace BGMPerson {
   export type Information =
     paths['/v0/persons/{person_id}']['get']['responses']['200']['content']['application/json'];
 
+  export type Image = paths['/v0/persons/{person_id}/image']['get']['responses']['302'];
+
   export type Subjects =
     paths['/v0/persons/{person_id}/subjects']['get']['responses']['200']['content']['application/json'];
 
@@ -62,6 +68,8 @@ export namespace BGMPerson {
 export namespace BGMUser {
   export type Information =
     paths['/v0/users/{username}']['get']['responses']['200']['content']['application/json'];
+
+  export type Avatar = paths['/v0/users/{username}/avatar']['get']['responses']['302'];
 
   export type Me = paths['/v0/me']['get']['responses']['200']['content']['application/json'];
 }
@@ -134,5 +142,16 @@ export type { BGMCategory as BGMIndices };
 /** 搜索 */
 export namespace BGMSearch {
   export type Search =
-    paths['/search/subject/{keywords}']['get']['responses']['200']['content']['application/json'];
+    | {
+        results?: number;
+        list?: components['schemas']['Legacy_SubjectSmall'][];
+      }
+    | {
+        results?: number;
+        list?: components['schemas']['Legacy_SubjectMedium'][];
+      }
+    | {
+        results?: number;
+        list?: components['schemas']['Legacy_SubjectLarge'][];
+      };
 }
