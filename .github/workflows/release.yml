@@ -3,13 +3,11 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - '*@*'
 
 jobs:
   release:
     runs-on: ubuntu-latest
-
-    if: ${{ github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'data') }}
 
     permissions:
       contents: write
@@ -28,14 +26,37 @@ jobs:
         with:
           node-version: 24.14.1
           cache: pnpm
+          registry-url: https://registry.npmjs.org
 
       - name: Install and build
         run: |
           pnpm install
           pnpm build
 
-      - name: Publish packages
-        run: pnpm -r publish --provenance --no-git-checks
+      - name: Resolve package from tag
+        id: release
+        run: |
+          tag='${{ github.ref_name }}'
+          package_name="${tag%@*}"
+          version="${tag##*@}"
+          package_version="$(pnpm --filter "${package_name}" exec node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")"
+          package_private="$(pnpm --filter "${package_name}" exec node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).private === true ? 'true' : 'false'")"
+
+          if [ "${package_version}" != "${version}" ]; then
+            echo "Tag version ${version} does not match package.json version ${package_version} for ${package_name}" >&2
+            exit 1
+          fi
+
+          echo "package_name=${package_name}" >> "$GITHUB_OUTPUT"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "private=${package_private}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish tagged package
+        if: ${{ steps.release.outputs.private != 'true' }}
+        working-directory: ${{ github.workspace }}
+        env:
+          NPM_CONFIG_PROVENANCE: 'true'
+        run: pnpm --filter "${{ steps.release.outputs.package_name }}" publish --provenance --no-git-checks
 
       - run: npx changelogithub
         env:

@@ -66,11 +66,12 @@
   "release-it": {
     "git": {
       "commitMessage": "chore(bgmx): release v${version}",
-      "tag": false,
+      "tag": true,
+      "tagName": "${name}@${version}",
       "push": true
     },
     "npm": {
-      "publish": true
+      "publish": false
     },
     "hooks": {
       "after:version": "pnpm run build",
