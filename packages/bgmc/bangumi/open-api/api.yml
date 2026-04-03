@@ -1,0 +1,610 @@
+openapi: 3.0.0
+info:
+  title: Bangumi API
+  description: |
+    你可以在 <https://next.bgm.tv/demo/access-token> 生成一个 Access Token
+
+    ## [关于 User Agent](https://github.com/bangumi/api/blob/master/docs-raw/user%20agent.md)
+
+    如果你在使用中遇到了问题，请优先使用 GitHub issue 提交问题。在 bangumi 小组发帖可能无法得到及时反馈。
+  version: "dev"
+  contact:
+    name: Bangumi API
+    url: https://github.com/bangumi/api/
+servers:
+  - url: https://api.bgm.tv
+paths:
+  /calendar:
+    get:
+      tags:
+        - 条目
+      summary: 每日放送
+      operationId: getCalendar
+      responses:
+        200:
+          description: 每日放送
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    weekday:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+                          example: Mon
+                        cn:
+                          type: string
+                          example: 星期一
+                        ja:
+                          type: string
+                          example: 月耀日
+                        id:
+                          type: integer
+                          example: 1
+                    items:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/Legacy_SubjectSmall"
+
+components:
+  schemas:
+    Legacy_SubjectType:
+      description: 条目类型
+        <br> 1 = book
+        <br> 2 = anime
+        <br> 3 = music
+        <br> 4 = game
+        <br> 6 = real
+      type: integer
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 6
+      example: 2
+    Legacy_SubjectSmall:
+      type: object
+      properties:
+        id:
+          description: 条目 ID
+          type: integer
+          example: 12
+        url:
+          description: 条目地址
+          type: string
+          example: https://bgm.tv/subject/12
+        type:
+          title: SubjectType
+          example: 2
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 6
+          type: integer
+          description: |-
+            条目类型
+            - `1` 为 书籍
+            - `2` 为 动画
+            - `3` 为 音乐
+            - `4` 为 游戏
+            - `6` 为 三次元
+            
+            没有 `5`
+          x-ms-enum:
+            name: SubjectType
+            modelAsString: false
+            values:
+              - Book
+              - Anime
+              - Music
+              - Game
+              - Real
+          x-enum-varnames:
+            - Book
+            - Anime
+            - Music
+            - Game
+            - Real
+        name:
+          description: 条目名称
+          type: string
+          example: ちょびっツ
+        name_cn:
+          description: 条目中文名称
+          type: string
+          example: 人形电脑天使心
+        summary:
+          description: 剧情简介
+          type: string
+          example: 在不久的将来,电子技术飞速发展,电脑成为人们生活中不可缺少的一部分.主角的名字是本须和秀树,是个19岁的少年,由于考试失败,来到东京上补习班,过着贫穷潦倒的生活……\r\n到达东京的第一天,他很幸运的在垃圾堆捡到一个人型电脑,一直以来秀树都非常渴望拥有个人电脑.当他抱着她带返公寓后,却不知如何开机,在意想不到的地方找到开关并开启后,故事就此展开\r\n本须和秀树捡到了人型计算机〔唧〕。虽然不晓得她到底是不是〔Chobits〕，但她的身上似乎藏有极大的秘密。看到秀树为了钱而烦恼，唧出去找打工，没想到却找到了危险的工作！为了让秀树开心，唧开始到色情小屋打工。但她在遭到过度激烈的强迫要求之后失控。让周遭计算机因此而强制停摆。\r\n另一方面，秀树发现好友新保与补习班的清水老师有着不可告人的关系……
+        air_date:
+          description: 放送开始日期
+          type: string
+          example: "2002-04-02"
+        air_weekday:
+          description: 放送星期
+          type: integer
+          example: 2
+        images:
+          description: 封面
+          type: object
+          properties:
+            large:
+              type: string
+              example: https://lain.bgm.tv/pic/cover/l/c2/0a/12_24O6L.jpg
+            common:
+              type: string
+              example: https://lain.bgm.tv/pic/cover/c/c2/0a/12_24O6L.jpg
+            medium:
+              type: string
+              example: https://lain.bgm.tv/pic/cover/m/c2/0a/12_24O6L.jpg
+            small:
+              type: string
+              example: https://lain.bgm.tv/pic/cover/s/c2/0a/12_24O6L.jpg
+            grid:
+              type: string
+              example: https://lain.bgm.tv/pic/cover/g/c2/0a/12_24O6L.jpg
+        eps:
+          description: 话数
+          type: integer
+          example: 27
+        eps_count:
+          description: 话数
+          type: integer
+          example: 27
+        rating:
+          description: 评分
+          type: object
+          properties:
+            total:
+              description: 总评分人数
+              type: integer
+              example: 2289
+            count:
+              description: 各分值评分人数
+              type: object
+              properties:
+                "1":
+                  type: integer
+                  example: 5
+                "2":
+                  type: integer
+                  example: 3
+                "3":
+                  type: integer
+                  example: 4
+                "4":
+                  type: integer
+                  example: 6
+                "5":
+                  type: integer
+                  example: 46
+                "6":
+                  type: integer
+                  example: 267
+                "7":
+                  type: integer
+                  example: 659
+                "8":
+                  type: integer
+                  example: 885
+                "9":
+                  type: integer
+                  example: 284
+                "10":
+                  type: integer
+                  example: 130
+            score:
+              description: 评分
+              type: number
+              example: 7.6
+        rank:
+          description: 排名
+          type: integer
+          example: 573
+        collection:
+          description: 收藏人数
+          type: object
+          properties:
+            wish:
+              description: 想做
+              type: integer
+              example: 608
+            collect:
+              description: 做过
+              type: integer
+              example: 3010
+            doing:
+              description: 在做
+              type: integer
+              example: 103
+            on_hold:
+              description: 搁置
+              type: integer
+              example: 284
+            dropped:
+              description: 抛弃
+              type: integer
+              example: 86
+    Legacy_SubjectMedium:
+      allOf:
+        - $ref: '#/components/schemas/Legacy_SubjectSmall'
+        - type: object
+          properties:
+            crt:
+              description: 角色信息
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/Legacy_Character'
+                  - type: object
+                    properties:
+                      role_name:
+                        description: 角色类型
+                        type: string
+                        example: 主角
+            staff:
+              description: 制作人员信息
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/Legacy_Person'
+                  - type: object
+                    properties:
+                      role_name:
+                        description: 人物类型
+                        type: string
+                        example: 主角
+                      jobs:
+                        description: 职位
+                        type: array
+                        items:
+                          type: string
+    Legacy_SubjectLarge:
+      allOf:
+        - $ref: '#/components/schemas/Legacy_SubjectMedium'
+        - type: object
+          properties:
+            eps:
+              description: 章节列表
+              type: array
+              items:
+                $ref: '#/components/schemas/Legacy_Episode'
+            topic:
+              description: 讨论版
+              type: array
+              items:
+                $ref: '#/components/schemas/Legacy_Topic'
+            blog:
+              description: 评论日志
+              type: array
+              items:
+                $ref: '#/components/schemas/Legacy_Blog'
+    Legacy_EpisodeType:
+      description: 章节类型
+        <br> 0 = 本篇
+        <br> 1 = 特别篇
+        <br> 2 = OP
+        <br> 3 = ED
+        <br> 4 = 预告/宣传/广告
+        <br> 5 = MAD
+        <br> 6 = 其他
+      type: integer
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      example: 0
+    Legacy_Episode:
+      description: 章节信息
+      type: object
+      properties:
+        id:
+          description: 章节 ID
+          type: integer
+          example: 1027
+        url:
+          description: 章节地址
+          type: string
+          example: https://bgm.tv/ep/1027
+        type:
+          $ref: '#/components/schemas/Legacy_EpisodeType'
+        sort:
+          description: 集数
+          type: integer
+          example: 1
+        name:
+          description: 标题
+          type: string
+          example: ちぃ 目覚める
+        name_cn:
+          description: 简体中文标题
+          type: string
+          example: 叽，觉醒了
+        duration:
+          description: 时长
+          type: string
+          example: 24m
+        airdate:
+          description: 放送日期
+          type: string
+          example: '2002-04-03'
+        comment:
+          description: 回复数量
+          type: integer
+          example: 9
+        desc:
+          description: 简介
+          type: string
+        status:
+          description: 放送状态
+            <br> Air = 已放送
+            <br> Today = 正在放送
+            <br> NA = 未放送
+          type: string
+          enum:
+            - Air
+            - Today
+            - NA
+          example: Air
+    Legacy_Topic:
+      description: 讨论版
+      type: object
+      properties:
+        id:
+          description: ID
+          type: integer
+        url:
+          description: 地址
+          type: string
+        title:
+          description: 标题
+          type: string
+        main_id:
+          description: 所属对象（条目） ID
+          type: integer
+        timestamp:
+          description: 发布时间
+          type: integer
+        lastpost:
+          description: 最后回复时间
+          type: integer
+        replies:
+          description: 回复数
+          type: integer
+        user:
+          $ref: '#/components/schemas/Legacy_User'
+    Legacy_Blog:
+      description: 日志
+      type: object
+      properties:
+        id:
+          description: ID
+          type: integer
+        url:
+          description: 地址
+          type: string
+        title:
+          description: 标题
+          type: string
+        summary:
+          description: 概览
+          type: string
+        image:
+          description: 图片
+          type: string
+        replies:
+          description: 回复数
+          type: integer
+        timestamp:
+          description: 发布时间
+          type: integer
+          example: 1357144903
+        dateline:
+          description: 发布时间
+          type: string
+          example: 2013-1-2 16:41
+        user:
+          $ref: '#/components/schemas/Legacy_User'
+    Legacy_User:
+      description: 用户信息
+      type: object
+      properties:
+        id:
+          description: 用户 id
+          type: integer
+          example: 1
+        url:
+          description: 用户主页地址
+          type: string
+          example: https://bgm.tv/user/sai
+        username:
+          description: 用户名
+          type: string
+          example: sai
+        nickname:
+          description: 昵称
+          type: string
+          example: Sai
+        avatar:
+          description: 头像地址
+          type: object
+          properties:
+            large:
+              type: string
+              example: https://lain.bgm.tv/pic/user/l/000/00/00/1.jpg?r=1391790456
+            medium:
+              type: string
+              example: https://lain.bgm.tv/pic/user/m/000/00/00/1.jpg?r=1391790456
+            small:
+              type: string
+              example: https://lain.bgm.tv/pic/user/s/000/00/00/1.jpg?r=1391790456
+        sign:
+          description: 签名
+          type: string
+          example: Awesome!
+        usergroup:
+          $ref: '#/components/schemas/Legacy_UserGroup'
+    Legacy_UserGroup:
+      description: >-
+        用户组
+        <br> 1 = 管理员
+        <br> 2 = Bangumi 管理猿
+        <br> 3 = 天窗管理猿
+        <br> 4 = 禁言用户
+        <br> 5 = 禁止访问用户
+        <br> 8 = 人物管理猿
+        <br> 9 = 维基条目管理猿
+        <br> 10 = 用户
+        <br> 11 = 维基人
+      type: integer
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 8
+        - 9
+        - 10
+        - 11
+      example: 11
+    Legacy_Person:
+      description: 现实人物
+      allOf:
+        - $ref: '#/components/schemas/Legacy_Mono'
+        - type: object
+          properties:
+            info:
+              $ref: '#/components/schemas/Legacy_MonoInfo'
+    Legacy_Character:
+      description: 虚拟角色
+      allOf:
+        - $ref: '#/components/schemas/Legacy_Mono'
+        - type: object
+          properties:
+            info:
+              $ref: '#/components/schemas/Legacy_MonoInfo'
+            actors:
+              description: 声优列表
+              type: array
+              items:
+                $ref: '#/components/schemas/Legacy_MonoBase'
+    Legacy_MonoBase:
+      description: 人物（基础模型）
+      type: object
+      properties:
+        id:
+          description: 人物 ID
+          type: integer
+        url:
+          description: 人物地址
+          type: string
+        name:
+          description: 姓名
+          type: string
+        images:
+          description: 肖像
+          type: object
+          properties:
+            large:
+              type: string
+              example: https://lain.bgm.tv/pic/crt/l/ce/65/32_crt_XMJOj.jpg
+            medium:
+              type: string
+              example: https://lain.bgm.tv/pic/crt/m/ce/65/32_crt_XMJOj.jpg
+            small:
+              type: string
+              example: https://lain.bgm.tv/pic/crt/s/ce/65/32_crt_XMJOj.jpg
+            grid:
+              type: string
+              example: https://lain.bgm.tv/pic/crt/g/ce/65/32_crt_XMJOj.jpg
+    Legacy_Mono:
+      description: 人物
+      allOf:
+        - $ref: '#/components/schemas/Legacy_MonoBase'
+        - type: object
+          properties:
+            name_cn:
+              description: 简体中文名
+              type: string
+            comment:
+              description: 回复数量
+              type: integer
+            collects:
+              description: 收藏人数
+              type: integer
+    Legacy_MonoInfo:
+      description: 人物信息
+      type: object
+      properties:
+        birth:
+          description: 生日
+          type: string
+          example: 4月13日
+        height:
+          description: 身高
+          type: string
+          example: 152cm
+        gender:
+          description: 性别
+          type: string
+          example: 女
+        alias:
+          description: 别名（另外添加出来的 key 为 0 开始的数字）
+          type: object
+          properties:
+            jp:
+              description: 日文名
+              type: string
+            kana:
+              description: 纯假名
+              type: string
+            nick:
+              description: 昵称
+              type: string
+            romaji:
+              description: 罗马字
+              type: string
+            zh:
+              description: 第二中文名
+              type: string
+        source:
+          description: 引用来源
+          oneOf:
+            - type: string
+              example: anidb.net
+            - type: array
+              items:
+                type: string
+                example: anidb.net
+        name_cn:
+          description: 简体中文名
+          type: string
+        cv:
+          description: 声优
+          type: string
+  securitySchemes:
+    OptionalHTTPBearer:
+      type: "http"
+      description: |
+        Some api like getting a subject doesn't require any authorization. 
+        But NSFW contents are only visible to authorized user, non-authorized user will get 404 response.
+        You can create a access token here [https://bgm.tv/dev/app](https://bgm.tv/dev/app)
+      scheme: "bearer"
+
+    HTTPBearer:
+      type: "http"
+      description: "require a authorization"
+      scheme: "bearer"

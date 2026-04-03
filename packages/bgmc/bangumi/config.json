@@ -1,0 +1,14 @@
+{
+  "inputs": [
+    {
+      "inputFile": "./open-api/version.json"
+    },
+    {
+      "inputFile": "./open-api/api.yml"
+    },
+    {
+      "inputFile": "./open-api/v0.yaml"
+    }
+  ],
+  "output": "./dist.json"
+}

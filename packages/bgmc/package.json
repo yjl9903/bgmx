@@ -46,7 +46,9 @@
   },
   "files": [
     "*.mjs",
-    "dist"
+    "bangumi",
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "tsdown",

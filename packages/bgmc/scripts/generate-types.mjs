@@ -6,21 +6,20 @@ import yaml from 'js-yaml';
 import openapiTS, { COMMENT_HEADER, astToString } from 'openapi-typescript';
 
 /**
- * Generate `bgmc` OpenAPI types from the locally cloned `bangumi/api` repository.
+ * Generate `bgmc` OpenAPI types from the bundled Bangumi OpenAPI config.
  *
  * Usage:
  *   pnpm -C packages/bgmc generate:types
  *
  * Prerequisites:
- * - `.github/api` must exist in the monorepo root and contain the Bangumi API repo.
- * - The cloned repo must include:
- *   - `.github/api/open-api/api.yml`
- *   - `.github/api/open-api/v0.yaml`
- *   - `.github/api/open-api/version.json`
+ * - `packages/bgmc/bangumi/config.json` must include:
+ *   - `./open-api/api.yml`
+ *   - `./open-api/v0.yaml`
+ *   - `./open-api/version.json`
  * - `openapi-typescript` and `js-yaml` must be installed in this workspace.
  *
  * What this script does:
- * - Reads Bangumi's split OpenAPI sources from the cloned repository.
+ * - Reads Bangumi's split OpenAPI sources from the local bundled config.
  * - Merges the base legacy paths from `api.yml` with the v0 paths from `v0.yaml`.
  * - Merges shared `components`, `tags`, and selected top-level metadata.
  * - Uses `version.json` to override the generated schema version when present.
@@ -38,7 +37,7 @@ import openapiTS, { COMMENT_HEADER, astToString } from 'openapi-typescript';
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const packageDir = path.resolve(scriptDir, '..');
 const repoDir = path.resolve(packageDir, '../..');
-const bangumiApiDir = path.join(repoDir, '.github', 'api', 'open-api');
+const openapiConfigFile = path.join(packageDir, 'bangumi', 'config.json');
 const outputFile = path.join(packageDir, 'src', 'types', 'types', 'index.ts');
 
 async function readYaml(file) {
@@ -47,6 +46,41 @@ async function readYaml(file) {
 
 async function readJson(file) {
   return JSON.parse(await readFile(file, 'utf8'));
+}
+
+async function readSchemaFile(file) {
+  if (path.extname(file) === '.json') {
+    return readJson(file);
+  }
+
+  return readYaml(file);
+}
+
+async function loadInputSpecs(configFile) {
+  const config = await readJson(configFile);
+  const configDir = path.dirname(configFile);
+  const inputs = new Map();
+
+  for (const item of config.inputs || []) {
+    if (!item?.inputFile) {
+      continue;
+    }
+
+    const inputFile = path.resolve(configDir, item.inputFile);
+    inputs.set(path.basename(item.inputFile), await readSchemaFile(inputFile));
+  }
+
+  return inputs;
+}
+
+function requireInputSpec(inputs, fileName) {
+  const spec = inputs.get(fileName);
+
+  if (!spec) {
+    throw new Error(`Missing OpenAPI input "${fileName}" in ${path.relative(repoDir, openapiConfigFile)}`);
+  }
+
+  return spec;
 }
 
 function mergeByName(items = []) {
@@ -107,9 +141,10 @@ function mergeSpec(baseSpec, v0Spec, versionSpec) {
   });
 }
 
-const baseSpec = await readYaml(path.join(bangumiApiDir, 'api.yml'));
-const v0Spec = await readYaml(path.join(bangumiApiDir, 'v0.yaml'));
-const versionSpec = await readJson(path.join(bangumiApiDir, 'version.json'));
+const inputSpecs = await loadInputSpecs(openapiConfigFile);
+const baseSpec = requireInputSpec(inputSpecs, 'api.yml');
+const v0Spec = requireInputSpec(inputSpecs, 'v0.yaml');
+const versionSpec = requireInputSpec(inputSpecs, 'version.json');
 
 const output = await openapiTS(mergeSpec(baseSpec, v0Spec, versionSpec));
 
