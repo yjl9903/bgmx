@@ -5,13 +5,13 @@
   "keywords": [
     "bgmd"
   ],
-  "homepage": "https://github.com/yjl9903/bgmc#readme",
+  "homepage": "https://github.com/yjl9903/bgmx#readme",
   "bugs": {
-    "url": "https://github.com/yjl9903/bgmc/issues"
+    "url": "https://github.com/yjl9903/bgmx/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yjl9903/bgmc.git"
+    "url": "git+https://github.com/yjl9903/bgmx.git"
   },
   "license": "MIT",
   "author": "XLor",
