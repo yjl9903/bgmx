@@ -1,9 +1,9 @@
 name: Release
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   release:
@@ -13,6 +13,7 @@ jobs:
 
     permissions:
       contents: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v6
@@ -33,16 +34,8 @@ jobs:
           pnpm install
           pnpm build
 
-      - name: Release
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
-
-          pnpm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
-          pnpm release:bgmd
+      - name: Publish packages
+        run: pnpm -r publish --provenance --no-git-checks
 
       - run: npx changelogithub
         env:
