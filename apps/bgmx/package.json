@@ -67,7 +67,7 @@
     "git": {
       "commitMessage": "chore(bgmx): release v${version}",
       "tag": true,
-      "tagName": "${name}@${version}",
+      "tagName": "${npm.name}@${version}",
       "push": true
     },
     "npm": {

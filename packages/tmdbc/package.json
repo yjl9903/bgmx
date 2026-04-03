@@ -65,7 +65,7 @@
     "git": {
       "commitMessage": "chore(tmdbc): release v${version}",
       "tag": true,
-      "tagName": "${name}@${version}",
+      "tagName": "${npm.name}@${version}",
       "push": true
     },
     "npm": {
