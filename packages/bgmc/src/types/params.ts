@@ -43,6 +43,18 @@ export namespace BGMEpisodeParams {
 
 /** 角色 */
 export namespace BGMCharacterParams {
+  /* ============ S - Search ============ */
+  type SearchRequestBody = JsonRequestBody<paths['/v0/search/characters']['post']>;
+
+  type SearchQuery = paths['/v0/search/characters']['post']['parameters']['query'];
+
+  /** 实验性 API， 随时可能发生改动 */
+  export type Search = {
+    query: SearchQuery;
+    requestBody: SearchRequestBody;
+  };
+  /* ============ E - Search ============ */
+
   export type Information = paths['/v0/characters/{character_id}']['get']['parameters'];
 
   export type Image = paths['/v0/characters/{character_id}/image']['get']['parameters'];
@@ -50,10 +62,26 @@ export namespace BGMCharacterParams {
   export type Subjects = paths['/v0/characters/{character_id}/subjects']['get']['parameters'];
 
   export type Persons = paths['/v0/characters/{character_id}/persons']['get']['parameters'];
+
+  export type Collect = paths['/v0/characters/{character_id}/collect']['post']['parameters'];
+
+  export type DeleteCollect = paths['/v0/characters/{character_id}/collect']['delete']['parameters'];
 }
 
 /** 人物 */
 export namespace BGMPersonParams {
+  /* ============ S - Search ============ */
+  type SearchRequestBody = JsonRequestBody<paths['/v0/search/persons']['post']>;
+
+  type SearchQuery = paths['/v0/search/persons']['post']['parameters']['query'];
+
+  /** 实验性 API， 随时可能发生改动 */
+  export type Search = {
+    query: SearchQuery;
+    requestBody: SearchRequestBody;
+  };
+  /* ============ E - Search ============ */
+
   export type Information = paths['/v0/persons/{person_id}']['get']['parameters'];
 
   export type Image = paths['/v0/persons/{person_id}/image']['get']['parameters'];
@@ -61,6 +89,10 @@ export namespace BGMPersonParams {
   export type Subject = paths['/v0/persons/{person_id}/subjects']['get']['parameters'];
 
   export type Characters = paths['/v0/persons/{person_id}/characters']['get']['parameters'];
+
+  export type Collect = paths['/v0/persons/{person_id}/collect']['post']['parameters'];
+
+  export type DeleteCollect = paths['/v0/persons/{person_id}/collect']['delete']['parameters'];
 }
 
 /** 用户 */
@@ -75,6 +107,16 @@ export namespace BGMCollectionParams {
   export type Information = paths['/v0/users/{username}/collections']['get']['parameters'];
 
   export type Subject = paths['/v0/users/{username}/collections/{subject_id}']['get']['parameters'];
+
+  export type Characters =
+    paths['/v0/users/{username}/collections/-/characters']['get']['parameters'];
+
+  export type Character =
+    paths['/v0/users/{username}/collections/-/characters/{character_id}']['get']['parameters'];
+
+  export type Persons = paths['/v0/users/{username}/collections/-/persons']['get']['parameters'];
+
+  export type Person = paths['/v0/users/{username}/collections/-/persons/{person_id}']['get']['parameters'];
 
   /* ============ S - PatchSubject ============ */
 

@@ -38,6 +38,9 @@ export namespace BGMEpisode {
 
 /** 角色 */
 export namespace BGMCharacter {
+  export type Search =
+    paths['/v0/search/characters']['post']['responses']['200']['content']['application/json'];
+
   export type Information =
     paths['/v0/characters/{character_id}']['get']['responses']['200']['content']['application/json'];
 
@@ -52,6 +55,9 @@ export namespace BGMCharacter {
 
 /** 人物 */
 export namespace BGMPerson {
+  export type Search =
+    paths['/v0/search/persons']['post']['responses']['200']['content']['application/json'];
+
   export type Information =
     paths['/v0/persons/{person_id}']['get']['responses']['200']['content']['application/json'];
 
@@ -81,6 +87,18 @@ export namespace BGMCollection {
 
   export type Subject =
     paths['/v0/users/{username}/collections/{subject_id}']['get']['responses']['200']['content']['application/json'];
+
+  export type Characters =
+    paths['/v0/users/{username}/collections/-/characters']['get']['responses']['200']['content']['application/json'];
+
+  export type Character =
+    paths['/v0/users/{username}/collections/-/characters/{character_id}']['get']['responses']['200']['content']['application/json'];
+
+  export type Persons =
+    paths['/v0/users/{username}/collections/-/persons']['get']['responses']['200']['content']['application/json'];
+
+  export type Person =
+    paths['/v0/users/{username}/collections/-/persons/{person_id}']['get']['responses']['200']['content']['application/json'];
 
   export type EpisodesInSubject =
     paths['/v0/users/-/collections/{subject_id}/episodes']['get']['responses']['200']['content']['application/json'];

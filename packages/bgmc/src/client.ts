@@ -124,11 +124,13 @@ export type RelatedSubject = BGMSubject.RelatedSubjects[0];
 export type Episode = BGMEpisode.EpisodeItem;
 export type Episodes = BGMEpisode.Episodes;
 
+export type CharacterSearch = BGMCharacter.Search;
 export type CharacterInformation = BGMCharacter.Information;
 export type CharacterImage = BGMCharacter.Image;
 export type CharacterSubjects = BGMCharacter.Subjects;
 export type CharacterPersons = BGMCharacter.Persons;
 
+export type PersonSearch = BGMPerson.Search;
 export type PersonInformation = BGMPerson.Information;
 export type PersonImage = BGMPerson.Image;
 export type PersonSubjects = BGMPerson.Subjects;
@@ -141,6 +143,10 @@ export type Me = BGMUser.Me;
 export type Search = BGMSearch.Search;
 export type CollectionInformation = BGMCollection.Information;
 export type CollectionSubject = BGMCollection.Subject;
+export type CharacterCollectionList = BGMCollection.Characters;
+export type CharacterCollection = BGMCollection.Character;
+export type PersonCollectionList = BGMCollection.Persons;
+export type PersonCollection = BGMCollection.Person;
 export type CollectionEpisodes = BGMCollection.EpisodesInSubject;
 export type EpisodeCollection = BGMCollection.EpisodesInEpisodes;
 
@@ -214,6 +220,22 @@ export class BgmClient {
     });
   }
 
+  public searchCharacters(params: BGMCharacterParams.Search) {
+    return this.send<CharacterSearch>('/v0/search/characters', {
+      method: 'POST',
+      query: params.query,
+      body: params.requestBody
+    });
+  }
+
+  public searchPersons(params: BGMPersonParams.Search) {
+    return this.send<PersonSearch>('/v0/search/persons', {
+      method: 'POST',
+      query: params.query,
+      body: params.requestBody
+    });
+  }
+
   public subject(id: number) {
     return this.request<SubjectInformation>(`/v0/subjects/${segment(id)}`);
   }
@@ -266,6 +288,20 @@ export class BgmClient {
     return this.request<CharacterPersons>(`/v0/characters/${segment(id)}/persons`);
   }
 
+  public collectCharacter(id: number) {
+    return this.send<void>(`/v0/characters/${segment(id)}/collect`, {
+      method: 'POST',
+      successStatus: 204
+    });
+  }
+
+  public uncollectCharacter(id: number) {
+    return this.send<void>(`/v0/characters/${segment(id)}/collect`, {
+      method: 'DELETE',
+      successStatus: 204
+    });
+  }
+
   public person(id: number) {
     return this.request<PersonInformation>(`/v0/persons/${segment(id)}`);
   }
@@ -284,6 +320,20 @@ export class BgmClient {
 
   public personCharacters(id: number) {
     return this.request<PersonCharacters>(`/v0/persons/${segment(id)}/characters`);
+  }
+
+  public collectPerson(id: number) {
+    return this.send<void>(`/v0/persons/${segment(id)}/collect`, {
+      method: 'POST',
+      successStatus: 204
+    });
+  }
+
+  public uncollectPerson(id: number) {
+    return this.send<void>(`/v0/persons/${segment(id)}/collect`, {
+      method: 'DELETE',
+      successStatus: 204
+    });
   }
 
   public user(username: string) {
@@ -313,6 +363,28 @@ export class BgmClient {
   public getCollection(username: string, subjectId: number) {
     return this.request<CollectionSubject>(
       `/v0/users/${segment(username)}/collections/${segment(subjectId)}`
+    );
+  }
+
+  public getCharacterCollections(username: string) {
+    return this.request<CharacterCollectionList>(
+      `/v0/users/${segment(username)}/collections/-/characters`
+    );
+  }
+
+  public getCharacterCollection(username: string, characterId: number) {
+    return this.request<CharacterCollection>(
+      `/v0/users/${segment(username)}/collections/-/characters/${segment(characterId)}`
+    );
+  }
+
+  public getPersonCollections(username: string) {
+    return this.request<PersonCollectionList>(`/v0/users/${segment(username)}/collections/-/persons`);
+  }
+
+  public getPersonCollection(username: string, personId: number) {
+    return this.request<PersonCollection>(
+      `/v0/users/${segment(username)}/collections/-/persons/${segment(personId)}`
     );
   }
 

@@ -1,7 +1,7 @@
 {
   "name": "bgmc",
   "version": "0.1.1",
-  "description": "Bangumi Client",
+  "description": "Bangumi OpenAPI Client",
   "keywords": [
     "bangumi",
     "bgm"
