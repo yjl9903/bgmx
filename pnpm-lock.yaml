@@ -69,10 +69,10 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: 1.19.12
-        version: 1.19.12(hono@4.12.10)
+        version: 1.19.12(hono@4.12.11)
       '@hono/zod-validator':
         specifier: 0.7.6
-        version: 0.7.6(hono@4.12.10)(zod@4.3.6)
+        version: 0.7.6(hono@4.12.11)(zod@4.3.6)
       bgmc:
         specifier: workspace:*
         version: link:../../packages/bgmc
@@ -86,8 +86,8 @@ importers:
         specifier: 0.45.2
         version: 0.45.2(@cloudflare/workers-types@4.20260405.1)
       hono:
-        specifier: 4.12.10
-        version: 4.12.10
+        specifier: 4.12.11
+        version: 4.12.11
       p-limit:
         specifier: 7.3.0
         version: 7.3.0
@@ -2294,8 +2294,8 @@ packages:
     resolution: {integrity: sha512-vUptKVTpIJhcczKBbgnS+RtcuYMB8+oNzPK2/Hp3hanz8JmpATdmmgLgSaadVREkDm+e2giHwY3ZRkyjSIDDFA==}
     engines: {node: '>= 0.4'}
 
-  hono@4.12.10:
-    resolution: {integrity: sha512-mx/p18PLy5og9ufies2GOSUqep98Td9q4i/EF6X7yJgAiIopxqdfIO3jbqsi3jRgTgw88jMDEzVKi+V2EF+27w==}
+  hono@4.12.11:
+    resolution: {integrity: sha512-r4xbIa3mGGGoH9nN4A14DOg2wx7y2oQyJEb5O57C/xzETG/qx4c7CVDQ5WMeKHZ7ORk2W0hZ/sQKXTav3cmYBA==}
     engines: {node: '>=16.9.0'}
 
   hookable@6.1.0:
@@ -4256,13 +4256,13 @@ snapshots:
 
   '@exodus/bytes@1.15.0': {}
 
-  '@hono/node-server@1.19.12(hono@4.12.10)':
+  '@hono/node-server@1.19.12(hono@4.12.11)':
     dependencies:
-      hono: 4.12.10
+      hono: 4.12.11
 
-  '@hono/zod-validator@0.7.6(hono@4.12.10)(zod@4.3.6)':
+  '@hono/zod-validator@0.7.6(hono@4.12.11)(zod@4.3.6)':
     dependencies:
-      hono: 4.12.10
+      hono: 4.12.11
       zod: 4.3.6
 
   '@iarna/toml@2.2.5': {}
@@ -5583,7 +5583,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.12.10: {}
+  hono@4.12.11: {}
 
   hookable@6.1.0: {}
 
