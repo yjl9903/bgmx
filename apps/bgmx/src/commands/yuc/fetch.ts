@@ -1,6 +1,9 @@
-import { JSDOM } from 'jsdom';
+import { createRequire } from 'node:module';
 
 import type { YucItem, YucCalendarItem } from './types';
+
+const require = createRequire(import.meta.url);
+const { JSDOM } = require('jsdom') as typeof import('jsdom');
 
 export async function fetchYucPage(year: number, month: number) {
   const page = `${year}${String(month).padStart(2, '0')}`;
