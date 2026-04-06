@@ -10,6 +10,14 @@
 - TypeScript wrapper of [Bangumi API](https://bangumi.github.io/api/)
 - TypeScript wrapper of [TMDB API](https://developer.themoviedb.org/docs/getting-started)
 
+## Skills
+
+Bangumi OpenAPI skills.
+
+```bash
+npx skills add https://github.com/yjl9903/bgmx --skill bangumi
+```
+
 ## Usage
 
 ### bgmd
