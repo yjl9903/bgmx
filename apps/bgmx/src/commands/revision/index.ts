@@ -26,6 +26,9 @@ export async function createRevision(subject: DatabaseSubject, options: FetchOpt
     const timestamp = await text({
       message: field === 'search.after' ? '输入开始时间' : '输入结束时间',
       validate: (value) => {
+        if (!value) {
+          return '时间非法';
+        }
         const date = new Date(value);
         if (Number.isNaN(date.getTime())) {
           return '时间非法';
@@ -86,12 +89,10 @@ export async function createRevision(subject: DatabaseSubject, options: FetchOpt
         const word = await text({
           message: '输入关键词'
         });
-        if (isCancel(word)) {
+        if (isCancel(word) || !word) {
           break;
         }
-        if (word) {
-          words.push(word);
-        }
+        words.push(word);
       }
       if (words.length === 0) return undefined;
 

@@ -1,4 +1,4 @@
-import { bold, strikethrough } from '@breadc/color';
+import { bold, strikethrough } from 'breadc';
 
 import { getSubjectAlias } from 'bgmt';
 
