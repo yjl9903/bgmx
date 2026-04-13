@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@types/jsdom": "^28.0.1",
-    "bangumi-data": ">=0.3.205"
+    "bangumi-data": ">=0.3.206"
   },
   "peerDependencies": {
     "bangumi-data": ">=0.3.205"
