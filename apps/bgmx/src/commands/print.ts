@@ -42,8 +42,8 @@ export function printBangumiSubject(bangumi: DatabaseBangumi) {
 export function printSubject(data: { subject: DatabaseSubject; revisions: DatabaseRevision[] }) {
   const subject = data.subject.data;
 
-  const label = (str: string) => {
-    return bold(str.padStart(10, ' '));
+  const label = (str: string, prefix = 0) => {
+    return bold(str.padEnd(10 - prefix, ' '));
   };
 
   console.log(`${label('id')}  ${subject.id}`);
@@ -55,18 +55,29 @@ export function printSubject(data: { subject: DatabaseSubject; revisions: Databa
 
   console.log('');
 
-  const include = data.subject.search.include;
-  if (include.length > 0) {
-    console.log(`${label('include')}  ${include[0]}`);
-    for (const a of include.slice(1)) {
-      console.log(`${label('')}  ${a}`);
+  console.log(`${label('search')}`);
+
+  const searchAfter = data.subject.search.after;
+  if (searchAfter) {
+    console.log(` ${label('after', 1)}  ${formatDatetime(new Date(searchAfter))}`);
+  }
+  const searchBefore = data.subject.search.before;
+  if (searchBefore) {
+    console.log(` ${label('before', 1)}  ${formatDatetime(new Date(searchBefore))}`);
+  }
+
+  const searchInclude = data.subject.search.include;
+  if (searchInclude.length > 0) {
+    console.log(` ${label('include', 1)}  ${searchInclude[0]}`);
+    for (const a of searchInclude.slice(1)) {
+      console.log(` ${label('', 1)}  ${a}`);
     }
   }
-  const exclude = data.subject.search.exclude;
-  if (exclude && exclude.length > 0) {
-    console.log(`${label('exclude')}  ${exclude[0]}`);
-    for (const a of exclude.slice(1)) {
-      console.log(`${label('')}  ${a}`);
+  const searchExclude = data.subject.search.exclude;
+  if (searchExclude && searchExclude.length > 0) {
+    console.log(` ${label('exclude', 1)}  ${searchExclude[0]}`);
+    for (const a of searchExclude.slice(1)) {
+      console.log(` ${label('', 1)}  ${a}`);
     }
   }
 
@@ -75,7 +86,7 @@ export function printSubject(data: { subject: DatabaseSubject; revisions: Databa
     console.log(`${label('revisions')}  x${data.revisions.length}`);
     for (const revision of data.revisions) {
       const text = `${bold(`#${revision.id}`)}: ${revision.detail.operation} ${revision.detail.path} ${revision.detail.value}`;
-      console.log(`   - ${revision.enabled ? text : `${strikethrough(text)}`}`);
+      console.log(` - ${revision.enabled ? text : `${strikethrough(text)}`}`);
     }
   }
 }
