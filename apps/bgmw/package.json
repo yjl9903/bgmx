@@ -57,7 +57,7 @@
     "hono": "4.12.15",
     "p-limit": "7.3.0",
     "tmdbc": "workspace:*",
-    "zod": "4.3.6"
+    "zod": "4.4.3"
   },
   "engines": {
     "node": ">=v20.8.0"

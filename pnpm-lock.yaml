@@ -72,7 +72,7 @@ importers:
         version: 2.0.0(hono@4.12.15)
       '@hono/zod-validator':
         specifier: 0.7.6
-        version: 0.7.6(hono@4.12.15)(zod@4.3.6)
+        version: 0.7.6(hono@4.12.15)(zod@4.4.3)
       bgmc:
         specifier: workspace:*
         version: link:../../packages/bgmc
@@ -95,8 +95,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tmdbc
       zod:
-        specifier: 4.3.6
-        version: 4.3.6
+        specifier: 4.4.3
+        version: 4.4.3
 
   apps/bgmx:
     dependencies:
@@ -3795,8 +3795,8 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
 snapshots:
 
@@ -4286,10 +4286,10 @@ snapshots:
     dependencies:
       hono: 4.12.15
 
-  '@hono/zod-validator@0.7.6(hono@4.12.15)(zod@4.3.6)':
+  '@hono/zod-validator@0.7.6(hono@4.12.15)(zod@4.4.3)':
     dependencies:
       hono: 4.12.15
-      zod: 4.3.6
+      zod: 4.4.3
 
   '@iarna/toml@2.2.5': {}
 
@@ -7083,4 +7083,4 @@ snapshots:
 
   zod@3.25.76: {}
 
-  zod@4.3.6: {}
+  zod@4.4.3: {}
