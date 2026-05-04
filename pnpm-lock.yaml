@@ -101,8 +101,8 @@ importers:
   apps/bgmx:
     dependencies:
       '@animegarden/client':
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.4
+        version: 0.5.4
       '@clack/prompts':
         specifier: ^1.3.0
         version: 1.3.0
@@ -186,8 +186,8 @@ importers:
 
 packages:
 
-  '@animegarden/client@0.5.3':
-    resolution: {integrity: sha512-+nQhtHDos/ZhlWnueoruOMN//uN5YsHqeMpZAd8MJKDeN4CbtnmTFF3cIC3hOQN+42FEJFRTN+DUQUjb1wsl/A==}
+  '@animegarden/client@0.5.4':
+    resolution: {integrity: sha512-Q5jgWoChJskTgwki7CyaPGeK5Vl3o9hEre8o1wPDwT8Ojh/w935ljdNiWaf+cuWBQnasLrXC/00mh4wHVbzZaA==}
     engines: {node: '>=v18.16.0'}
 
   '@asamuzakjp/css-color@5.1.11':
@@ -1503,8 +1503,8 @@ packages:
     resolution: {integrity: sha512-jRR5wdylq8CkOe6hei19GGZnxM6rBGwFl3Bg0YItGDimvjGtAvdZk4Pu6Cl4u4Igsws4a1fd1Vq3ezrhn4KmFw==}
     engines: {node: '>= 14'}
 
-  anipar@0.5.3:
-    resolution: {integrity: sha512-X5FJeimLShyxgfQ102KzXc99OxH1p7xQLZKjIVNfCEfOoHUlJOUGHxE1J46udn0cmgT79AB/eVlOkpSU1/26xA==}
+  anipar@0.5.4:
+    resolution: {integrity: sha512-cDoeqMtYehuOZhMgDfMXSchUTXg9EUh7csrwHnPTu0lpDSJwl4Dgbima3rD5E908iKKhEx8/vdTiFJXV4va0HQ==}
     engines: {node: '>=v18.16.0'}
 
   ansi-align@3.0.1:
@@ -3796,9 +3796,9 @@ packages:
 
 snapshots:
 
-  '@animegarden/client@0.5.3':
+  '@animegarden/client@0.5.4':
     dependencies:
-      anipar: 0.5.3
+      anipar: 0.5.4
       ohash: 2.0.11
       simptrad: 0.2.0
       zod: 3.25.76
@@ -4736,7 +4736,7 @@ snapshots:
 
   agent-base@7.1.3: {}
 
-  anipar@0.5.3: {}
+  anipar@0.5.4: {}
 
   ansi-align@3.0.1:
     dependencies:
