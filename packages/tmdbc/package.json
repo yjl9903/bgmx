@@ -59,7 +59,7 @@
     "breadc": "^1.0.0-beta.15"
   },
   "engines": {
-    "node": ">=v20.8.0"
+    "node": ">=v24.0.0"
   },
   "release-it": {
     "git": {

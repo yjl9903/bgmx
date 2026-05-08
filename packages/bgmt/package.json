@@ -57,7 +57,7 @@
     "simptrad": "^0.2.0"
   },
   "engines": {
-    "node": ">=v20.8.0"
+    "node": ">=v24.0.0"
   },
   "release-it": {
     "git": {
