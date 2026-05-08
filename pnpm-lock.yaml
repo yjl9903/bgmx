@@ -5,9 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  release-it@16.2.1:
-    hash: 2e2aea092db4fff1b2e8ff1321b805586ce32e43d7ba087e7775e392021c69e2
-    path: patches/release-it@16.2.1.patch
+  release-it@16.2.1: 2e2aea092db4fff1b2e8ff1321b805586ce32e43d7ba087e7775e392021c69e2
 
 importers:
 

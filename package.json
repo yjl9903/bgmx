@@ -38,17 +38,8 @@
     "vitest": "^4.1.5",
     "wrangler": "^4.89.0"
   },
-  "packageManager": "pnpm@10.33.4",
+  "packageManager": "pnpm@11.0.8",
   "engines": {
     "node": ">=v24.0.0"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "release-it@16.2.1": "patches/release-it@16.2.1.patch"
-    },
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "workerd"
-    ]
   }
 }
