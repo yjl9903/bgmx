@@ -38,7 +38,7 @@
     "vitest": "^4.1.6",
     "wrangler": "^4.89.0"
   },
-  "packageManager": "pnpm@11.1.0",
+  "packageManager": "pnpm@11.1.1",
   "engines": {
     "node": ">=v24.0.0"
   }
