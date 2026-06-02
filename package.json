@@ -23,7 +23,7 @@
     "@cloudflare/workers-types": "^4.20260531.1",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.12.4",
-    "bangumi-data": ">=0.3.208",
+    "bangumi-data": ">=0.3.209",
     "bumpp": "latest",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
