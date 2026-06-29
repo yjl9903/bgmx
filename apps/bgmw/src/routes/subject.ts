@@ -7,16 +7,13 @@ import {
   createSubjectRevision,
   disableSubjectRevision,
   enableSubjectRevision,
-  fetchActiveCalendarRows,
   fetchBangumiById,
   fetchSubjectAllRevisions,
   fetchSubjectById,
   fetchSubjectRevisions,
   fetchSubjectsAfterCursor,
-  updateCalendar,
   updateSubject
 } from '../subject/database';
-import { type CalendarSubject } from '../schema';
 
 import { zValidator } from './middlewares/zod';
 import { authorization } from './middlewares/auth';
@@ -347,102 +344,6 @@ router.get(
         {
           ok: false,
           error: 'Failed to fetch subject list'
-        },
-        500
-      );
-    }
-  }
-);
-
-// 查询 calendar
-router.get('/calendar', async (c) => {
-  const requestId = c.get('requestId');
-
-  try {
-    const resp = await fetchActiveCalendarRows(c);
-
-    const calendar: CalendarSubject[][] = [[], [], [], [], [], [], []];
-    const web: CalendarSubject[] = [];
-
-    for (const item of resp) {
-      const subject: CalendarSubject = {
-        ...item.subjects,
-        platform: item.calendars.platform,
-        weekday: item.calendars.weekday
-      };
-      if (item.calendars.platform === 'tv' && item.calendars.weekday !== null) {
-        calendar[item.calendars.weekday]?.push(subject);
-      } else {
-        web.push(subject);
-      }
-    }
-
-    return c.json({
-      ok: true,
-      data: {
-        calendar,
-        web
-      }
-    });
-  } catch (error) {
-    console.error('[bgmw] failed to fetch calendar', error, { requestId });
-
-    return c.json(
-      {
-        ok: false,
-        error: 'Failed to fetch calendar'
-      },
-      500
-    );
-  }
-});
-
-// 更新 calendar
-router.post(
-  '/calendar',
-  authorization,
-  zValidator(
-    'json',
-    z.object({
-      calendar: z.array(
-        z.object({
-          id: z.coerce.number().int().gt(0),
-          platform: z.enum(['tv', 'web']),
-          weekday: z.coerce.number().int().min(0).max(6).nullable().optional().default(null)
-        })
-      )
-    })
-  ),
-  async (c) => {
-    const requestId = c.get('requestId');
-
-    try {
-      const resp = await updateCalendar(c, c.req.valid('json').calendar);
-
-      if (resp.ok) {
-        return c.json(
-          {
-            ok: true,
-            data: resp.data
-          },
-          200
-        );
-      } else {
-        return c.json(
-          {
-            ok: false,
-            error: resp.error?.message ?? 'Unknown error'
-          },
-          500
-        );
-      }
-    } catch (error) {
-      console.error('[bgmw] failed to update calendar', error, { requestId });
-
-      return c.json(
-        {
-          ok: false,
-          error: 'Failed to update calendar'
         },
         500
       );

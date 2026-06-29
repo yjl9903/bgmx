@@ -38,19 +38,3 @@ export const subjects = sqliteTable('subjects', {
 });
 
 export type Subject = typeof subjects.$inferSelect;
-
-export const calendars = sqliteTable('calendars', {
-  id: integer('id')
-    .primaryKey()
-    .references(() => subjects.id),
-  platform: text('platform').$type<'tv' | 'web'>().notNull(),
-  weekday: integer('weekday'),
-  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(false)
-});
-
-export type CalendarInput = Omit<Required<typeof calendars.$inferInsert>, 'isActive'>;
-
-export type CalendarSubject = Subject & {
-  platform: 'tv' | 'web';
-  weekday: number | undefined | null;
-};

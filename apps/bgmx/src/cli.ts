@@ -6,7 +6,7 @@ import { fetchResources } from '@animegarden/client';
 
 import { version } from '../package.json';
 
-import { formatDatetime } from './utils';
+import { formatDatetime, formatSeason, parseBooleanOption, parseSeasonOption } from './utils';
 import {
   dumpDataBy,
   dumpCalendar,
@@ -150,11 +150,15 @@ cli
 
 cli
   .command('sync yuc', '拉取并更新 yuc.wiki 周历数据')
-  .option('--update-server', '是否更新服务端数据, 默认值: true', { default: true })
   .option('--session <file>', `会话文件, 默认值: yuc-{year}-{month}.yaml`)
   .option('--force-overwrite', '强制覆盖会话文件数据, 默认值: false')
   .option('--year <year>', '年份, 默认值: ' + new Date().getFullYear())
   .option('--month <month>', '月份, 可选值: 1, 4, 7, 10')
+  .option('--update-server', '是否更新服务端数据, 默认值: true', { default: true })
+  .option('--update-active <boolean>', '是否更新该季度周历 active 状态', {
+    default: true,
+    cast: parseBooleanOption
+  })
   .option('--retry <number>', '重试次数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
   .action(async (options) => {
     const secret = options.secret ?? process.env.SECRET;
@@ -222,12 +226,13 @@ cli
       consola.success('抓取周历数据成功');
     }
 
+    const season = formatSeason(data.year, data.month);
     const calendar: CalendarInput[] = [];
     for (let i = 0; i < data.calendar.length; i++) {
       const row = data.calendar[i];
       for (const item of row) {
         calendar.push({
-          id: item.id,
+          subject_id: item.id,
           platform: 'tv',
           weekday: i
         });
@@ -236,7 +241,7 @@ cli
     for (let i = 0; i < data.web.length; i++) {
       const item = data.web[i];
       calendar.push({
-        id: item.id,
+        subject_id: item.id,
         platform: 'web',
         weekday: null
       });
@@ -281,7 +286,14 @@ cli
         }
       }
 
-      await updateCalendar(calendar, { baseURL: options.baseUrl, secret });
+      await updateCalendar(
+        {
+          season,
+          isActive: options.updateActive,
+          calendar
+        },
+        { baseURL: options.baseUrl, secret }
+      );
       consola.success('更新周历数据成功');
     }
   });
@@ -291,8 +303,12 @@ cli
   .option('--out <file>', '输出目标文件')
   .option('--version <version>', '输出文件版本号')
   .option('--full', '输出完整 subject 条目')
+  .option('--season <season>', '指定季度，可重复或用逗号分隔，例如 2026-04,2026-07')
   .action(async (options) => {
-    const resp = await fetchCalendar({ baseURL: options.baseUrl });
+    const resp = await fetchCalendar({
+      baseURL: options.baseUrl,
+      seasons: parseSeasonOption(options.season)
+    });
 
     printCalendar(resp.calendar, resp.web);
 

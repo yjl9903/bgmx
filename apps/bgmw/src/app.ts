@@ -4,6 +4,7 @@ import { logger } from 'hono/logger';
 import type { AppEnv } from './env';
 
 import { bangumiRoute } from './routes/bangumi';
+import { calendarRoute } from './routes/calendar';
 import { healthRoute } from './routes/health';
 import { subjectRoute } from './routes/subject';
 import { connectDatabase } from './database';
@@ -29,6 +30,7 @@ export const createApp = () => {
 
   app.route('/', healthRoute);
   app.route('/', bangumiRoute);
+  app.route('/', calendarRoute);
   app.route('/', subjectRoute);
 
   app.notFound((c) => {

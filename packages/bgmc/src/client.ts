@@ -379,7 +379,9 @@ export class BgmClient {
   }
 
   public getPersonCollections(username: string) {
-    return this.request<PersonCollectionList>(`/v0/users/${segment(username)}/collections/-/persons`);
+    return this.request<PersonCollectionList>(
+      `/v0/users/${segment(username)}/collections/-/persons`
+    );
   }
 
   public getPersonCollection(username: string, personId: number) {

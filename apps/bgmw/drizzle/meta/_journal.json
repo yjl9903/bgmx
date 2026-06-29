@@ -29,6 +29,13 @@
       "when": 1760801639695,
       "tag": "0003_tranquil_synch",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1782750233250,
+      "tag": "0004_sloppy_jocasta",
+      "breakpoints": true
     }
   ]
 }

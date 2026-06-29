@@ -65,7 +65,8 @@ export namespace BGMCharacterParams {
 
   export type Collect = paths['/v0/characters/{character_id}/collect']['post']['parameters'];
 
-  export type DeleteCollect = paths['/v0/characters/{character_id}/collect']['delete']['parameters'];
+  export type DeleteCollect =
+    paths['/v0/characters/{character_id}/collect']['delete']['parameters'];
 }
 
 /** 人物 */
@@ -116,7 +117,8 @@ export namespace BGMCollectionParams {
 
   export type Persons = paths['/v0/users/{username}/collections/-/persons']['get']['parameters'];
 
-  export type Person = paths['/v0/users/{username}/collections/-/persons/{person_id}']['get']['parameters'];
+  export type Person =
+    paths['/v0/users/{username}/collections/-/persons/{person_id}']['get']['parameters'];
 
   /* ============ S - PatchSubject ============ */
 

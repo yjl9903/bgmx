@@ -1,0 +1,6 @@
+interface:
+  display_name: "bgmx"
+  short_description: "Maintain bgmx Bangumi data workflows"
+  default_prompt: "Use $bgmx to sync Bangumi subjects, create revisions, and update seasonal calendars."
+policy:
+  allow_implicit_invocation: false

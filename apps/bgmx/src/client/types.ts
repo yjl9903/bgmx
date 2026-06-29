@@ -1,9 +1,14 @@
 export type {
   Bangumi as DatabaseBangumi,
-  Subject as DatabaseSubject,
-  CalendarInput,
-  CalendarSubject
+  Subject as DatabaseSubject
 } from '../../../bgmw/src/schema/subject';
+
+export type {
+  CalendarInput,
+  CalendarSubject,
+  CalendarUpdateInput,
+  CalendarUpdateResult
+} from '../../../bgmw/src/schema/calendar';
 
 export type {
   Revision as DatabaseRevision,
