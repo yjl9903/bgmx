@@ -81,34 +81,49 @@ for a migration or repair.
 
 ## Sync And Switch Calendar
 
-Use this when the user asks to import yuc.wiki seasonal calendar data or switch the online active
-calendar season.
+Use this section only for calendar update work: importing a yuc.wiki season, resolving Bangumi
+subject ids, uploading the calendar, marking a season active, or cancelling an active season.
 
-- Sync a season from yuc.wiki and update that season's relations:
-  ```bash
-  bgmx sync yuc --year 2026 --month 7 --update-server
-  ```
-- Sync and mark the season active:
-  ```bash
-  bgmx sync yuc --year 2026 --month 7 --update-server --update-active true
-  ```
-- Sync and mark the season inactive:
-  ```bash
-  bgmx sync yuc --year 2026 --month 7 --update-server --update-active false
-  ```
-- Fetch a specific season:
-  ```bash
-  bgmx calendar --season 2026-07
-  ```
-- Fetch multiple seasons by repeating or comma-separating `--season` values if the CLI supports the
-  form in use:
-  ```bash
-  bgmx calendar --season 2026-04,2026-07
-  ```
+### Update And Activate A Calendar
+
+1. Generate an initial yuc calendar session file in a draft directory without `.env`, so it cannot
+   upload. Use an explicit session file name so it can be reviewed and edited:
+   ```bash
+   bgmx sync yuc --year 2026 --month 7 --session yuc-2026-07.yaml
+   ```
+2. Read the generated session file. Find every calendar item whose `id` is missing or `-1`.
+3. Infer missing Bangumi subject ids using the available tools:
+   - Query bgmx subjects first when useful: `bgmx subject <subject_id>`.
+   - Use `bgmc`/Bangumi search for candidate subjects.
+   - Use web search when title aliases, season naming, or release metadata are ambiguous.
+   - Prefer the exact seasonal subject, not the franchise/root subject.
+4. Update the session file with resolved Bangumi subject ids.
+5. Report the complete calendar before uploading. Include every animation in the season and its
+   Bangumi subject id, grouped by weekday and web/ONA.
+6. Wait for the user to confirm the reported calendar.
+7. Upload the confirmed calendar and mark the season active:
+   ```bash
+   bgmx sync yuc --year 2026 --month 7 --session yuc-2026-07.yaml --update-server --update-active true
+   ```
+8. Verify the uploaded season:
+   ```bash
+   bgmx calendar --season 2026-07
+   ```
 
 Calendar seasons use `yyyy-MM` where `MM` is `01`, `04`, `07`, or `10`. `sync yuc` derives this
-season from `--year` and `--month`. If `--update-active` is omitted, the command updates the
-season's calendar relations without changing `is_active`.
+season from `--year` and `--month`.
 
-When switching active online calendars, explicitly set the outgoing season inactive and the incoming
-season active. The backend does not enforce a single active calendar.
+### Cancel An Active Calendar
+
+Use this when the user asks to deactivate a season without deleting its calendar data.
+
+1. Confirm the target season:
+   ```bash
+   bgmx calendar --season 2026-07
+   ```
+2. Mark it inactive:
+   ```bash
+   bgmx sync yuc --year 2026 --month 7 --session yuc-2026-07.yaml --update-server --update-active false
+   ```
+3. Verify active calendar state with `bgmx calendar` or fetch the season directly with
+   `bgmx calendar --season 2026-07`.
