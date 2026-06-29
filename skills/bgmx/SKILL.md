@@ -89,7 +89,10 @@ subject ids, uploading the calendar, marking a season active, or cancelling an a
 1. Generate an initial yuc calendar session file in a draft directory without `.env`, so it cannot
    upload. Use an explicit session file name so it can be reviewed and edited:
    ```bash
-   bgmx sync yuc --year 2026 --month 7 --session yuc-2026-07.yaml
+   bgmx sync yuc \
+     --year 2026 \
+     --month 7 \
+     --session yuc-2026-07.yaml
    ```
 2. Read the generated session file. Find every calendar item whose `id` is missing or `-1`.
 3. Infer missing Bangumi subject ids using the available tools:
@@ -103,7 +106,12 @@ subject ids, uploading the calendar, marking a season active, or cancelling an a
 6. Wait for the user to confirm the reported calendar.
 7. Upload the confirmed calendar and mark the season active:
    ```bash
-   bgmx sync yuc --year 2026 --month 7 --session yuc-2026-07.yaml --update-server --update-active true
+   bgmx sync yuc \
+     --year 2026 \
+     --month 7 \
+     --session yuc-2026-07.yaml \
+     --update-server \
+     --update-active true
    ```
 8. Verify the uploaded season:
    ```bash
@@ -111,7 +119,8 @@ subject ids, uploading the calendar, marking a season active, or cancelling an a
    ```
 
 Calendar seasons use `yyyy-MM` where `MM` is `01`, `04`, `07`, or `10`. `sync yuc` derives this
-season from `--year` and `--month`.
+season only from explicit `--year` and `--month`; it does not infer them from the session file name.
+Always pass both flags when reading or uploading a session file.
 
 ### Cancel An Active Calendar
 
@@ -123,7 +132,15 @@ Use this when the user asks to deactivate a season without deleting its calendar
    ```
 2. Mark it inactive:
    ```bash
-   bgmx sync yuc --year 2026 --month 7 --session yuc-2026-07.yaml --update-server --update-active false
+   bgmx sync yuc \
+     --year 2026 \
+     --month 7 \
+     --session yuc-2026-07.yaml \
+     --update-server \
+     --update-active false
    ```
-3. Verify active calendar state with `bgmx calendar` or fetch the season directly with
-   `bgmx calendar --season 2026-07`.
+3. Verify active calendar state:
+   ```bash
+   bgmx calendar
+   bgmx calendar --season 2026-07
+   ```
