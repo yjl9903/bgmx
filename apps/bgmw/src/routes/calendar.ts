@@ -24,6 +24,19 @@ function validateSeasons(seasons: string[]) {
   return z.array(seasonSchema).safeParse(seasons);
 }
 
+function dedupeAndSortCalendarSubjects(subjects: CalendarSubject[]) {
+  const seen = new Set<number>();
+  subjects.sort((a, b) => b.id - a.id);
+  for (let i = 0; i < subjects.length; i++) {
+    if (seen.has(subjects[i].id)) {
+      subjects.splice(i, 1);
+      i--;
+    } else {
+      seen.add(subjects[i].id);
+    }
+  }
+}
+
 router.get('/calendar', publicCache(), async (c) => {
   const requestId = c.get('requestId');
   const queriedSeasons = c.req.queries('season') ?? [];
@@ -57,6 +70,10 @@ router.get('/calendar', publicCache(), async (c) => {
         web.push(subject);
       }
     }
+    for (const row of calendar) {
+      dedupeAndSortCalendarSubjects(row);
+    }
+    dedupeAndSortCalendarSubjects(web);
 
     return c.json({
       ok: true,

@@ -72,6 +72,26 @@ describe('calendar route', () => {
       },
       {
         relation: {
+          id: 3,
+          season: '2026-07',
+          subjectId: 3,
+          platform: 'tv',
+          weekday: 1
+        },
+        subject: createSubject(3)
+      },
+      {
+        relation: {
+          id: 4,
+          season: '2026-07',
+          subjectId: 1,
+          platform: 'tv',
+          weekday: 1
+        },
+        subject: createSubject(1)
+      },
+      {
+        relation: {
           id: 2,
           season: '2026-07',
           subjectId: 2,
@@ -88,12 +108,7 @@ describe('calendar route', () => {
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
     expect(fetchCalendarRows).toHaveBeenCalledWith(expect.anything(), ['2026-04', '2026-07']);
-    expect(json.data.calendar[1]).toHaveLength(1);
-    expect(json.data.calendar[1][0]).toMatchObject({
-      id: 1,
-      platform: 'tv',
-      weekday: 1
-    });
+    expect(json.data.calendar[1].map((item: any) => item.id)).toEqual([3, 1]);
     expect(json.data.web).toHaveLength(1);
     expect(json.data.web[0]).toMatchObject({
       id: 2,
