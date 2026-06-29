@@ -69,7 +69,7 @@ cli
 
 cli
   .command('sync bangumi', '拉取并更新所有 bangumi 条目数据')
-  .option('--update-server', '是否更新服务端数据, 默认值: true', { default: true })
+  .option('--update-server', '是否更新服务端数据, 默认值: false', { default: false })
   .option('--log <file>', '日志文件, 默认值: sync-bangumi.md')
   .option('--out-dir <directory>', '输出目录, 默认值: data/bangumi')
   .option('--concurrency <number>', '并发数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
@@ -136,7 +136,7 @@ cli
 
 cli
   .command('sync tmdb', '拉取并更新所有 tmdb 条目数据')
-  .option('--update-server', '是否更新服务端数据, 默认值: true', { default: true })
+  .option('--update-server', '是否更新服务端数据, 默认值: false', { default: false })
   .option('--log <file>', '日志文件, 默认值: sync-tmdb.md')
   .option('--out-dir <directory>', '输出目录, 默认值: data/tmdb')
   .option('--concurrency <number>', '并发数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
@@ -154,7 +154,7 @@ cli
   .option('--force-overwrite', '强制覆盖会话文件数据, 默认值: false')
   .option('--year <year>', '年份, 默认值: ' + new Date().getFullYear())
   .option('--month <month>', '月份, 可选值: 1, 4, 7, 10')
-  .option('--update-server', '是否更新服务端数据, 默认值: true', { default: true })
+  .option('--update-server', '是否更新服务端数据, 默认值: false', { default: false })
   .option('--update-active <boolean>', '是否更新该季度周历 active 状态', {
     default: true,
     cast: parseBooleanOption
