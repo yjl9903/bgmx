@@ -11,6 +11,7 @@ vi.mock('../src/calendar/database', () => ({
 
 import { deleteCalendar, fetchCalendarRows, upsertCalendar } from '../src/calendar/database';
 import { calendarRoute } from '../src/routes/calendar';
+import { PUBLIC_CACHE_CONTROL } from '../src/routes/middlewares/cache';
 
 function createTestApp() {
   const app = new Hono<AppEnv>();
@@ -46,6 +47,7 @@ describe('calendar route', () => {
     const json = (await resp.json()) as any;
 
     expect(resp.status).toBe(200);
+    expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
     expect(fetchCalendarRows).toHaveBeenCalledWith(expect.anything(), undefined);
     expect(json).toEqual({
       ok: true,
@@ -84,6 +86,7 @@ describe('calendar route', () => {
     const json = (await resp.json()) as any;
 
     expect(resp.status).toBe(200);
+    expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
     expect(fetchCalendarRows).toHaveBeenCalledWith(expect.anything(), ['2026-04', '2026-07']);
     expect(json.data.calendar[1]).toHaveLength(1);
     expect(json.data.calendar[1][0]).toMatchObject({
@@ -129,6 +132,7 @@ describe('calendar route', () => {
     const json = (await resp.json()) as any;
 
     expect(resp.status).toBe(200);
+    expect(resp.headers.get('Cache-Control')).toBeNull();
     expect(upsertCalendar).toHaveBeenCalledWith(expect.anything(), {
       season: '2026-04',
       isActive: true,
@@ -182,6 +186,7 @@ describe('calendar route', () => {
     );
 
     expect(resp.status).toBe(200);
+    expect(resp.headers.get('Cache-Control')).toBeNull();
     expect(upsertCalendar).toHaveBeenCalledWith(expect.anything(), {
       season: '2026-04',
       isActive: undefined,
@@ -213,6 +218,7 @@ describe('calendar route', () => {
     const json = (await resp.json()) as any;
 
     expect(resp.status).toBe(200);
+    expect(resp.headers.get('Cache-Control')).toBeNull();
     expect(deleteCalendar).toHaveBeenCalledWith(expect.anything(), '2026-04');
     expect(json).toEqual({
       ok: true,
@@ -239,6 +245,8 @@ describe('calendar route', () => {
 
     expect(getResp.status).toBe(400);
     expect(deleteResp.status).toBe(400);
+    expect(getResp.headers.get('Cache-Control')).toBeNull();
+    expect(deleteResp.headers.get('Cache-Control')).toBeNull();
     expect(fetchCalendarRows).not.toHaveBeenCalled();
     expect(deleteCalendar).not.toHaveBeenCalled();
   });

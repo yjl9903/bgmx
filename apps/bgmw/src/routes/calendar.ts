@@ -8,6 +8,7 @@ import { type CalendarSubject } from '../schema';
 
 import { zValidator } from './middlewares/zod';
 import { authorization } from './middlewares/auth';
+import { publicCache } from './middlewares/cache';
 
 const router = new Hono<AppEnv>();
 
@@ -23,7 +24,7 @@ function validateSeasons(seasons: string[]) {
   return z.array(seasonSchema).safeParse(seasons);
 }
 
-router.get('/calendar', async (c) => {
+router.get('/calendar', publicCache(), async (c) => {
   const requestId = c.get('requestId');
   const queriedSeasons = c.req.queries('season') ?? [];
   const seasons = queriedSeasons.length > 0 ? validateSeasons(queriedSeasons) : undefined;

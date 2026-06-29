@@ -17,6 +17,7 @@ import {
 
 import { zValidator } from './middlewares/zod';
 import { authorization } from './middlewares/auth';
+import { publicCache } from './middlewares/cache';
 
 const router = new Hono<AppEnv>();
 
@@ -24,6 +25,7 @@ const router = new Hono<AppEnv>();
 router.get(
   '/subject/:id',
   zValidator('param', z.object({ id: z.coerce.number().int().gt(0) })),
+  publicCache(),
   async (c) => {
     const requestId = c.get('requestId');
     const subjectId = c.req.valid('param').id;
@@ -318,6 +320,7 @@ router.get(
       limit: z.coerce.number().int().positive().max(1000).default(100)
     })
   ),
+  publicCache(),
   async (c) => {
     const requestId = c.get('requestId');
 

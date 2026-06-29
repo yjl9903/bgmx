@@ -11,11 +11,12 @@ import { client, fetchAndUpdateBangumiSubject } from '../bangumi';
 
 import { zValidator } from './middlewares/zod';
 import { authorization } from './middlewares/auth';
+import { publicCache } from './middlewares/cache';
 
 const router = new Hono<AppEnv>();
 
 // 查询 bangumi calendar
-router.get('/bangumi/calendar', async (c) => {
+router.get('/bangumi/calendar', publicCache(), async (c) => {
   const calendar = await client.calendar();
 
   return c.json({
@@ -28,6 +29,7 @@ router.get('/bangumi/calendar', async (c) => {
 router.get(
   '/bangumi/subject/:id',
   zValidator('param', z.object({ id: z.coerce.number().gt(0) })),
+  publicCache(),
   async (c) => {
     const requestId = c.get('requestId');
     const subjectId = c.req.valid('param').id;
@@ -93,6 +95,7 @@ router.get(
       limit: z.coerce.number().int().positive().max(1000).default(100)
     })
   ),
+  publicCache(),
   async (c) => {
     const requestId = c.get('requestId');
 
