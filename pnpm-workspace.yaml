@@ -7,9 +7,6 @@ allowBuilds:
   sharp: true
   workerd: true
 
-patchedDependencies:
-  release-it@16.2.1: patches/release-it@16.2.1.patch
-
 gitChecks: false
 ignoreWorkspaceRootCheck: true
 shamefullyHoist: true
