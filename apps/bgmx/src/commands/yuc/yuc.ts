@@ -29,7 +29,11 @@ export interface FetchYucDataOptions {
 
 export async function fetchYucData(options: FetchYucDataOptions) {
   const [year, month] =
-    options.year && options.month ? [options.year, options.month] : inferOnairMonth();
+    options.year && options.month
+      ? [options.year, options.month]
+      : options.session && !options.year && !options.month
+        ? inferOnairMonthFromSession(options.session)
+        : inferOnairMonth();
 
   const sessionFile = options.session ?? `yuc-${year}-${('' + month).padStart(2, '0')}.yaml`;
 
@@ -106,6 +110,14 @@ export async function writeSession(
     }),
     'utf-8'
   );
+}
+
+function inferOnairMonthFromSession(file: string) {
+  const match = path.basename(file).match(/(\d{4})-?(\d{2})/);
+  if (!match) {
+    throw new Error(`Cannot infer yuc year and month from session file: ${file}`);
+  }
+  return [+match[1], +match[2]];
 }
 
 function inferOnairMonth() {

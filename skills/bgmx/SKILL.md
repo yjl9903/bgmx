@@ -119,8 +119,8 @@ subject ids, uploading the calendar, marking a season active, or cancelling an a
    ```
 
 Calendar seasons use `yyyy-MM` where `MM` is `01`, `04`, `07`, or `10`. `sync yuc` derives this
-season only from explicit `--year` and `--month`; it does not infer them from the session file name.
-Always pass both flags when reading or uploading a session file.
+season from explicit `--year` and `--month`; when both are omitted and `--session` is set, it derives
+them from the session file name, with or without the hyphen between year and month.
 
 ### Cancel An Active Calendar
 
