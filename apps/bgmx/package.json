@@ -18,13 +18,11 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs"
-    }
+    ".": "./dist/index.mjs",
+    "./cli": "./dist/cli.mjs",
+    "./package.json": "./package.json"
   },
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "types": "dist/index.d.mts",
   "bin": {
     "bgmx": "./cli.mjs"
   },
@@ -79,5 +77,8 @@
       "after:version": "pnpm run build",
       "before:init": "pnpm run build"
     }
+  },
+  "inlinedDependencies": {
+    "drizzle-orm": "0.45.2"
   }
 }
