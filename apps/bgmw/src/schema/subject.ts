@@ -15,8 +15,6 @@ export const bangumis = sqliteTable('bangumis', {
     .$defaultFn(() => new Date())
 });
 
-export type Bangumi = typeof bangumis.$inferSelect;
-
 export const tmdbs = sqliteTable('tmdbs', {
   id: integer('id').primaryKey(),
   data: text('data', { mode: 'json' }).$type<unknown>().notNull(),
@@ -36,5 +34,3 @@ export const subjects = sqliteTable('subjects', {
     .notNull()
     .$defaultFn(() => new Date())
 });
-
-export type Subject = typeof subjects.$inferSelect;

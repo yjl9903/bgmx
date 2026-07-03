@@ -1,4 +1,21 @@
-import type { SubjectInformation } from 'bgmc';
+import type { RelatedSubject, SubjectCharacters, SubjectInformation, SubjectPersons } from 'bgmc';
+
+export type Bangumi = {
+  id: number;
+  data: SubjectInformation;
+  persons: SubjectPersons;
+  characters: SubjectCharacters;
+  subjects: RelatedSubject[];
+  updatedAt: Date;
+};
+
+export type Subject = {
+  id: number;
+  title: string;
+  data: SubjectData;
+  search: SubjectSearch;
+  updatedAt: Date;
+};
 
 export type SubjectData = {
   id: number;
@@ -37,4 +54,65 @@ export type SubjectSearch = {
   keywords?: string[];
   after?: number;
   before?: number;
+};
+
+export type Calendar = {
+  season: string;
+  isActive: boolean;
+};
+
+export type CalendarRelation = {
+  id: number;
+  season: string;
+  subjectId: number;
+  platform: 'tv' | 'web';
+  weekday: number | null;
+};
+
+export type CalendarInput = {
+  subject_id: number;
+  platform: 'tv' | 'web';
+  weekday?: number | null;
+};
+
+export type CalendarUpdateInput = {
+  season: string;
+  isActive?: boolean;
+  calendar?: CalendarInput[];
+};
+
+export type CalendarUpdateResult = {
+  season: string;
+  is_active: boolean;
+  calendar: CalendarInput[];
+};
+
+export type CalendarSubject = Subject & {
+  platform: 'tv' | 'web';
+  weekday: number | undefined | null;
+};
+
+export type RevisionDetail =
+  | {
+      operation: 'set.add';
+      path: string;
+      value: string[];
+    }
+  | {
+      operation: 'set.delete';
+      path: string;
+      value: string[];
+    }
+  | {
+      operation: 'field.set';
+      path: string;
+      value: unknown;
+    };
+
+export type Revision = {
+  id: number;
+  targetId: number;
+  detail: RevisionDetail;
+  enabled: boolean;
+  createdAt: Date;
 };

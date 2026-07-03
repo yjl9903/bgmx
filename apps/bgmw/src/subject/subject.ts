@@ -6,7 +6,7 @@ import {
   normalizeTags
 } from 'bgmt';
 
-import type { Bangumi as DatabaseBangumi, Revision, Subject, SubjectImage } from '../schema';
+import type { Bangumi as DatabaseBangumi, Revision, Subject, SubjectImage } from '../schema/types';
 
 import { applyRevisions } from './revision';
 

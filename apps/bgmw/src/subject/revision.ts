@@ -1,4 +1,4 @@
-import type { Subject, Revision } from '../schema';
+import type { Subject, Revision } from '../schema/types';
 
 export function applyRevisions(sourceSubject: Subject, revisions: Revision[]) {
   if (revisions.length === 0) return { ok: true, subject: sourceSubject };

@@ -77,8 +77,5 @@
       "after:version": "pnpm run build",
       "before:init": "pnpm run build"
     }
-  },
-  "inlinedDependencies": {
-    "drizzle-orm": "0.45.2"
   }
 }

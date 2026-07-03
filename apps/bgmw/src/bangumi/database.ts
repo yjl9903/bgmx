@@ -1,7 +1,8 @@
 import type { Context } from '../env';
 
 import { updateSubject, fetchSubjectRevisions } from '../subject';
-import { bangumis, type Bangumi as DatabaseBangumi } from '../schema/subject';
+import type { Bangumi as DatabaseBangumi } from '../schema/types';
+import { bangumis } from '../schema/subject';
 
 import { client } from './client';
 

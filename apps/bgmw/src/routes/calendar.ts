@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { Hono } from 'hono';
 
 import type { AppEnv } from '../env';
+import type { CalendarSubject } from '../schema/types';
 
 import { deleteCalendar, fetchCalendarRows, upsertCalendar } from '../calendar/database';
-import { type CalendarSubject } from '../schema';
 
 import { zValidator } from './middlewares/zod';
 import { authorization } from './middlewares/auth';

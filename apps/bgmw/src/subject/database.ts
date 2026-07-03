@@ -1,10 +1,12 @@
 import { and, asc, eq, gt } from 'drizzle-orm';
 
 import type { Context } from '../env';
+import type {
+  Bangumi as DatabaseBangumi,
+  Revision as DatabaseRevision,
+  RevisionDetail
+} from '../schema/types';
 import {
-  type Bangumi as DatabaseBangumi,
-  type Revision as DatabaseRevision,
-  type RevisionDetail,
   revisions as revisionsSchema,
   subjects as subjectsSchema
 } from '../schema';

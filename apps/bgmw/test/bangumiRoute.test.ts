@@ -82,11 +82,17 @@ describe('bangumi route cache headers', () => {
   });
 
   it('does not cache upstream error responses', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(client.subject).mockRejectedValueOnce(new Error('upstream failed'));
 
-    const resp = await createTestApp().request('/bangumi/subject/1');
+    try {
+      const resp = await createTestApp().request('/bangumi/subject/1');
 
-    expect(resp.status).toBe(502);
-    expect(resp.headers.get('Cache-Control')).toBeNull();
+      expect(resp.status).toBe(502);
+      expect(resp.headers.get('Cache-Control')).toBeNull();
+      expect(consoleError).toHaveBeenCalledOnce();
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });

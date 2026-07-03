@@ -1,7 +1,5 @@
-export * from './subject';
+export { bangumis, subjects, tmdbs } from './subject';
 
-export * from './calendar';
+export { calendarRelations, calendars } from './calendar';
 
-export * from './revision';
-
-export * from './types';
+export { revisions } from './revision';

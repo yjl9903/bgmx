@@ -2,10 +2,8 @@ import { asc, eq, inArray } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
 
 import type { Context } from '../env';
+import type { CalendarInput, CalendarUpdateInput, CalendarUpdateResult } from '../schema/types';
 import {
-  type CalendarInput,
-  type CalendarUpdateInput,
-  type CalendarUpdateResult,
   calendarRelations as calendarRelationsSchema,
   calendars as calendarsSchema,
   subjects as subjectsSchema
