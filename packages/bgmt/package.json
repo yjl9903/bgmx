@@ -19,28 +19,11 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    },
-    "./cdn": {
-      "types": "./dist/cdn.d.ts",
-      "import": "./dist/cdn.mjs",
-      "require": "./dist/cdn.cjs"
-    }
+    ".": "./dist/index.mjs",
+    "./cdn": "./dist/cdn.mjs",
+    "./package.json": "./package.json"
   },
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/*",
-        "./*"
-      ]
-    }
-  },
+  "types": "dist/index.d.mts",
   "files": [
     "dist"
   ],

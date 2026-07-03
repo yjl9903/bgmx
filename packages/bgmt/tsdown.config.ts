@@ -5,8 +5,5 @@ export default defineConfig({
     index: 'src/index.ts',
     cdn: 'src/cdn/index.ts'
   },
-  format: ['esm', 'cjs'],
-  dts: true,
-  clean: true,
-  outDir: 'dist'
+  exports: true,
 });

@@ -6,8 +6,5 @@ export default defineConfig({
     types: 'src/types/index.ts',
     cli: 'src/cli.ts'
   },
-  format: ['esm', 'cjs'],
-  dts: true,
-  clean: true,
-  outDir: 'dist'
+  exports: true,
 });
