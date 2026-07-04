@@ -20,6 +20,7 @@
   "exports": {
     ".": "./dist/index.mjs",
     "./cli": "./dist/cli.mjs",
+    "./client": "./dist/client.mjs",
     "./package.json": "./package.json"
   },
   "types": "dist/index.d.mts",
