@@ -30,21 +30,22 @@ export function transformCalendarSubject(item: CalendarSubject, options: { full?
     ? {
         id: item.id,
         title: item.title,
-        platform: item.bangumi.platform || item.platform,
-        onair_date: item.onair_date,
-        poster: item.poster,
-        summary: item.bangumi.summary,
         alias: item.alias,
-        tags: item.bangumi.tags,
+        platform: item.bangumi.platform,
+        onair_date: item.onair_date || item.bangumi.date,
+        poster: item.poster || item.bangumi.images.large || '',
+        summary: item.bangumi.summary,
+        tags: new Set([...(item.bangumi?.meta_tags ?? []), ...(item.bangumi?.tags ?? [])]),
         search: item.search
       }
     : {
         id: item.id,
         title: item.title,
-        platform: item.bangumi.platform || item.platform,
-        onair_date: item.onair_date,
-        poster: item.poster,
-        tags: item.bangumi.tags,
+        alias: item.alias,
+        platform: item.bangumi.platform,
+        onair_date: item.onair_date || item.bangumi.date,
+        poster: item.poster || item.bangumi.images.large || '',
+        tags: new Set([...(item.bangumi?.meta_tags ?? []), ...(item.bangumi?.tags ?? [])]),
         search: item.search
       };
 }
