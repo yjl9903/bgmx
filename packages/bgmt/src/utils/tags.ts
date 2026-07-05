@@ -18,11 +18,18 @@ const MERGE_TAGS = [
   ['轻改', '轻小说改'],
   ['东映アニメーション', '东映动画'],
   ['TV', 'TVA'],
+  ['ProductionI.G', 'Production.I.G', 'Production_I.G'],
+  ['8bit', '8-Bit'],
+  ['SILVERLINK', 'SILVERLINK.', 'SILVER_LINK.'],
+  ['studiodeen', 'Studio.DEEN', 'STUDIO_DEEN'],
+  ['A-1Pictures', 'A-Pictures', 'A-1_Pictures'],
+  ['WITSTUDIO', 'WIT_STUDIO'],
+  ['davidproduction', 'david_production'],
+  ['KINEMACITRUS', 'KINEMA_CITRUS'],
   ['东方Project', '东方project'],
   ['手冢PRODUCTION', '手冢Production'],
-  ['A-1Pictures', 'A-Pictures'],
   ['MADHouse', 'MAD_HOUSE', 'Mad-house'],
-  ['studiodeen', 'Studio.DEEN'],
+  ['InfiniteStratos', 'Infinite Stratos'],
   ['治愈', '治癒'],
   ['泡面', '泡麵'],
   ['音乐', '音楽'],
@@ -39,6 +46,7 @@ const REMOVE_TAGS = new Set([
   '未确定',
   '日本',
   '日本动画',
+  '?',
   'Mobile_Suit_Gundam_0083:Stardu',
   '机动戦舰ナデシコ-The_prince_of_darknes',
   'H2O_-FOOTPRINTS_IN_THE_SAND-',
@@ -95,7 +103,7 @@ function mergeSimpleTags(tags: Tag[]) {
       t.name = target;
     }
 
-    const name0 = t.name.normalize('NFKC').trim().replace(/,+$/, '');
+    const name0 = normalizeDateTag(t.name.normalize('NFKC').trim().replace(/,+$/, ''));
     if (!name0 || REMOVE_TAGS.has(name0)) continue;
     const name1 = fullToHalf(tradToSimple(name0), { punctuation: true });
     const name2 = MERGE_TAGS.find((arr) => arr.includes(name1))?.[0] ?? name1;
@@ -114,4 +122,8 @@ function expandTag(tag: Tag) {
     .map((name) => name.trim())
     .filter((name) => name && !REMOVE_TAGS.has(name))
     .map((name) => ({ name, count: tag.count }));
+}
+
+function normalizeDateTag(name: string) {
+  return name.replace(/^((?:19|20)\d{2})年0?(\d{1,2})月番?$/, '$1年$2月');
 }

@@ -7,7 +7,9 @@ describe('tags', () => {
     [['2025', '2025年', '10月', '2025年10月'], ['2025年10月']],
     [['10月', '2025', '2025年', '2025年10月'], ['2025年10月']],
     [['2025', '2025年', '2025年10月'], ['2025年10月']],
-    [['2025', '2025年', '2025年10月', '2025秋'], ['2025年10月']]
+    [['2025', '2025年', '2025年10月', '2025秋'], ['2025年10月']],
+    [['2022年01月', '2022年1月'], ['2022年1月']],
+    [['2012年1月', '2012年1月番'], ['2012年1月']]
   ])('should normalize %o -> %o', (input: string[], expected: string[]) => {
     expect(normalizeTags(input.map((t) => ({ name: t, count: 1 })))).toEqual(expected);
   });
@@ -20,6 +22,7 @@ describe('tags', () => {
           'TⅤ',
           '百合　',
           'MAPPA　',
+          'Infinite　Stratos',
           '东方project',
           '手冢Production',
           '奇幻,',
@@ -35,13 +38,15 @@ describe('tags', () => {
           '总集编',
           "Children'sPlaygroundEntertainm",
           'ChildrensPlaygroundEntertainme',
-          ','
+          ',',
+          '?'
         ].map((t) => ({ name: t, count: 1 }))
       )
     ).toEqual([
       '1992',
       'A-1Pictures',
       "Children'sPlaygroundEntertainment",
+      'InfiniteStratos',
       'MADHouse',
       'MAPPA',
       'TV',
@@ -55,6 +60,42 @@ describe('tags', () => {
       '泡面',
       '百合',
       '音乐'
+    ]);
+  });
+
+  it('should merge common studio variants', () => {
+    expect(
+      normalizeTags(
+        [
+          'Production.I.G',
+          'ProductionI.G',
+          'Production_I.G',
+          '8-Bit',
+          '8bit',
+          'SILVERLINK.',
+          'SILVER_LINK.',
+          'SILVERLINK',
+          'STUDIO_DEEN',
+          'studiodeen',
+          'A-1Pictures',
+          'A-1_Pictures',
+          'WITSTUDIO',
+          'WIT_STUDIO',
+          'davidproduction',
+          'david_production',
+          'KINEMACITRUS',
+          'KINEMA_CITRUS'
+        ].map((t) => ({ name: t, count: 1 }))
+      )
+    ).toEqual([
+      '8bit',
+      'A-1Pictures',
+      'KINEMACITRUS',
+      'ProductionI.G',
+      'SILVERLINK',
+      'WITSTUDIO',
+      'davidproduction',
+      'studiodeen'
     ]);
   });
 
