@@ -1,30 +1,30 @@
-export type SubjectRating = {
+type SubjectRating = {
   score: number;
   rank: number;
 };
 
-export type SubjectImage = {
-  provider: 'bgm' | 'tmdb';
-  quality: string;
-  src: string;
-};
+type SubjectAlias = Partial<Record<'ja' | 'zh' | 'en', string[]>>;
 
-export type SubjectSearch = {
+type SubjectSearch = {
   include: string[];
 
-  exclude?: string[] | null | undefined;
+  after?: number | null | undefined;
+
+  before?: number | null | undefined;
 };
 
-export type BasicSubject = {
+type BasicSubject = {
   id: number;
 
   title: string;
+
+  alias: SubjectAlias;
 
   platform: string;
 
   onair_date?: string | null | undefined;
 
-  rating: SubjectRating;
+  rating?: SubjectRating | null | undefined;
 
   poster: string;
 
@@ -33,10 +33,25 @@ export type BasicSubject = {
   search: SubjectSearch;
 };
 
-export type FullSubject = BasicSubject & {
+type FullSubject = BasicSubject & {
   summary: string;
+};
 
-  alias: string[];
+declare const _version: string;
 
-  images: SubjectImage[];
+declare const _subjects: BasicSubject[];
+
+declare const _default: {
+  subjects: BasicSubject[];
+};
+
+export {
+  SubjectRating,
+  SubjectAlias,
+  SubjectSearch,
+  BasicSubject,
+  FullSubject,
+  _version as version,
+  _subjects as subjects,
+  _default as default
 };
