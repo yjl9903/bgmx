@@ -15,6 +15,7 @@
     {
       "matchBaseBranches": ["main"],
       "matchPackageNames": ["bangumi-data"],
+      "prPriority": 100,
       "automerge": true
     }
   ]
