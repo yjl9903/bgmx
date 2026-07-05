@@ -10,7 +10,7 @@ export function transformDatabaseSubject(item: DatabaseSubject, options: { full?
         poster: item.poster || item.bangumi.images.large || '',
         summary: item.bangumi.summary,
         alias: item.alias,
-        tags: new Set([...item.bangumi.meta_tags, ...item.bangumi.tags]),
+        tags: new Set([...(item.bangumi?.meta_tags ?? []), ...(item.bangumi?.tags ?? [])]),
         search: item.search
       }
     : {
@@ -20,7 +20,7 @@ export function transformDatabaseSubject(item: DatabaseSubject, options: { full?
         onair_date: item.onair_date || item.bangumi.date,
         poster: item.poster || item.bangumi.images.large || '',
         alias: item.alias,
-        tags: new Set([...item.bangumi.meta_tags, ...item.bangumi.tags]),
+        tags: new Set([...(item.bangumi?.meta_tags ?? []), ...(item.bangumi?.tags ?? [])]),
         search: item.search
       };
 }
