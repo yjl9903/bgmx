@@ -140,7 +140,7 @@ export async function updateSubject(
 ) {
   const database = ctx.get('database');
 
-  const subject = createDatabaseSubject(bangumi, revisions);
+  const subject = await createDatabaseSubject(bangumi, revisions);
 
   const dbSubject = await database.query.subjects
     .findFirst({
@@ -152,15 +152,23 @@ export async function updateSubject(
     // 使用深度比较检查是否需要更新
     const dirty =
       dbSubject.title !== subject.title ||
+      dbSubject.poster !== subject.poster ||
+      dbSubject.onair_date !== subject.onair_date ||
+      !deepEqual(dbSubject.alias, subject.alias) ||
       !deepEqual(dbSubject.search, subject.search) ||
-      !deepEqual(dbSubject.data, subject.data);
+      !deepEqual(dbSubject.bangumi, subject.bangumi) ||
+      !deepEqual(dbSubject.tmdb, subject.tmdb);
 
     if (dirty) {
       const resp = await database
         .update(subjectsSchema)
         .set({
           title: subject.title,
-          data: subject.data,
+          bangumi: subject.bangumi,
+          tmdb: subject.tmdb,
+          poster: subject.poster,
+          onair_date: subject.onair_date,
+          alias: subject.alias,
           search: subject.search
         })
         .where(eq(subjectsSchema.id, bangumi.id))
@@ -184,7 +192,11 @@ export async function updateSubject(
         target: subjectsSchema.id,
         set: {
           title: subject.title,
-          data: subject.data,
+          bangumi: subject.bangumi,
+          tmdb: subject.tmdb,
+          poster: subject.poster,
+          onair_date: subject.onair_date,
+          alias: subject.alias,
           search: subject.search
         }
       })

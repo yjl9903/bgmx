@@ -27,7 +27,7 @@ export function matchBgmId(
   extra: { year?: number; month?: number }
 ) {
   for (const subject of subjects) {
-    const targets = [...subject.title, ...subject.search.include];
+    const targets = [subject.title, ...subject.search.include];
 
     const names2 = names.map((name) => trimSeason(name));
     const targets2 = targets.map((target) => trimSeason(target));
@@ -72,9 +72,9 @@ export function matchBgmId(
 }
 
 function matchDate(subject: DatabaseSubject, extra: { year?: number; month?: number }) {
-  if (subject.data.onair_date && extra.year && extra.month) {
+  if (subject.onair_date && extra.year && extra.month) {
     const d1 = new Date(extra.year, extra.month - 1, 1);
-    const d2 = new Date(subject.data.onair_date);
+    const d2 = new Date(subject.onair_date);
 
     return (
       Math.abs(

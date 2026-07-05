@@ -40,7 +40,7 @@ export function printBangumiSubject(bangumi: DatabaseBangumi) {
 }
 
 export function printSubject(data: { subject: DatabaseSubject; revisions: DatabaseRevision[] }) {
-  const subject = data.subject.data;
+  const subject = data.subject;
 
   const label = (str: string, prefix = 0) => {
     return bold(str.padEnd(10 - prefix, ' '));
@@ -48,9 +48,9 @@ export function printSubject(data: { subject: DatabaseSubject; revisions: Databa
 
   console.log(`${label('id')}  ${subject.id}`);
   console.log(`${label('name')}  ${subject.title}`);
-  console.log(`${label('platform')}  ${subject.platform}`);
+  console.log(`${label('platform')}  ${subject.bangumi.platform}`);
   console.log(`${label('date')}  ${subject.onair_date}`);
-  console.log(`${label('rating')}  ${subject.rating.score} #${subject.rating.rank}`);
+  console.log(`${label('rating')}  ${subject.bangumi.rating.score} #${subject.bangumi.rating.rank}`);
   console.log(`${label('updated')}  ${formatDatetime(new Date(data.subject.updatedAt))}`);
 
   console.log('');
@@ -95,13 +95,13 @@ export function printCalendar(calendar: CalendarSubject[][], web: CalendarSubjec
   for (let i = 0; i < calendar.length; i++) {
     console.log(bold(['周一', '周二', '周三', '周四', '周五', '周六', '周日'][i]));
     for (const item of calendar[i]) {
-      console.log(`${item.title} (id: ${item.id}, ${item.data.onair_date})`);
+      console.log(`${item.title} (id: ${item.id}, ${item.onair_date})`);
     }
     console.log();
   }
 
   console.log(`${bold('web')}`);
   for (const item of web) {
-    console.log(`${item.title} (id: ${item.id}, ${item.data.onair_date})`);
+    console.log(`${item.title} (id: ${item.id}, ${item.onair_date})`);
   }
 }

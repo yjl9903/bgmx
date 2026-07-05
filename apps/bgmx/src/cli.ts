@@ -179,8 +179,8 @@ cli
         subjects.push(subject);
       }
       subjects.sort((a, b) =>
-        a.data.onair_date && b.data.onair_date
-          ? new Date(b.data.onair_date).getTime() - new Date(a.data.onair_date).getTime()
+        a.onair_date && b.onair_date
+          ? new Date(b.onair_date).getTime() - new Date(a.onair_date).getTime()
           : b.id - a.id
       );
 
@@ -194,7 +194,7 @@ cli
           const subject = subjects.find((s) => s.id === item.id);
           if (subject) {
             console.info(
-              `${names[0]} -> ${subject.title} (id: ${subject.id}, ${subject.data.onair_date ?? '?'})`
+              `${names[0]} -> ${subject.title} (id: ${subject.id}, ${subject.onair_date ?? '?'})`
             );
           } else {
             console.error(`未知 subject ${item.id}`);

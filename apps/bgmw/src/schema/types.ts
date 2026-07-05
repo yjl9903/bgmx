@@ -12,41 +12,32 @@ export type Bangumi = {
 export type Subject = {
   id: number;
   title: string;
-  data: SubjectData;
+  alias: SubjectAlias;
+  poster: string;
+  onair_date?: string | undefined | null;
   search: SubjectSearch;
+  bangumi: SubjectBangumiData;
+  tmdb: SubjectTmdbData | null;
   updatedAt: Date;
 };
 
-export type SubjectData = {
-  id: number;
-
-  title: string;
-
-  platform: SubjectInformation['platform'];
-
-  onair_date?: string | undefined | null;
-
-  alias: string[];
-
+export type SubjectBangumiData = Omit<
+  SubjectInformation,
+  'name' | 'name_cn' | 'summary' | 'tags' | 'rating'
+> & {
+  name: string;
+  name_cn: string;
+  summary: string;
+  tags: string[];
   rating: {
     score: number;
     rank: number;
   };
-
-  summary: string;
-
-  poster: string;
-
-  images: SubjectImage[];
-
-  tags: string[];
 };
 
-export type SubjectImage = {
-  provider: 'bgm' | 'tmdb';
-  quality: string;
-  src: string;
-};
+export type SubjectTmdbData = unknown;
+
+export type SubjectAlias = Partial<Record<'ja' | 'zh' | 'en', string[]>>;
 
 export type SubjectSearch = {
   include: string[];

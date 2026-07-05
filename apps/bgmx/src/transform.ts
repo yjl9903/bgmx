@@ -1,5 +1,3 @@
-import { normalizeSummary } from 'bgmt';
-
 import { CalendarSubject, DatabaseSubject } from './client';
 
 export function transformDatabaseSubject(item: DatabaseSubject, options: { full?: boolean } = {}) {
@@ -7,24 +5,22 @@ export function transformDatabaseSubject(item: DatabaseSubject, options: { full?
     ? {
         id: item.id,
         title: item.title,
-        platform: item.data.platform,
-        onair_date: item.data.onair_date,
-        rating: item.data.rating,
-        poster: item.data.poster,
-        images: item.data.images,
-        summary: normalizeSummary(item.data.summary),
-        alias: item.data.alias,
-        tags: item.data.tags,
+        platform: item.bangumi.platform,
+        onair_date: item.onair_date,
+        poster: item.poster,
+        summary: item.bangumi.summary,
+        alias: item.alias,
+        tags: item.bangumi.tags,
         search: item.search
       }
     : {
         id: item.id,
         title: item.title,
-        platform: item.data.platform,
-        onair_date: item.data.onair_date,
-        rating: item.data.rating,
-        poster: item.data.poster,
-        tags: item.data.tags,
+        platform: item.bangumi.platform,
+        onair_date: item.onair_date,
+        poster: item.poster,
+        alias: item.alias,
+        tags: item.bangumi.tags,
         search: item.search
       };
 }
@@ -34,24 +30,21 @@ export function transformCalendarSubject(item: CalendarSubject, options: { full?
     ? {
         id: item.id,
         title: item.title,
-        platform: item.data.platform || item.platform,
-        onair_date: item.data.onair_date,
-        rating: item.data.rating,
-        poster: item.data.poster,
-        images: item.data.images,
-        summary: normalizeSummary(item.data.summary),
-        alias: item.data.alias,
-        tags: item.data.tags,
+        platform: item.bangumi.platform || item.platform,
+        onair_date: item.onair_date,
+        poster: item.poster,
+        summary: item.bangumi.summary,
+        alias: item.alias,
+        tags: item.bangumi.tags,
         search: item.search
       }
     : {
         id: item.id,
         title: item.title,
-        platform: item.data.platform || item.platform,
-        onair_date: item.data.onair_date,
-        rating: item.data.rating,
-        poster: item.data.poster,
-        tags: item.data.tags,
+        platform: item.bangumi.platform || item.platform,
+        onair_date: item.onair_date,
+        poster: item.poster,
+        tags: item.bangumi.tags,
         search: item.search
       };
 }

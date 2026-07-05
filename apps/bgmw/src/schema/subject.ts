@@ -2,7 +2,7 @@ import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
 
 import type { RelatedSubject, SubjectCharacters, SubjectInformation, SubjectPersons } from 'bgmc';
 
-import type { SubjectData, SubjectSearch } from './types';
+import type { SubjectAlias, SubjectBangumiData, SubjectSearch, SubjectTmdbData } from './types';
 
 export const bangumis = sqliteTable('bangumis', {
   id: integer('id').primaryKey(),
@@ -28,7 +28,11 @@ export const subjects = sqliteTable('subjects', {
     .primaryKey()
     .references(() => bangumis.id),
   title: text('title').notNull(),
-  data: text('data', { mode: 'json' }).$type<SubjectData>().notNull(),
+  bangumi: text('bangumi', { mode: 'json' }).$type<SubjectBangumiData>().notNull(),
+  tmdb: text('tmdb', { mode: 'json' }).$type<SubjectTmdbData | null>(),
+  poster: text('poster').notNull(),
+  onair_date: text('onair_date'),
+  alias: text('alias', { mode: 'json' }).$type<SubjectAlias>().notNull(),
   search: text('search', { mode: 'json' }).$type<SubjectSearch>().notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
