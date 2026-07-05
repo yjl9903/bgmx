@@ -33,7 +33,7 @@ import { transformDatabaseSubject } from './transform';
 import { syncBangumi } from './commands/bangumi';
 import { createRevision } from './commands/revision';
 
-const cli = breadc('bgmx', { version })
+const cli = breadc('bgmx', { version, i18n: 'zh' })
   .option('--base-url <url>', 'API 地址, 默认值: https://bgm.animes.garden')
   .option('-s, --secret <string>', 'API 密钥');
 
