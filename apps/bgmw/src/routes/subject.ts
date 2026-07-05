@@ -2,7 +2,9 @@ import { z } from 'zod';
 import { Hono } from 'hono';
 
 import type { AppEnv } from '../env';
+import type { Subject } from '../schema/types';
 
+import { fetchAndUpdateBangumiSubject } from '../bangumi';
 import {
   createSubjectRevision,
   disableSubjectRevision,
@@ -20,6 +22,7 @@ import { authorization } from './middlewares/auth';
 import { publicCache } from './middlewares/cache';
 
 const router = new Hono<AppEnv>();
+const SUBJECT_STALE_MS = 24 * 60 * 60 * 1000;
 
 // 查询数据库中的单个 subject
 router.get(
@@ -31,8 +34,22 @@ router.get(
     const subjectId = c.req.valid('param').id;
 
     try {
-      const subject = await fetchSubjectById(c, subjectId);
-      const revisions = await fetchSubjectRevisions(c, subjectId);
+      let subject = await fetchSubjectById(c, subjectId);
+
+      if (!subject || isSubjectStale(subject)) {
+        const refreshed = await fetchAndUpdateBangumiSubject(c, subjectId);
+        if (!refreshed.ok) {
+          return c.json(
+            {
+              ok: false,
+              error: 'Failed to refresh subject'
+            },
+            502
+          );
+        }
+
+        subject = await fetchSubjectById(c, subjectId);
+      }
 
       if (!subject) {
         return c.json(
@@ -43,6 +60,8 @@ router.get(
           404
         );
       }
+
+      const revisions = await fetchSubjectRevisions(c, subjectId);
 
       return c.json(
         {
@@ -70,6 +89,10 @@ router.get(
     }
   }
 );
+
+function isSubjectStale(subject: Pick<Subject, 'updatedAt'>) {
+  return Date.now() - new Date(subject.updatedAt).getTime() > SUBJECT_STALE_MS;
+}
 
 // 创建 revision 更新单个 subject
 router.post(
