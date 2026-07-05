@@ -34,7 +34,13 @@ type BasicSubject = {
 };
 
 type FullSubject = BasicSubject & {
-  summary: string;
+  summary?: string | null | undefined;
+
+  // SubjectBangumiData
+  bangumi?: unknown;
+
+  // SubjectTmdbData
+  tmdb?: unknown;
 };
 
 declare const _version: string;
