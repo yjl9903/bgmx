@@ -1,7 +1,7 @@
 # bgmc
 
 [![version](https://img.shields.io/npm/v/bgmc?label=bgmc)](https://www.npmjs.com/package/bgmc)
-[![CI](https://github.com/yjl9903/bgmc/actions/workflows/ci.yml/badge.svg)](https://github.com/yjl9903/bgmc/actions/workflows/ci.yml)
+[![CI](https://github.com/yjl9903/bgmx/actions/workflows/ci.yml/badge.svg)](https://github.com/yjl9903/bgmx/actions/workflows/ci.yml)
 
 JavaScript [Bangumi](https://bgm.tv) client bindings.
 

@@ -4,7 +4,7 @@
 [![version](https://img.shields.io/npm/v/bgmt?label=bgmt)](https://www.npmjs.com/package/bgmt)
 [![version](https://img.shields.io/npm/v/bgmc?label=bgmc)](https://www.npmjs.com/package/bgmc)
 [![version](https://img.shields.io/npm/v/tmdbc?label=tmdbc)](https://www.npmjs.com/package/tmdbc)
-[![CI](https://github.com/yjl9903/bgmc/actions/workflows/ci.yml/badge.svg)](https://github.com/yjl9903/bgmc/actions/workflows/ci.yml)
+[![CI](https://github.com/yjl9903/bgmx/actions/workflows/ci.yml/badge.svg)](https://github.com/yjl9903/bgmx/actions/workflows/ci.yml)
 
 - Bangumi data which is scraped from [Bangumi](https://bgm.tv/) and [TMDB](https://www.themoviedb.org/)
 - TypeScript wrapper of [Bangumi API](https://bangumi.github.io/api/)
