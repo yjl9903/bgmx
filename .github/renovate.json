@@ -1,8 +1,19 @@
 {
   "extends": ["github>yjl9903/renovate-config"],
-  "baseBranchPatterns": ["dev"],
+  "baseBranchPatterns": ["dev", "main"],
   "packageRules": [
     {
+      "matchBaseBranches": ["dev"],
+      "matchPackageNames": ["bangumi-data"],
+      "enabled": false
+    },
+    {
+      "matchBaseBranches": ["main"],
+      "matchPackageNames": ["!bangumi-data"],
+      "enabled": false
+    },
+    {
+      "matchBaseBranches": ["main"],
       "matchPackageNames": ["bangumi-data"],
       "automerge": true
     }
