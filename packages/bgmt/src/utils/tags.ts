@@ -17,10 +17,37 @@ const MERGE_TAGS = [
   ['漫改', '漫画改'],
   ['轻改', '轻小说改'],
   ['东映アニメーション', '东映动画'],
-  ['TV', 'TVA']
+  ['TV', 'TVA'],
+  ['东方Project', '东方project'],
+  ['手冢PRODUCTION', '手冢Production'],
+  ['A-1Pictures', 'A-Pictures'],
+  ['MADHouse', 'MAD_HOUSE', 'Mad-house'],
+  ['studiodeen', 'Studio.DEEN'],
+  ['治愈', '治癒'],
+  ['泡面', '泡麵'],
+  ['音乐', '音楽'],
+  ['总集篇', '总集编'],
+  [
+    "Children'sPlaygroundEntertainment",
+    "Children'sPlaygroundEntertainm",
+    'ChildrensPlaygroundEntertainme'
+  ]
 ];
 
-const REMOVE_TAGS = new Set(['未定档', '未确定', '日本', '日本动画']);
+const REMOVE_TAGS = new Set([
+  '未定档',
+  '未确定',
+  '日本',
+  '日本动画',
+  'Mobile_Suit_Gundam_0083:Stardu',
+  '机动戦舰ナデシコ-The_prince_of_darknes',
+  'H2O_-FOOTPRINTS_IN_THE_SAND-',
+  'サイボーグクロちゃんサイボーグクロちゃんサイボーグクロちゃん',
+  '这年头什么寄吧粪作都能有第二季,抄袭爽文更别提',
+  '(西゜∀゜)アハハハハ八八ノヽノヽノヽノ\\',
+  '>▽<',
+  '≡ω≡'
+]);
 
 export function normalizeTags(tags: Tag[], options: NormalizeTagsOptions = {}) {
   const merged = mergeSimpleTags(tags.filter((t) => !REMOVE_TAGS.has(t.name)));
@@ -29,6 +56,7 @@ export function normalizeTags(tags: Tag[], options: NormalizeTagsOptions = {}) {
 }
 
 function mergeSimpleTags(tags: Tag[]) {
+  tags = tags.flatMap((t) => expandTag(t));
   const map = new Map<string, number>();
   for (const t of tags) {
     // 2025秋 -> 2025年10月
@@ -67,7 +95,8 @@ function mergeSimpleTags(tags: Tag[]) {
       t.name = target;
     }
 
-    const name0 = t.name;
+    const name0 = t.name.normalize('NFKC').trim().replace(/,+$/, '');
+    if (!name0 || REMOVE_TAGS.has(name0)) continue;
     const name1 = fullToHalf(tradToSimple(name0), { punctuation: true });
     const name2 = MERGE_TAGS.find((arr) => arr.includes(name1))?.[0] ?? name1;
 
@@ -75,4 +104,14 @@ function mergeSimpleTags(tags: Tag[]) {
     map.set(name, (map.get(name) ?? 0) + t.count);
   }
   return [...map.entries()].map(([k, v]) => ({ name: k, count: v }));
+}
+
+function expandTag(tag: Tag) {
+  return tag.name
+    .normalize('NFKC')
+    .trim()
+    .split(/(?:\|\||,)+/)
+    .map((name) => name.trim())
+    .filter((name) => name && !REMOVE_TAGS.has(name))
+    .map((name) => ({ name, count: tag.count }));
 }
