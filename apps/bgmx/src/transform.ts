@@ -6,21 +6,21 @@ export function transformDatabaseSubject(item: DatabaseSubject, options: { full?
         id: item.id,
         title: item.title,
         platform: item.bangumi.platform,
-        onair_date: item.onair_date,
-        poster: item.poster,
+        onair_date: item.onair_date || item.bangumi.date,
+        poster: item.poster || item.bangumi.images.large || '',
         summary: item.bangumi.summary,
         alias: item.alias,
-        tags: item.bangumi.tags,
+        tags: new Set([...item.bangumi.meta_tags, ...item.bangumi.tags]),
         search: item.search
       }
     : {
         id: item.id,
         title: item.title,
         platform: item.bangumi.platform,
-        onair_date: item.onair_date,
-        poster: item.poster,
+        onair_date: item.onair_date || item.bangumi.date,
+        poster: item.poster || item.bangumi.images.large || '',
         alias: item.alias,
-        tags: item.bangumi.tags,
+        tags: new Set([...item.bangumi.meta_tags, ...item.bangumi.tags]),
         search: item.search
       };
 }
