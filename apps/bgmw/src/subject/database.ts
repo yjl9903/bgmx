@@ -169,7 +169,8 @@ export async function updateSubject(
           poster: subject.poster,
           onair_date: subject.onair_date,
           alias: subject.alias,
-          search: subject.search
+          search: subject.search,
+          updatedAt: subject.updatedAt
         })
         .where(eq(subjectsSchema.id, bangumi.id))
         .returning({ id: subjectsSchema.id });
@@ -197,7 +198,8 @@ export async function updateSubject(
           poster: subject.poster,
           onair_date: subject.onair_date,
           alias: subject.alias,
-          search: subject.search
+          search: subject.search,
+          updatedAt: subject.updatedAt
         }
       })
       .returning({ id: subjectsSchema.id });

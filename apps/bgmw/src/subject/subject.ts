@@ -37,10 +37,17 @@ export async function createDatabaseSubject(bangumi: DatabaseBangumi, revisions:
 
 function getSubjectBangumiData(bangumi: DatabaseBangumi): SubjectBangumiData {
   return {
-    ...bangumi.data,
+    id: bangumi.data.id,
+    type: bangumi.data.type,
     name: decodeSubjectTitle(bangumi.data.name),
     name_cn: decodeSubjectTitle(bangumi.data.name_cn),
     summary: normalizeSummary(bangumi.data.summary),
+    date: bangumi.data.date,
+    platform: bangumi.data.platform,
+    images: bangumi.data.images,
+    eps: bangumi.data.eps,
+    total_episodes: bangumi.data.total_episodes,
+    meta_tags: bangumi.data.meta_tags,
     tags: normalizeTags(bangumi.data.tags, { count: 10 }),
     rating: {
       score: bangumi.data.rating.score,

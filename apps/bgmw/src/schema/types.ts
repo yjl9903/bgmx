@@ -21,13 +21,18 @@ export type Subject = {
   updatedAt: Date;
 };
 
-export type SubjectBangumiData = Omit<
-  SubjectInformation,
-  'name' | 'name_cn' | 'summary' | 'tags' | 'rating'
-> & {
+export type SubjectBangumiData = {
+  id: SubjectInformation['id'];
+  type: SubjectInformation['type'];
   name: string;
   name_cn: string;
   summary: string;
+  date?: SubjectInformation['date'];
+  platform: SubjectInformation['platform'];
+  images: SubjectInformation['images'];
+  eps: SubjectInformation['eps'];
+  total_episodes: SubjectInformation['total_episodes'];
+  meta_tags: SubjectInformation['meta_tags'];
   tags: string[];
   rating: {
     score: number;

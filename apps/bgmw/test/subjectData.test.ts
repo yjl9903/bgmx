@@ -34,10 +34,14 @@ describe('createDatabaseSubject', () => {
         id: 1,
         data: {
           id: 1,
+          type: 2,
           name: 'Original JP',
           name_cn: '中文名',
           summary: ' summary\r\n',
           date: undefined,
+          platform: 'TV',
+          eps: 13,
+          total_episodes: 13,
           images: {
             large: 'poster.jpg',
             common: 'common.jpg',
@@ -46,6 +50,8 @@ describe('createDatabaseSubject', () => {
             grid: 'grid.jpg'
           },
           rating: { score: 7.5, rank: 100 },
+          collection: { wish: 1 },
+          meta_tags: ['raw'],
           tags: [{ name: '漫画改', count: 11 }],
           infobox: [
             { key: '英文名', value: 'English Name' },
@@ -69,7 +75,12 @@ describe('createDatabaseSubject', () => {
       zh: ['中文名']
     });
     expect(subject.search.include).toEqual(['Original JP', '中文名', 'English Name']);
+    expect(subject.bangumi).not.toHaveProperty('collection');
+    expect(subject.bangumi).not.toHaveProperty('infobox');
     expect(subject.bangumi.name).toBe('Original JP');
+    expect(subject.bangumi.eps).toBe(13);
+    expect(subject.bangumi.total_episodes).toBe(13);
+    expect(subject.bangumi.meta_tags).toEqual(['raw']);
     expect(subject.bangumi.summary).toBe('summary');
     expect(subject.bangumi.tags).toEqual(['漫改']);
     expect(subject.bangumi.rating).toEqual({ score: 7.5, rank: 100 });
