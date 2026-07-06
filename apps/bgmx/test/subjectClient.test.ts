@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { deleteSubject, refreshSubject } from '../src/client';
+import { deleteSubject, fetchSubjects, refreshSubject } from '../src/client';
 
 describe('subject client', () => {
   it('refreshes subject through subject endpoint', async () => {
@@ -42,5 +42,46 @@ describe('subject client', () => {
       'https://example.test/subject/1',
       expect.objectContaining({ method: 'DELETE' })
     );
+  });
+
+  it('splits subject list requests above server limit', async () => {
+    const page = (start: number, count: number) =>
+      Array.from({ length: count }, (_, index) => ({ id: start + index }));
+    const fetch = vi
+      .fn<typeof globalThis.fetch>()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ ok: true, data: page(1, 1000), next_cursor: 1000 }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ ok: true, data: page(1001, 1000), next_cursor: 2000 }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ ok: true, data: page(2001, 500), next_cursor: 2500 }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      );
+
+    const subjects = [];
+    for await (const subject of fetchSubjects({
+      baseURL: 'https://example.test',
+      fetch,
+      limit: 2500
+    })) {
+      subjects.push(subject);
+    }
+
+    expect(subjects).toHaveLength(2500);
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      'https://example.test/subjects?cursor=0&limit=1000',
+      'https://example.test/subjects?cursor=1000&limit=1000',
+      'https://example.test/subjects?cursor=2000&limit=500'
+    ]);
   });
 });

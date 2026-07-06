@@ -104,12 +104,24 @@ export async function disableRevision(
   throw new Error(`Create subject revision failed`, { cause: resp });
 }
 
+const MaxSubjectsLimit = 1000;
+
 export async function* fetchSubjects(
-  options: FetchOptions & { q?: string } = {}
+  options: FetchOptions & { q?: string; limit?: number } = {}
 ): AsyncGenerator<DatabaseSubject> {
   let cursor = 0;
+  let count = 0;
+  const limit = options.limit ?? Infinity;
   while (true) {
-    const params = new URLSearchParams({ cursor: String(cursor) });
+    const requestLimit = Math.min(limit - count, MaxSubjectsLimit);
+    if (requestLimit <= 0) {
+      break;
+    }
+
+    const params = new URLSearchParams({
+      cursor: String(cursor),
+      limit: String(requestLimit)
+    });
     if (options.q) params.set('q', options.q);
 
     const resp = await fetchAPI<any>(`/subjects?${params}`, {}, options);
@@ -117,10 +129,14 @@ export async function* fetchSubjects(
     if (resp.ok) {
       for (const subject of resp.data) {
         yield subject;
+        count++;
+        if (count >= limit) {
+          break;
+        }
       }
 
       cursor = resp.next_cursor;
-      if (!cursor) {
+      if (!cursor || count >= limit) {
         break;
       }
     } else {
