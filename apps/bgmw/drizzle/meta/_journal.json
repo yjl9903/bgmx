@@ -50,6 +50,13 @@
       "when": 1783353686283,
       "tag": "0006_tan_silverclaw",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1783362560877,
+      "tag": "0007_thankful_stellaris",
+      "breakpoints": true
     }
   ]
 }

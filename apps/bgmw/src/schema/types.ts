@@ -55,6 +55,7 @@ export type SubjectSearch = {
 export type Calendar = {
   season: string;
   is_active: boolean;
+  updated_at: Date;
 };
 
 export type CalendarRelation = {
@@ -80,12 +81,20 @@ export type CalendarUpdateInput = {
 export type CalendarUpdateResult = {
   season: string;
   is_active: boolean;
+  updated_at: Date;
   calendar: CalendarInput[];
 };
 
 export type CalendarSubject = Subject & {
   platform: 'tv' | 'web';
   weekday: number | undefined | null;
+};
+
+export type CalendarResult = {
+  seasons: string[];
+  updated_at: Date | null;
+  calendar: CalendarSubject[][];
+  web: CalendarSubject[];
 };
 
 export type RevisionDetail =

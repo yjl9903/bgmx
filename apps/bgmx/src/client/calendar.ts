@@ -1,5 +1,5 @@
 import type {
-  CalendarSubject,
+  CalendarResult,
   CalendarUpdateInput,
   CalendarUpdateResult,
   FetchOptions
@@ -20,7 +20,7 @@ export async function fetchCalendar(options: FetchCalendarOptions = {}) {
   const path = search.size > 0 ? `/calendar?${search.toString()}` : '/calendar';
   const resp = await fetchAPI<any>(path, { method: 'GET' }, options);
   if (resp.ok) {
-    return resp.data as { calendar: CalendarSubject[][]; web: CalendarSubject[] };
+    return resp.data as CalendarResult;
   }
   throw new Error(`Fetch calendar failed`, { cause: resp });
 }

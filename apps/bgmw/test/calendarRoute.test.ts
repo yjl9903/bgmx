@@ -35,6 +35,14 @@ function createSubject(id: number) {
   } as any;
 }
 
+function createCalendar(season: string, updated_at = new Date('2026-07-01T00:00:00.000Z')) {
+  return {
+    season,
+    is_active: true,
+    updated_at
+  };
+}
+
 describe('calendar route', () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -52,15 +60,39 @@ describe('calendar route', () => {
     expect(json).toEqual({
       ok: true,
       data: {
+        seasons: [],
+        updated_at: null,
         calendar: [[], [], [], [], [], [], []],
         web: []
       }
     });
   });
 
+  it('returns active seasons without calendar rows', async () => {
+    vi.mocked(fetchCalendarRows).mockResolvedValueOnce([
+      {
+        calendar: createCalendar('2026-07'),
+        relation: null,
+        subject: null
+      }
+    ]);
+
+    const resp = await createTestApp().request('/calendar');
+    const json = (await resp.json()) as any;
+
+    expect(resp.status).toBe(200);
+    expect(json.data).toEqual({
+      seasons: ['2026-07'],
+      updated_at: '2026-07-01T00:00:00.000Z',
+      calendar: [[], [], [], [], [], [], []],
+      web: []
+    });
+  });
+
   it('merges queried seasons into the old calendar response shape', async () => {
     vi.mocked(fetchCalendarRows).mockResolvedValueOnce([
       {
+        calendar: createCalendar('2026-04', new Date('2026-04-01T00:00:00.000Z')),
         relation: {
           id: 1,
           season: '2026-04',
@@ -71,6 +103,7 @@ describe('calendar route', () => {
         subject: createSubject(1)
       },
       {
+        calendar: createCalendar('2026-07', new Date('2026-07-01T00:00:00.000Z')),
         relation: {
           id: 3,
           season: '2026-07',
@@ -81,6 +114,7 @@ describe('calendar route', () => {
         subject: createSubject(3)
       },
       {
+        calendar: createCalendar('2026-07', new Date('2026-07-01T00:00:00.000Z')),
         relation: {
           id: 4,
           season: '2026-07',
@@ -91,6 +125,7 @@ describe('calendar route', () => {
         subject: createSubject(1)
       },
       {
+        calendar: createCalendar('2026-07', new Date('2026-07-01T00:00:00.000Z')),
         relation: {
           id: 2,
           season: '2026-07',
@@ -108,6 +143,8 @@ describe('calendar route', () => {
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
     expect(fetchCalendarRows).toHaveBeenCalledWith(expect.anything(), ['2026-04', '2026-07']);
+    expect(json.data.seasons).toEqual(['2026-04', '2026-07']);
+    expect(json.data.updated_at).toBe('2026-07-01T00:00:00.000Z');
     expect(json.data.calendar[1].map((item: any) => item.id)).toEqual([3, 1]);
     expect(json.data.web).toHaveLength(1);
     expect(json.data.web[0]).toMatchObject({
@@ -123,6 +160,7 @@ describe('calendar route', () => {
       data: {
         season: '2026-04',
         is_active: true,
+        updated_at: new Date('2026-04-01T00:00:00.000Z'),
         calendar: []
       }
     });
@@ -156,6 +194,7 @@ describe('calendar route', () => {
     expect(json.data).toEqual({
       season: '2026-04',
       is_active: true,
+      updated_at: '2026-04-01T00:00:00.000Z',
       calendar: []
     });
   });
@@ -166,6 +205,7 @@ describe('calendar route', () => {
       data: {
         season: '2026-04',
         is_active: false,
+        updated_at: new Date('2026-04-01T00:00:00.000Z'),
         calendar: [
           {
             subject_id: 1,

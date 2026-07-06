@@ -57,8 +57,17 @@ router.get('/calendar', publicCache(), async (c) => {
 
     const calendar: CalendarSubject[][] = [[], [], [], [], [], [], []];
     const web: CalendarSubject[] = [];
+    const effectiveSeasons = new Set<string>();
+    let updatedAt: Date | null = null;
 
     for (const item of resp) {
+      effectiveSeasons.add(item.calendar.season);
+      if (!updatedAt || item.calendar.updated_at > updatedAt) {
+        updatedAt = item.calendar.updated_at;
+      }
+      if (!item.relation || !item.subject) {
+        continue;
+      }
       const subject: CalendarSubject = {
         ...item.subject,
         platform: item.relation.platform,
@@ -78,6 +87,8 @@ router.get('/calendar', publicCache(), async (c) => {
     return c.json({
       ok: true,
       data: {
+        seasons: [...effectiveSeasons],
+        updated_at: updatedAt,
         calendar,
         web
       }

@@ -19,14 +19,15 @@ export async function fetchCalendarRows(ctx: Context, seasons?: string[]) {
 
   return database
     .select({
+      calendar: calendarsSchema,
       relation: calendarRelationsSchema,
       subject: subjectsSchema
     })
-    .from(calendarRelationsSchema)
-    .innerJoin(calendarsSchema, eq(calendarRelationsSchema.season, calendarsSchema.season))
-    .innerJoin(subjectsSchema, eq(calendarRelationsSchema.subject_id, subjectsSchema.id))
+    .from(calendarsSchema)
+    .leftJoin(calendarRelationsSchema, eq(calendarRelationsSchema.season, calendarsSchema.season))
+    .leftJoin(subjectsSchema, eq(calendarRelationsSchema.subject_id, subjectsSchema.id))
     .where(condition)
-    .orderBy(asc(calendarRelationsSchema.season), asc(calendarRelationsSchema.id));
+    .orderBy(asc(calendarsSchema.season), asc(calendarRelationsSchema.id));
 }
 
 export async function upsertCalendar(
@@ -35,20 +36,22 @@ export async function upsertCalendar(
 ): Promise<{ ok: true; data: CalendarUpdateResult } | { ok: false; error: Error }> {
   try {
     const database = ctx.get('database');
+    const now = new Date();
 
     if (input.isActive === undefined) {
       await database
         .insert(calendarsSchema)
-        .values({ season: input.season })
+        .values({ season: input.season, updated_at: now })
         .onConflictDoNothing({ target: calendarsSchema.season });
     } else {
       await database
         .insert(calendarsSchema)
-        .values({ season: input.season, is_active: input.isActive })
+        .values({ season: input.season, is_active: input.isActive, updated_at: now })
         .onConflictDoUpdate({
           target: calendarsSchema.season,
           set: {
-            is_active: input.isActive
+            is_active: input.isActive,
+            updated_at: now
           }
         });
     }
@@ -109,6 +112,13 @@ export async function upsertCalendar(
       if (hasBatchItems(statements)) {
         await database.batch(statements);
       }
+
+      if (input.isActive === undefined) {
+        await database
+          .update(calendarsSchema)
+          .set({ updated_at: now })
+          .where(eq(calendarsSchema.season, input.season));
+      }
     }
 
     const [calendarRow, relations] = await database.batch([
@@ -133,6 +143,7 @@ export async function upsertCalendar(
       data: {
         season: calendarRow.season,
         is_active: calendarRow.is_active,
+        updated_at: calendarRow.updated_at,
         calendar: relations.map((item): CalendarInput => {
           return {
             subject_id: item.subject_id,
