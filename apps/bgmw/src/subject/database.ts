@@ -12,9 +12,12 @@ import type {
 import { decodeSubjectTitle, normalizeTitle } from 'bgmt';
 
 import {
+  bangumis as bangumisSchema,
+  calendarRelations as calendarRelationsSchema,
   revisions as revisionsSchema,
   subjectSearchTitles as subjectSearchTitlesSchema,
-  subjects as subjectsSchema
+  subjects as subjectsSchema,
+  tmdbs as tmdbsSchema
 } from '../schema';
 
 import { deepEqual } from './utils';
@@ -126,6 +129,23 @@ export async function disableSubjectRevision(ctx: Context, subjectId: number, re
   console.log('[bgmw]', 'disable subject revision', subjectId, revisionId, revisions);
 
   return revisions;
+}
+
+export async function deleteSubjectData(ctx: Context, subjectId: number) {
+  const database = ctx.get('database');
+
+  await database.batch([
+    database
+      .delete(calendarRelationsSchema)
+      .where(eq(calendarRelationsSchema.subject_id, subjectId)),
+    database
+      .delete(subjectSearchTitlesSchema)
+      .where(eq(subjectSearchTitlesSchema.subject_id, subjectId)),
+    database.delete(revisionsSchema).where(eq(revisionsSchema.target_id, subjectId)),
+    database.delete(subjectsSchema).where(eq(subjectsSchema.id, subjectId)),
+    database.delete(tmdbsSchema).where(eq(tmdbsSchema.id, subjectId)),
+    database.delete(bangumisSchema).where(eq(bangumisSchema.id, subjectId))
+  ]);
 }
 
 export async function fetchSubjectsAfterCursor(ctx: Context, cursor: number, limit: number) {

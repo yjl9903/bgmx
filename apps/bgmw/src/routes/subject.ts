@@ -7,6 +7,7 @@ import type { Subject } from '../schema/types';
 import { fetchAndUpdateBangumiSubject } from '../bangumi';
 import {
   createSubjectRevision,
+  deleteSubjectData,
   disableSubjectRevision,
   enableSubjectRevision,
   fetchBangumiById,
@@ -23,7 +24,12 @@ import { authorization } from './middlewares/auth';
 import { publicCache } from './middlewares/cache';
 
 const router = new Hono<AppEnv>();
+
 const SUBJECT_STALE_MS = 24 * 60 * 60 * 1000;
+
+function isSubjectStale(subject: Pick<Subject, 'updated_at'>) {
+  return Date.now() - new Date(subject.updated_at).getTime() > SUBJECT_STALE_MS;
+}
 
 // 查询数据库中的单个 subject
 router.get(
@@ -91,9 +97,56 @@ router.get(
   }
 );
 
-function isSubjectStale(subject: Pick<Subject, 'updated_at'>) {
-  return Date.now() - new Date(subject.updated_at).getTime() > SUBJECT_STALE_MS;
-}
+// 刷新 bangumi 数据并更新 subject
+router.post(
+  '/subject/:id',
+  authorization,
+  zValidator('param', z.object({ id: z.coerce.number().int().gt(0) })),
+  async (c) => {
+    const subjectId = c.req.valid('param').id;
+    const resp = await fetchAndUpdateBangumiSubject(c, subjectId);
+
+    return c.json(resp, resp.ok ? 200 : 502);
+  }
+);
+
+// 删除该 subject 关联的所有数据
+router.delete(
+  '/subject/:id',
+  authorization,
+  zValidator('param', z.object({ id: z.coerce.number().int().gt(0) })),
+  async (c) => {
+    const requestId = c.get('requestId');
+    const subjectId = c.req.valid('param').id;
+
+    try {
+      await deleteSubjectData(c, subjectId);
+
+      return c.json(
+        {
+          ok: true,
+          data: {
+            id: subjectId
+          }
+        },
+        200
+      );
+    } catch (error) {
+      console.error('[bgmw] failed to delete subject', error, {
+        requestId,
+        subjectId
+      });
+
+      return c.json(
+        {
+          ok: false,
+          error: 'Failed to delete subject'
+        },
+        500
+      );
+    }
+  }
+);
 
 // 创建 revision 更新单个 subject
 router.post(

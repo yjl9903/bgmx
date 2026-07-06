@@ -5,6 +5,7 @@ import type { AppEnv } from '../src/env';
 
 vi.mock('../src/subject/database', () => ({
   createSubjectRevision: vi.fn(),
+  deleteSubjectData: vi.fn(),
   disableSubjectRevision: vi.fn(),
   enableSubjectRevision: vi.fn(),
   fetchBangumiById: vi.fn(),
@@ -21,6 +22,7 @@ vi.mock('../src/bangumi', () => ({
 }));
 
 import {
+  deleteSubjectData,
   fetchBangumiById,
   fetchSubjectAllRevisions,
   fetchSubjectById,
@@ -145,5 +147,57 @@ describe('subject route cache headers', () => {
 
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBeNull();
+  });
+
+  it('refreshes subject through authenticated subject post', async () => {
+    vi.mocked(fetchAndUpdateBangumiSubject).mockResolvedValueOnce({
+      ok: true,
+      data: createSubject(1)
+    } as any);
+
+    const resp = await createTestApp().request(
+      '/subject/1',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer secret'
+        }
+      },
+      {
+        SECRET: 'secret'
+      }
+    );
+
+    expect(resp.status).toBe(200);
+    expect(resp.headers.get('Cache-Control')).toBeNull();
+    expect(fetchAndUpdateBangumiSubject).toHaveBeenCalledWith(expect.anything(), 1);
+  });
+
+  it('deletes subject data through authenticated subject delete', async () => {
+    vi.mocked(deleteSubjectData).mockResolvedValueOnce(undefined);
+
+    const resp = await createTestApp().request(
+      '/subject/1',
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: 'Bearer secret'
+        }
+      },
+      {
+        SECRET: 'secret'
+      }
+    );
+    const json = (await resp.json()) as any;
+
+    expect(resp.status).toBe(200);
+    expect(resp.headers.get('Cache-Control')).toBeNull();
+    expect(deleteSubjectData).toHaveBeenCalledWith(expect.anything(), 1);
+    expect(json).toEqual({
+      ok: true,
+      data: {
+        id: 1
+      }
+    });
   });
 });

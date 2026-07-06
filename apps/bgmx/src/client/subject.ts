@@ -1,4 +1,10 @@
-import type { FetchOptions, DatabaseSubject, RevisionDetail, DatabaseRevision } from './types';
+import type {
+  FetchOptions,
+  DatabaseBangumi,
+  DatabaseSubject,
+  RevisionDetail,
+  DatabaseRevision
+} from './types';
 
 import { fetchAPI } from './base';
 
@@ -11,6 +17,28 @@ export async function fetchSubject(
     return resp.data;
   }
   throw new Error(`Fetch subject failed`, { cause: resp });
+}
+
+export async function refreshSubject(
+  subjectId: number,
+  options: FetchOptions = {}
+): Promise<DatabaseBangumi> {
+  const resp = await fetchAPI<any>(`/subject/${subjectId}`, { method: 'POST' }, options);
+  if (resp.ok) {
+    return resp.data;
+  }
+  throw new Error(`Refresh subject failed`, { cause: resp });
+}
+
+export async function deleteSubject(
+  subjectId: number,
+  options: FetchOptions = {}
+): Promise<{ id: number }> {
+  const resp = await fetchAPI<any>(`/subject/${subjectId}`, { method: 'DELETE' }, options);
+  if (resp.ok) {
+    return resp.data as { id: number };
+  }
+  throw new Error(`Delete subject failed`, { cause: resp });
 }
 
 export async function fetchRevisions(
