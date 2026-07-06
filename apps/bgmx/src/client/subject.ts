@@ -76,10 +76,15 @@ export async function disableRevision(
   throw new Error(`Create subject revision failed`, { cause: resp });
 }
 
-export async function* fetchSubjects(options: FetchOptions = {}): AsyncGenerator<DatabaseSubject> {
+export async function* fetchSubjects(
+  options: FetchOptions & { q?: string } = {}
+): AsyncGenerator<DatabaseSubject> {
   let cursor = 0;
   while (true) {
-    const resp = await fetchAPI<any>(`/subjects?cursor=${cursor}`, {}, options);
+    const params = new URLSearchParams({ cursor: String(cursor) });
+    if (options.q) params.set('q', options.q);
+
+    const resp = await fetchAPI<any>(`/subjects?${params}`, {}, options);
 
     if (resp.ok) {
       for (const subject of resp.data) {

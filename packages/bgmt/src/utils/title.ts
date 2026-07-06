@@ -1,9 +1,9 @@
 import type { SubjectInformation } from 'bgmc';
 
-import { fullToHalf, tradToSimple } from 'simptrad';
+import { normalize } from 'simptrad';
 
 export function normalizeTitle(t: string) {
-  return fullToHalf(tradToSimple(t), { punctuation: true });
+  return normalize(t, { punctuation: ' ' }).trim();
 }
 
 export function getSubjectDisplayName(bgm?: Pick<SubjectInformation, 'name' | 'name_cn'>) {

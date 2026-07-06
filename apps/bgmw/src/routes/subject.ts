@@ -14,6 +14,7 @@ import {
   fetchSubjectById,
   fetchSubjectRevisions,
   fetchSubjectsAfterCursor,
+  fetchSubjectsBySearchTitle,
   updateSubject
 } from '../subject/database';
 
@@ -340,7 +341,8 @@ router.get(
     'query',
     z.object({
       cursor: z.coerce.number().int().min(0).default(0),
-      limit: z.coerce.number().int().positive().max(1000).default(100)
+      limit: z.coerce.number().int().positive().max(1000).default(100),
+      q: z.string().optional()
     })
   ),
   publicCache(),
@@ -348,9 +350,12 @@ router.get(
     const requestId = c.get('requestId');
 
     try {
-      const { cursor, limit } = c.req.valid('query');
+      const { cursor, limit, q } = c.req.valid('query');
 
-      const data = await fetchSubjectsAfterCursor(c, cursor, limit);
+      const data =
+        q === undefined
+          ? await fetchSubjectsAfterCursor(c, cursor, limit)
+          : await fetchSubjectsBySearchTitle(c, q, cursor, limit);
 
       const nextCursor =
         data.length === limit && data.length > 0 ? (data[data.length - 1]?.id ?? null) : null;

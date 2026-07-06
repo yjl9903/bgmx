@@ -1,13 +1,19 @@
-import { and, asc, eq, gt } from 'drizzle-orm';
+import { and, asc, eq, gt, inArray, sql } from 'drizzle-orm';
 
 import type { Context } from '../env';
+import type { Database } from '../database';
 import type {
   Bangumi as DatabaseBangumi,
   Revision as DatabaseRevision,
-  RevisionDetail
+  RevisionDetail,
+  Subject as DatabaseSubject
 } from '../schema/types';
+
+import { decodeSubjectTitle, normalizeTitle } from 'bgmt';
+
 import {
   revisions as revisionsSchema,
+  subjectSearchTitles as subjectSearchTitlesSchema,
   subjects as subjectsSchema
 } from '../schema';
 
@@ -133,6 +139,93 @@ export async function fetchSubjectsAfterCursor(ctx: Context, cursor: number, lim
     .limit(limit);
 }
 
+export async function fetchSubjectsBySearchTitle(
+  ctx: Context,
+  query: string,
+  cursor: number,
+  limit: number
+) {
+  const database = ctx.get('database');
+  const normalizedQuery = normalizeTitle(decodeSubjectTitle(query));
+
+  if (!normalizedQuery) return [];
+
+  return database
+    .select()
+    .from(subjectsSchema)
+    .where(
+      and(
+        gt(subjectsSchema.id, cursor),
+        sql`exists (
+          select 1
+          from ${subjectSearchTitlesSchema}
+          where ${subjectSearchTitlesSchema.subjectId} = ${subjectsSchema.id}
+            and instr(${subjectSearchTitlesSchema.normalizedTitle}, ${normalizedQuery}) > 0
+        )`
+      )
+    )
+    .orderBy(asc(subjectsSchema.id))
+    .limit(limit);
+}
+
+async function refreshSubjectSearchTitles(
+  database: Database,
+  subject: Pick<DatabaseSubject, 'id' | 'search'>
+) {
+  const next = new Map<string, string>();
+  for (const title of subject.search.include) {
+    const normalizedTitle = normalizeTitle(decodeSubjectTitle(title));
+    if (normalizedTitle && !next.has(normalizedTitle)) {
+      next.set(normalizedTitle, title);
+    }
+  }
+
+  const prev = await database
+    .select({
+      id: subjectSearchTitlesSchema.id,
+      title: subjectSearchTitlesSchema.title,
+      normalizedTitle: subjectSearchTitlesSchema.normalizedTitle
+    })
+    .from(subjectSearchTitlesSchema)
+    .where(eq(subjectSearchTitlesSchema.subjectId, subject.id));
+
+  const prevByTitle = new Map(prev.map((row) => [row.normalizedTitle, row]));
+  const deleteIds = prev.filter((row) => !next.has(row.normalizedTitle)).map((row) => row.id);
+  const insertRows = [...next]
+    .filter(([normalizedTitle]) => !prevByTitle.has(normalizedTitle))
+    .map(([normalizedTitle, title]) => ({ subjectId: subject.id, title, normalizedTitle }));
+  const updateRows = [...next]
+    .map(([normalizedTitle, title]) => ({ title, row: prevByTitle.get(normalizedTitle) }))
+    .filter((item): item is { title: string; row: NonNullable<typeof item.row> } =>
+      Boolean(item.row && item.row.title !== item.title)
+    );
+
+  const statements = [
+    ...(deleteIds.length > 0
+      ? [
+          database
+            .delete(subjectSearchTitlesSchema)
+            .where(inArray(subjectSearchTitlesSchema.id, deleteIds))
+        ]
+      : []),
+    ...updateRows.map(({ title, row }) =>
+      database
+        .update(subjectSearchTitlesSchema)
+        .set({ title })
+        .where(eq(subjectSearchTitlesSchema.id, row.id))
+    ),
+    ...(insertRows.length > 0
+      ? [database.insert(subjectSearchTitlesSchema).values(insertRows)]
+      : [])
+  ];
+
+  if (statements.length > 0) {
+    await database.batch(
+      statements as [(typeof statements)[number], ...Array<(typeof statements)[number]>]
+    );
+  }
+}
+
 export async function updateSubject(
   ctx: Context,
   bangumi: DatabaseBangumi,
@@ -175,11 +268,15 @@ export async function updateSubject(
         .where(eq(subjectsSchema.id, bangumi.id))
         .returning({ id: subjectsSchema.id });
 
+      await refreshSubjectSearchTitles(database, subject);
+
       return {
         ok: resp.length > 0 && resp[0]?.id === subject.id ? true : false,
         data: subject
       };
     } else {
+      await refreshSubjectSearchTitles(database, dbSubject);
+
       return {
         ok: false,
         data: dbSubject
@@ -203,6 +300,8 @@ export async function updateSubject(
         }
       })
       .returning({ id: subjectsSchema.id });
+
+    await refreshSubjectSearchTitles(database, subject);
 
     return {
       ok: resp.length > 0 && resp[0]?.id === subject.id ? true : false,

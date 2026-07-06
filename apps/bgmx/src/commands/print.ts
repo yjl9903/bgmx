@@ -50,7 +50,9 @@ export function printSubject(data: { subject: DatabaseSubject; revisions: Databa
   console.log(`${label('name')}  ${subject.title}`);
   console.log(`${label('platform')}  ${subject.bangumi.platform}`);
   console.log(`${label('date')}  ${subject.onair_date}`);
-  console.log(`${label('rating')}  ${subject.bangumi.rating.score} #${subject.bangumi.rating.rank}`);
+  console.log(
+    `${label('rating')}  ${subject.bangumi.rating.score} #${subject.bangumi.rating.rank}`
+  );
   console.log(`${label('updated')}  ${formatDatetime(new Date(data.subject.updatedAt))}`);
 
   console.log('');

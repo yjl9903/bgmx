@@ -12,6 +12,7 @@ vi.mock('../src/subject/database', () => ({
   fetchSubjectById: vi.fn(),
   fetchSubjectRevisions: vi.fn(),
   fetchSubjectsAfterCursor: vi.fn(),
+  fetchSubjectsBySearchTitle: vi.fn(),
   updateSubject: vi.fn()
 }));
 
@@ -24,7 +25,8 @@ import {
   fetchSubjectAllRevisions,
   fetchSubjectById,
   fetchSubjectRevisions,
-  fetchSubjectsAfterCursor
+  fetchSubjectsAfterCursor,
+  fetchSubjectsBySearchTitle
 } from '../src/subject/database';
 import { fetchAndUpdateBangumiSubject } from '../src/bangumi';
 import { subjectRoute } from '../src/routes/subject';
@@ -75,6 +77,16 @@ describe('subject route cache headers', () => {
 
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
+  });
+
+  it('searches public subjects by title query', async () => {
+    vi.mocked(fetchSubjectsBySearchTitle).mockResolvedValueOnce([createSubject(1)]);
+
+    const resp = await createTestApp().request('/subjects?q=%E6%91%87%E6%BB%9A');
+
+    expect(resp.status).toBe(200);
+    expect(fetchSubjectsBySearchTitle).toHaveBeenCalledWith(expect.anything(), '摇滚', 0, 100);
+    expect(fetchSubjectsAfterCursor).not.toHaveBeenCalled();
   });
 
   it('refreshes missing subject responses before returning', async () => {

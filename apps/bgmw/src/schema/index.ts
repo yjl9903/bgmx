@@ -1,4 +1,4 @@
-export { bangumis, subjects, tmdbs } from './subject';
+export { bangumis, subjects, subjectSearchTitles, tmdbs } from './subject';
 
 export { calendarRelations, calendars } from './calendar';
 

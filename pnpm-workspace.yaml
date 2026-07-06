@@ -9,4 +9,6 @@ allowBuilds:
 
 gitChecks: false
 ignoreWorkspaceRootCheck: true
+minimumReleaseAgeExclude:
+  - simptrad@0.3.0
 shamefullyHoist: true

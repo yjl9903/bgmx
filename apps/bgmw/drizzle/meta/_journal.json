@@ -43,6 +43,13 @@
       "when": 1783268041209,
       "tag": "0005_subject_platform_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1783353686283,
+      "tag": "0006_tan_silverclaw",
+      "breakpoints": true
     }
   ]
 }

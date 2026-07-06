@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, index, integer, text } from 'drizzle-orm/sqlite-core';
 
 import type { RelatedSubject, SubjectCharacters, SubjectInformation, SubjectPersons } from 'bgmc';
 
@@ -38,3 +38,22 @@ export const subjects = sqliteTable('subjects', {
     .notNull()
     .$defaultFn(() => new Date())
 });
+
+export const subjectSearchTitles = sqliteTable(
+  'subject_search_titles',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    subjectId: integer('subject_id')
+      .notNull()
+      .references(() => subjects.id),
+    title: text('title').notNull(),
+    normalizedTitle: text('normalized_title').notNull()
+  },
+  (table) => [
+    index('subject_search_titles_subject_normalized_title_idx').on(
+      table.subjectId,
+      table.normalizedTitle
+    ),
+    index('subject_search_titles_subject_id_idx').on(table.subjectId)
+  ]
+);
