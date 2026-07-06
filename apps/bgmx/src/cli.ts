@@ -20,6 +20,7 @@ import {
 import {
   type DatabaseSubject,
   type CalendarInput,
+  deleteSubject,
   fetchAndUpdateBangumiSubject,
   fetchSubject,
   fetchSubjects,
@@ -27,7 +28,8 @@ import {
   updateCalendar,
   enableRevision,
   disableRevision,
-  fetchRevisions
+  fetchRevisions,
+  refreshSubject
 } from './client';
 import { transformDatabaseSubject } from './transform';
 import { syncBangumi } from './commands/bangumi';
@@ -320,16 +322,42 @@ cli
     }
   });
 
-cli.command('subject <subject_id>', '查询 bgmx 条目').action(async (subjectId, options) => {
-  const secret = options.secret ?? process.env.SECRET;
+cli
+  .command('subject <subject_id>', '查询/更新/删除 bgmx 条目')
+  .option('--post', '更新 bgmx 条目')
+  .option('--delete', '删除 bgmx 条目及其关联数据')
+  .action(async (subjectId, options) => {
+    const secret = options.secret ?? process.env.SECRET;
 
-  const resp = await fetchSubject(+subjectId, {
-    baseURL: options.baseUrl,
-    secret
+    if (options.post && options.delete) {
+      throw new Error('--post and --delete cannot be used together');
+    }
+
+    if (options.delete) {
+      await deleteSubject(+subjectId, {
+        baseURL: options.baseUrl,
+        secret
+      });
+      consola.success(`已删除 subject ${subjectId}`);
+      return;
+    }
+
+    if (options.post) {
+      const updated = await refreshSubject(+subjectId, {
+        baseURL: options.baseUrl,
+        secret
+      });
+      printBangumiSubject(updated);
+      return;
+    }
+
+    const resp = await fetchSubject(+subjectId, {
+      baseURL: options.baseUrl,
+      secret
+    });
+
+    printSubject(resp);
   });
-
-  printSubject(resp);
-});
 
 cli
   .command('subject revision <subject_id>', '创建 bgmx 条目修订')
@@ -435,16 +463,19 @@ cli
     }
   });
 
-cli.command('bangumi subject <id>', '查询并更新 bangumi 条目').action(async (id, options) => {
-  const secret = options.secret ?? process.env.SECRET;
+cli
+  .command('bangumi subject <id>', '查询并更新 bangumi 条目')
+  .option('--post', '刷新并更新服务端条目')
+  .action(async (id, options) => {
+    const secret = options.secret ?? process.env.SECRET;
 
-  const resp = await fetchAndUpdateBangumiSubject(+id, {
-    baseURL: options.baseUrl,
-    secret
+    const resp = await fetchAndUpdateBangumiSubject(+id, {
+      baseURL: options.baseUrl,
+      secret
+    });
+
+    printBangumiSubject(resp);
   });
-
-  printBangumiSubject(resp);
-});
 
 if (process.stdin.isTTY) {
   consola.wrapConsole();
