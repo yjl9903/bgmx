@@ -6,6 +6,8 @@ import { bangumis } from '../schema/subject';
 
 import { client } from './client';
 
+const BANGUMI_ANIME_TYPE = 2;
+
 export type FetchAndUpdateBangumiSubjectResult =
   | {
       ok: true;
@@ -74,6 +76,13 @@ export async function updateDatabaseBangumi(
   payload: Pick<DatabaseBangumi, 'data' | 'persons' | 'characters' | 'subjects'>
 ) {
   try {
+    if (payload.data.type !== BANGUMI_ANIME_TYPE) {
+      return {
+        ok: false,
+        error: 'Bangumi subject is not anime'
+      };
+    }
+
     const database = ctx.get('database');
 
     const now = new Date();
