@@ -40,7 +40,7 @@ export async function fetchSubjectAllRevisions(ctx: Context, subjectId: number) 
   const database = ctx.get('database');
 
   return database.query.revisions.findMany({
-    where: (table, { and, eq }) => and(eq(table.targetId, subjectId)),
+    where: (table, { and, eq }) => and(eq(table.target_id, subjectId)),
     orderBy: (table, { asc }) => asc(table.id)
   });
 }
@@ -49,7 +49,7 @@ export async function fetchSubjectRevisions(ctx: Context, subjectId: number) {
   const database = ctx.get('database');
 
   return database.query.revisions.findMany({
-    where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.targetId, subjectId)),
+    where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.target_id, subjectId)),
     orderBy: (table, { asc }) => asc(table.id)
   });
 }
@@ -59,7 +59,7 @@ export async function fetchSubjectRevision(ctx: Context, subjectId: number, revi
 
   return database.query.revisions.findFirst({
     where: (table, { and, eq }) =>
-      and(eq(table.enabled, true), eq(table.id, revisionId), eq(table.targetId, subjectId))
+      and(eq(table.enabled, true), eq(table.id, revisionId), eq(table.target_id, subjectId))
   });
 }
 
@@ -74,13 +74,13 @@ export async function createSubjectRevision(
     database
       .insert(revisionsSchema)
       .values({
-        targetId: subjectId,
+        target_id: subjectId,
         enabled: true,
         detail
       })
       .returning(),
     database.query.revisions.findMany({
-      where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.targetId, subjectId)),
+      where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.target_id, subjectId)),
       orderBy: (table, { asc }) => asc(table.id)
     })
   ]);
@@ -97,9 +97,9 @@ export async function enableSubjectRevision(ctx: Context, subjectId: number, rev
     database
       .update(revisionsSchema)
       .set({ enabled: true })
-      .where(and(eq(revisionsSchema.id, revisionId), eq(revisionsSchema.targetId, subjectId))),
+      .where(and(eq(revisionsSchema.id, revisionId), eq(revisionsSchema.target_id, subjectId))),
     database.query.revisions.findMany({
-      where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.targetId, subjectId)),
+      where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.target_id, subjectId)),
       orderBy: (table, { asc }) => asc(table.id)
     })
   ]);
@@ -116,9 +116,9 @@ export async function disableSubjectRevision(ctx: Context, subjectId: number, re
     database
       .update(revisionsSchema)
       .set({ enabled: false })
-      .where(and(eq(revisionsSchema.id, revisionId), eq(revisionsSchema.targetId, subjectId))),
+      .where(and(eq(revisionsSchema.id, revisionId), eq(revisionsSchema.target_id, subjectId))),
     database.query.revisions.findMany({
-      where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.targetId, subjectId)),
+      where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.target_id, subjectId)),
       orderBy: (table, { asc }) => asc(table.id)
     })
   ]);
@@ -159,8 +159,8 @@ export async function fetchSubjectsBySearchTitle(
         sql`exists (
           select 1
           from ${subjectSearchTitlesSchema}
-          where ${subjectSearchTitlesSchema.subjectId} = ${subjectsSchema.id}
-            and instr(${subjectSearchTitlesSchema.normalizedTitle}, ${normalizedQuery}) > 0
+          where ${subjectSearchTitlesSchema.subject_id} = ${subjectsSchema.id}
+            and instr(${subjectSearchTitlesSchema.normalized_title}, ${normalizedQuery}) > 0
         )`
       )
     )
@@ -174,9 +174,9 @@ async function refreshSubjectSearchTitles(
 ) {
   const next = new Map<string, string>();
   for (const title of subject.search.include) {
-    const normalizedTitle = normalizeTitle(decodeSubjectTitle(title));
-    if (normalizedTitle && !next.has(normalizedTitle)) {
-      next.set(normalizedTitle, title);
+    const normalized_title = normalizeTitle(decodeSubjectTitle(title));
+    if (normalized_title && !next.has(normalized_title)) {
+      next.set(normalized_title, title);
     }
   }
 
@@ -184,18 +184,18 @@ async function refreshSubjectSearchTitles(
     .select({
       id: subjectSearchTitlesSchema.id,
       title: subjectSearchTitlesSchema.title,
-      normalizedTitle: subjectSearchTitlesSchema.normalizedTitle
+      normalized_title: subjectSearchTitlesSchema.normalized_title
     })
     .from(subjectSearchTitlesSchema)
-    .where(eq(subjectSearchTitlesSchema.subjectId, subject.id));
+    .where(eq(subjectSearchTitlesSchema.subject_id, subject.id));
 
-  const prevByTitle = new Map(prev.map((row) => [row.normalizedTitle, row]));
-  const deleteIds = prev.filter((row) => !next.has(row.normalizedTitle)).map((row) => row.id);
+  const prevByTitle = new Map(prev.map((row) => [row.normalized_title, row]));
+  const deleteIds = prev.filter((row) => !next.has(row.normalized_title)).map((row) => row.id);
   const insertRows = [...next]
-    .filter(([normalizedTitle]) => !prevByTitle.has(normalizedTitle))
-    .map(([normalizedTitle, title]) => ({ subjectId: subject.id, title, normalizedTitle }));
+    .filter(([normalized_title]) => !prevByTitle.has(normalized_title))
+    .map(([normalized_title, title]) => ({ subject_id: subject.id, title, normalized_title }));
   const updateRows = [...next]
-    .map(([normalizedTitle, title]) => ({ title, row: prevByTitle.get(normalizedTitle) }))
+    .map(([normalized_title, title]) => ({ title, row: prevByTitle.get(normalized_title) }))
     .filter((item): item is { title: string; row: NonNullable<typeof item.row> } =>
       Boolean(item.row && item.row.title !== item.title)
     );
@@ -263,7 +263,7 @@ export async function updateSubject(
           onair_date: subject.onair_date,
           alias: subject.alias,
           search: subject.search,
-          updatedAt: subject.updatedAt
+          updated_at: subject.updated_at
         })
         .where(eq(subjectsSchema.id, bangumi.id))
         .returning({ id: subjectsSchema.id });
@@ -296,7 +296,7 @@ export async function updateSubject(
           onair_date: subject.onair_date,
           alias: subject.alias,
           search: subject.search,
-          updatedAt: subject.updatedAt
+          updated_at: subject.updated_at
         }
       })
       .returning({ id: subjectsSchema.id });

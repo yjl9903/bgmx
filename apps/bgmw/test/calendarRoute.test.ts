@@ -31,7 +31,7 @@ function createSubject(id: number) {
     title: `subject ${id}`,
     data: {},
     search: {},
-    updatedAt: new Date('2026-01-01T00:00:00.000Z')
+    updated_at: new Date('2026-01-01T00:00:00.000Z')
   } as any;
 }
 
@@ -64,7 +64,7 @@ describe('calendar route', () => {
         relation: {
           id: 1,
           season: '2026-04',
-          subjectId: 1,
+          subject_id: 1,
           platform: 'tv',
           weekday: 1
         },
@@ -74,7 +74,7 @@ describe('calendar route', () => {
         relation: {
           id: 3,
           season: '2026-07',
-          subjectId: 3,
+          subject_id: 3,
           platform: 'tv',
           weekday: 1
         },
@@ -84,7 +84,7 @@ describe('calendar route', () => {
         relation: {
           id: 4,
           season: '2026-07',
-          subjectId: 1,
+          subject_id: 1,
           platform: 'tv',
           weekday: 1
         },
@@ -94,7 +94,7 @@ describe('calendar route', () => {
         relation: {
           id: 2,
           season: '2026-07',
-          subjectId: 2,
+          subject_id: 2,
           platform: 'web',
           weekday: null
         },

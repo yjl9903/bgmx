@@ -34,7 +34,7 @@ export function printBangumiSubject(bangumi: DatabaseBangumi) {
     }
   }
 
-  console.log(`${label('updated')}  ${formatDatetime(new Date(bangumi.updatedAt))}`);
+  console.log(`${label('updated')}  ${formatDatetime(new Date(bangumi.updated_at))}`);
 
   // console.log(subject);
 }
@@ -53,7 +53,7 @@ export function printSubject(data: { subject: DatabaseSubject; revisions: Databa
   console.log(
     `${label('rating')}  ${subject.bangumi.rating.score} #${subject.bangumi.rating.rank}`
   );
-  console.log(`${label('updated')}  ${formatDatetime(new Date(data.subject.updatedAt))}`);
+  console.log(`${label('updated')}  ${formatDatetime(new Date(data.subject.updated_at))}`);
 
   console.log('');
 

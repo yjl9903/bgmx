@@ -44,13 +44,13 @@ function createTestApp() {
   return app;
 }
 
-function createSubject(id: number, updatedAt = new Date()) {
+function createSubject(id: number, updated_at = new Date()) {
   return {
     id,
     title: `subject ${id}`,
     data: {},
     search: {},
-    updatedAt
+    updated_at
   } as any;
 }
 
@@ -74,9 +74,14 @@ describe('subject route cache headers', () => {
     vi.mocked(fetchSubjectsAfterCursor).mockResolvedValueOnce([createSubject(1)]);
 
     const resp = await createTestApp().request('/subjects');
+    const json = (await resp.json()) as any;
 
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
+    expect(json.data[0].updated_at).toBeDefined();
+    expect(json.data[0].updatedAt).toBeUndefined();
+    expect(json.next_cursor).toBeNull();
+    expect(json.nextCursor).toBeUndefined();
   });
 
   it('searches public subjects by title query', async () => {

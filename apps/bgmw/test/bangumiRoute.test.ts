@@ -73,12 +73,17 @@ describe('bangumi route cache headers', () => {
   });
 
   it('caches public bangumi subject list responses', async () => {
-    const database = createDatabase([{ id: 1 }]);
+    const database = createDatabase([{ id: 1, updated_at: new Date('2026-01-01T00:00:00.000Z') }]);
 
     const resp = await createTestApp(database).request('/bangumi/subjects');
+    const json = (await resp.json()) as any;
 
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
+    expect(json.data[0].updated_at).toBeDefined();
+    expect(json.data[0].updatedAt).toBeUndefined();
+    expect(json.next_cursor).toBeNull();
+    expect(json.nextCursor).toBeUndefined();
   });
 
   it('does not cache upstream error responses', async () => {

@@ -15,7 +15,7 @@ export async function fetchCalendarRows(ctx: Context, seasons?: string[]) {
   const condition =
     seasons && seasons.length > 0
       ? inArray(calendarsSchema.season, seasons)
-      : eq(calendarsSchema.isActive, true);
+      : eq(calendarsSchema.is_active, true);
 
   return database
     .select({
@@ -24,7 +24,7 @@ export async function fetchCalendarRows(ctx: Context, seasons?: string[]) {
     })
     .from(calendarRelationsSchema)
     .innerJoin(calendarsSchema, eq(calendarRelationsSchema.season, calendarsSchema.season))
-    .innerJoin(subjectsSchema, eq(calendarRelationsSchema.subjectId, subjectsSchema.id))
+    .innerJoin(subjectsSchema, eq(calendarRelationsSchema.subject_id, subjectsSchema.id))
     .where(condition)
     .orderBy(asc(calendarRelationsSchema.season), asc(calendarRelationsSchema.id));
 }
@@ -44,11 +44,11 @@ export async function upsertCalendar(
     } else {
       await database
         .insert(calendarsSchema)
-        .values({ season: input.season, isActive: input.isActive })
+        .values({ season: input.season, is_active: input.isActive })
         .onConflictDoUpdate({
           target: calendarsSchema.season,
           set: {
-            isActive: input.isActive
+            is_active: input.isActive
           }
         });
     }
@@ -60,7 +60,7 @@ export async function upsertCalendar(
       });
       const calendar = input.calendar.map((item) => ({
         season: input.season,
-        subjectId: item.subject_id,
+        subject_id: item.subject_id,
         platform: item.platform,
         weekday: item.weekday ?? null
       }));
@@ -132,10 +132,10 @@ export async function upsertCalendar(
       ok: true,
       data: {
         season: calendarRow.season,
-        is_active: calendarRow.isActive,
+        is_active: calendarRow.is_active,
         calendar: relations.map((item): CalendarInput => {
           return {
-            subject_id: item.subjectId,
+            subject_id: item.subject_id,
             platform: item.platform,
             weekday: item.weekday
           };
@@ -160,11 +160,11 @@ export async function deleteCalendar(ctx: Context, season: string) {
 }
 
 function getCalendarRelationKey(row: {
-  subjectId: number;
+  subject_id: number;
   platform: 'tv' | 'web';
   weekday: number | null;
 }) {
-  return `${row.subjectId}:${row.platform}:${row.weekday ?? ''}`;
+  return `${row.subject_id}:${row.platform}:${row.weekday ?? ''}`;
 }
 
 function hasBatchItems<T>(items: T[]): items is [T, ...T[]] {

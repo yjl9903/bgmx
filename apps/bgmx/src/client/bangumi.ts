@@ -35,7 +35,7 @@ export async function* fetchBangumiSubjects(
         yield subject;
       }
 
-      cursor = resp.nextCursor;
+      cursor = resp.next_cursor;
       if (!cursor) {
         break;
       }

@@ -111,14 +111,14 @@ router.get(
         .orderBy(asc(bangumis.id))
         .limit(limit);
 
-      const nextCursor =
+      const next_cursor =
         data.length === limit && data.length > 0 ? (data[data.length - 1]?.id ?? null) : null;
 
       return c.json(
         {
           ok: true,
           data,
-          nextCursor
+          next_cursor
         },
         200
       );

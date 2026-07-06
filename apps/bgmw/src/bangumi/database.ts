@@ -84,7 +84,7 @@ export async function updateDatabaseBangumi(
       persons: payload.persons,
       characters: payload.characters,
       subjects: payload.subjects,
-      updatedAt: now
+      updated_at: now
     };
 
     const resp = await database
@@ -97,7 +97,7 @@ export async function updateDatabaseBangumi(
           persons: payload.persons,
           characters: payload.characters,
           subjects: payload.subjects,
-          updatedAt: now
+          updated_at: now
         }
       })
       .returning({ id: bangumis.id });

@@ -29,7 +29,7 @@ export async function createDatabaseSubject(bangumi: DatabaseBangumi, revisions:
     search: {
       include: Object.values(alias).flat()
     },
-    updatedAt: new Date()
+    updated_at: new Date()
   };
 
   return applyRevisions(subject, revisions).subject;

@@ -91,8 +91,8 @@ router.get(
   }
 );
 
-function isSubjectStale(subject: Pick<Subject, 'updatedAt'>) {
-  return Date.now() - new Date(subject.updatedAt).getTime() > SUBJECT_STALE_MS;
+function isSubjectStale(subject: Pick<Subject, 'updated_at'>) {
+  return Date.now() - new Date(subject.updated_at).getTime() > SUBJECT_STALE_MS;
 }
 
 // 创建 revision 更新单个 subject
@@ -357,14 +357,14 @@ router.get(
           ? await fetchSubjectsAfterCursor(c, cursor, limit)
           : await fetchSubjectsBySearchTitle(c, q, cursor, limit);
 
-      const nextCursor =
+      const next_cursor =
         data.length === limit && data.length > 0 ? (data[data.length - 1]?.id ?? null) : null;
 
       return c.json(
         {
           ok: true,
           data,
-          nextCursor
+          next_cursor
         },
         200
       );

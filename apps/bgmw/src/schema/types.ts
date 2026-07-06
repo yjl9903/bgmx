@@ -6,7 +6,7 @@ export type Bangumi = {
   persons: SubjectPersons;
   characters: SubjectCharacters;
   subjects: RelatedSubject[];
-  updatedAt: Date;
+  updated_at: Date;
 };
 
 export type Subject = {
@@ -18,7 +18,7 @@ export type Subject = {
   search: SubjectSearch;
   bangumi: SubjectBangumiData;
   tmdb: SubjectTmdbData | null;
-  updatedAt: Date;
+  updated_at: Date;
 };
 
 export type SubjectBangumiData = {
@@ -54,13 +54,13 @@ export type SubjectSearch = {
 
 export type Calendar = {
   season: string;
-  isActive: boolean;
+  is_active: boolean;
 };
 
 export type CalendarRelation = {
   id: number;
   season: string;
-  subjectId: number;
+  subject_id: number;
   platform: 'tv' | 'web';
   weekday: number | null;
 };
@@ -107,8 +107,8 @@ export type RevisionDetail =
 
 export type Revision = {
   id: number;
-  targetId: number;
+  target_id: number;
   detail: RevisionDetail;
   enabled: boolean;
-  createdAt: Date;
+  created_at: Date;
 };

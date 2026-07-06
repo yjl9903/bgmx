@@ -91,7 +91,7 @@ export async function* fetchSubjects(
         yield subject;
       }
 
-      cursor = resp.nextCursor;
+      cursor = resp.next_cursor;
       if (!cursor) {
         break;
       }

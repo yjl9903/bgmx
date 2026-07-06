@@ -10,7 +10,7 @@ export const bangumis = sqliteTable('bangumis', {
   persons: text('persons', { mode: 'json' }).$type<SubjectPersons>().notNull(),
   characters: text('characters', { mode: 'json' }).$type<SubjectCharacters>().notNull(),
   subjects: text('subjects', { mode: 'json' }).$type<RelatedSubject[]>().notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+  updated_at: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
     .$defaultFn(() => new Date())
 });
@@ -18,7 +18,7 @@ export const bangumis = sqliteTable('bangumis', {
 export const tmdbs = sqliteTable('tmdbs', {
   id: integer('id').primaryKey(),
   data: text('data', { mode: 'json' }).$type<unknown>().notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+  updated_at: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
     .$defaultFn(() => new Date())
 });
@@ -34,7 +34,7 @@ export const subjects = sqliteTable('subjects', {
   onair_date: text('onair_date'),
   alias: text('alias', { mode: 'json' }).$type<SubjectAlias>().notNull(),
   search: text('search', { mode: 'json' }).$type<SubjectSearch>().notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+  updated_at: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
     .$defaultFn(() => new Date())
 });
@@ -43,17 +43,17 @@ export const subjectSearchTitles = sqliteTable(
   'subject_search_titles',
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    subjectId: integer('subject_id')
+    subject_id: integer('subject_id')
       .notNull()
       .references(() => subjects.id),
     title: text('title').notNull(),
-    normalizedTitle: text('normalized_title').notNull()
+    normalized_title: text('normalized_title').notNull()
   },
   (table) => [
     index('subject_search_titles_subject_normalized_title_idx').on(
-      table.subjectId,
-      table.normalizedTitle
+      table.subject_id,
+      table.normalized_title
     ),
-    index('subject_search_titles_subject_id_idx').on(table.subjectId)
+    index('subject_search_titles_subject_id_idx').on(table.subject_id)
   ]
 );

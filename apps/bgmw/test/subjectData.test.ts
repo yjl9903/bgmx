@@ -61,7 +61,7 @@ describe('createDatabaseSubject', () => {
         persons: [],
         characters: [],
         subjects: [],
-        updatedAt: new Date()
+        updated_at: new Date()
       } as any,
       []
     );
