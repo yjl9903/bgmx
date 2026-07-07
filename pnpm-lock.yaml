@@ -170,8 +170,8 @@ importers:
         specifier: workspace:*
         version: link:../bgmc
       simptrad:
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.3.0
+        version: 0.3.0
 
   packages/tmdbc:
     dependencies:
@@ -2388,6 +2388,9 @@ packages:
   simptrad@0.2.0:
     resolution: {integrity: sha512-SADENHX3KNuTLThG/LQCZvIywDOwCFTC2aLufwmSgjVbHUEZKIjRzleb28J856kL4ozkKptv08eR3GyJFRCnMg==}
 
+  simptrad@0.3.0:
+    resolution: {integrity: sha512-ppFu4RuncoKhXj0wvD2SDZbYKDTGp5JdJrF02AxhUpBsTc8ga5bCYaHZ/QxuZftcsCCoW9tGiMQhhVLQ5euMcw==}
+
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
 
@@ -4600,6 +4603,8 @@ snapshots:
   signal-exit@4.1.0: {}
 
   simptrad@0.2.0: {}
+
+  simptrad@0.3.0: {}
 
   sisteransi@1.0.5: {}
 
