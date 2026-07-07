@@ -2,7 +2,12 @@ import { asc, eq, inArray } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
 
 import type { Context } from '../env';
-import type { CalendarInput, CalendarUpdateInput, CalendarUpdateResult } from '../schema/types';
+import type {
+  Calendar,
+  CalendarInput,
+  CalendarUpdateInput,
+  CalendarUpdateResult
+} from '../schema/types';
 import {
   calendarRelations as calendarRelationsSchema,
   calendars as calendarsSchema,
@@ -28,6 +33,12 @@ export async function fetchCalendarRows(ctx: Context, seasons?: string[]) {
     .leftJoin(subjectsSchema, eq(calendarRelationsSchema.subject_id, subjectsSchema.id))
     .where(condition)
     .orderBy(asc(calendarsSchema.season), asc(calendarRelationsSchema.id));
+}
+
+export async function fetchCalendars(ctx: Context): Promise<Calendar[]> {
+  const database = ctx.get('database');
+
+  return database.select().from(calendarsSchema).orderBy(asc(calendarsSchema.season));
 }
 
 export async function upsertCalendar(

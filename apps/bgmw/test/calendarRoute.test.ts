@@ -6,10 +6,16 @@ import type { AppEnv } from '../src/env';
 vi.mock('../src/calendar/database', () => ({
   deleteCalendar: vi.fn(),
   fetchCalendarRows: vi.fn(),
+  fetchCalendars: vi.fn(),
   upsertCalendar: vi.fn()
 }));
 
-import { deleteCalendar, fetchCalendarRows, upsertCalendar } from '../src/calendar/database';
+import {
+  deleteCalendar,
+  fetchCalendarRows,
+  fetchCalendars,
+  upsertCalendar
+} from '../src/calendar/database';
 import { calendarRoute } from '../src/routes/calendar';
 import { PUBLIC_CACHE_CONTROL } from '../src/routes/middlewares/cache';
 
@@ -152,6 +158,32 @@ describe('calendar route', () => {
       platform: 'web',
       weekday: null
     });
+  });
+
+  it('lists all calendar seasons', async () => {
+    vi.mocked(fetchCalendars).mockResolvedValueOnce([
+      createCalendar('2026-04', new Date('2026-04-01T00:00:00.000Z')),
+      createCalendar('2026-07', new Date('2026-07-01T00:00:00.000Z'))
+    ]);
+
+    const resp = await createTestApp().request('/calendars');
+    const json = (await resp.json()) as any;
+
+    expect(resp.status).toBe(200);
+    expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
+    expect(fetchCalendars).toHaveBeenCalledWith(expect.anything());
+    expect(json.data).toEqual([
+      {
+        season: '2026-04',
+        is_active: true,
+        updated_at: '2026-04-01T00:00:00.000Z'
+      },
+      {
+        season: '2026-07',
+        is_active: true,
+        updated_at: '2026-07-01T00:00:00.000Z'
+      }
+    ]);
   });
 
   it('updates only is_active when calendar is omitted', async () => {

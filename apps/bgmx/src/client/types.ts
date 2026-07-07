@@ -1,6 +1,7 @@
 export type {
   Bangumi as DatabaseBangumi,
   Subject as DatabaseSubject,
+  Calendar,
   CalendarInput,
   CalendarResult,
   CalendarSubject,

@@ -4,7 +4,12 @@ import { Hono } from 'hono';
 import type { AppEnv } from '../env';
 import type { CalendarSubject } from '../schema/types';
 
-import { deleteCalendar, fetchCalendarRows, upsertCalendar } from '../calendar/database';
+import {
+  deleteCalendar,
+  fetchCalendarRows,
+  fetchCalendars,
+  upsertCalendar
+} from '../calendar/database';
 
 import { zValidator } from './middlewares/zod';
 import { authorization } from './middlewares/auth';
@@ -100,6 +105,29 @@ router.get('/calendar', publicCache(), async (c) => {
       {
         ok: false,
         error: 'Failed to fetch calendar'
+      },
+      500
+    );
+  }
+});
+
+router.get('/calendars', publicCache(), async (c) => {
+  const requestId = c.get('requestId');
+
+  try {
+    const calendars = await fetchCalendars(c);
+
+    return c.json({
+      ok: true,
+      data: calendars
+    });
+  } catch (error) {
+    console.error('[bgmw] failed to fetch calendars', error, { requestId });
+
+    return c.json(
+      {
+        ok: false,
+        error: 'Failed to fetch calendars'
       },
       500
     );
