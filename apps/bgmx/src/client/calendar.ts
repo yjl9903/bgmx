@@ -1,6 +1,6 @@
 import type {
-  Calendar,
   CalendarResult,
+  CalendarSummary,
   CalendarUpdateInput,
   CalendarUpdateResult,
   FetchOptions
@@ -12,10 +12,10 @@ export type FetchCalendarOptions = FetchOptions & {
   seasons?: string[];
 };
 
-export async function fetchCalendars(options: FetchOptions = {}): Promise<Calendar[]> {
+export async function fetchCalendars(options: FetchOptions = {}): Promise<CalendarSummary[]> {
   const resp = await fetchAPI<any>('/calendars', { method: 'GET' }, options);
   if (resp.ok) {
-    return resp.data as Calendar[];
+    return resp.data as CalendarSummary[];
   }
   throw new Error(`Fetch calendars failed`, { cause: resp });
 }

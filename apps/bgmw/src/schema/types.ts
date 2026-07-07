@@ -58,6 +58,10 @@ export type Calendar = {
   updated_at: Date;
 };
 
+export type CalendarSummary = Calendar & {
+  count: number;
+};
+
 export type CalendarRelation = {
   id: number;
   season: string;

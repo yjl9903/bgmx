@@ -162,8 +162,8 @@ describe('calendar route', () => {
 
   it('lists all calendar seasons', async () => {
     vi.mocked(fetchCalendars).mockResolvedValueOnce([
-      createCalendar('2026-04', new Date('2026-04-01T00:00:00.000Z')),
-      createCalendar('2026-07', new Date('2026-07-01T00:00:00.000Z'))
+      { ...createCalendar('2026-04', new Date('2026-04-01T00:00:00.000Z')), count: 48 },
+      { ...createCalendar('2026-07', new Date('2026-07-01T00:00:00.000Z')), count: 52 }
     ]);
 
     const resp = await createTestApp().request('/calendars');
@@ -176,12 +176,14 @@ describe('calendar route', () => {
       {
         season: '2026-04',
         is_active: true,
-        updated_at: '2026-04-01T00:00:00.000Z'
+        updated_at: '2026-04-01T00:00:00.000Z',
+        count: 48
       },
       {
         season: '2026-07',
         is_active: true,
-        updated_at: '2026-07-01T00:00:00.000Z'
+        updated_at: '2026-07-01T00:00:00.000Z',
+        count: 52
       }
     ]);
   });

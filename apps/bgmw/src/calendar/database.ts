@@ -1,9 +1,9 @@
-import { asc, eq, inArray } from 'drizzle-orm';
+import { asc, countDistinct, eq, inArray } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
 
 import type { Context } from '../env';
 import type {
-  Calendar,
+  CalendarSummary,
   CalendarInput,
   CalendarUpdateInput,
   CalendarUpdateResult
@@ -35,10 +35,20 @@ export async function fetchCalendarRows(ctx: Context, seasons?: string[]) {
     .orderBy(asc(calendarsSchema.season), asc(calendarRelationsSchema.id));
 }
 
-export async function fetchCalendars(ctx: Context): Promise<Calendar[]> {
+export async function fetchCalendars(ctx: Context): Promise<CalendarSummary[]> {
   const database = ctx.get('database');
 
-  return database.select().from(calendarsSchema).orderBy(asc(calendarsSchema.season));
+  return database
+    .select({
+      season: calendarsSchema.season,
+      is_active: calendarsSchema.is_active,
+      updated_at: calendarsSchema.updated_at,
+      count: countDistinct(calendarRelationsSchema.subject_id)
+    })
+    .from(calendarsSchema)
+    .leftJoin(calendarRelationsSchema, eq(calendarRelationsSchema.season, calendarsSchema.season))
+    .groupBy(calendarsSchema.season)
+    .orderBy(asc(calendarsSchema.season));
 }
 
 export async function upsertCalendar(
