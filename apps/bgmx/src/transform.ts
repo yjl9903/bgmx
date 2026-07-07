@@ -1,7 +1,7 @@
 import { CalendarSubject, DatabaseSubject } from './client';
 
 export function transformDatabaseSubject(item: DatabaseSubject, options: { full?: boolean } = {}) {
-  const images = item.bangumi.images;
+  // const images = item.bangumi.images;
 
   return options.full
     ? {
@@ -10,11 +10,11 @@ export function transformDatabaseSubject(item: DatabaseSubject, options: { full?
         platform: item.bangumi.platform,
         onair_date: item.onair_date || item.bangumi.date,
         poster: item.poster || item.bangumi.images.large || '',
-        images: (['large', 'common', 'medium', 'small', 'grid'] as const).map((quality) => ({
-          provider: 'bgm' as const,
-          quality,
-          src: images[quality]
-        })),
+        // images: (['large', 'common', 'medium', 'small', 'grid'] as const).map((quality) => ({
+        //   provider: 'bgm' as const,
+        //   quality,
+        //   src: images[quality]
+        // })),
         summary: item.bangumi.summary || '',
         alias: item.alias,
         tags: [...new Set([...(item.bangumi?.meta_tags ?? []), ...(item.bangumi?.tags ?? [])])],

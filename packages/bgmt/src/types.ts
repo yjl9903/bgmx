@@ -33,16 +33,14 @@ type BasicSubject = {
   search: SubjectSearch;
 };
 
-type SubjectImage = {
-  provider: 'bgm' | 'tmdb';
-  quality: string;
-  src: string;
-};
+// type SubjectImage = {
+//   provider: 'bgm' | 'tmdb';
+//   quality: string;
+//   src: string;
+// };
 
 type FullSubject = BasicSubject & {
   summary: string;
-
-  images: SubjectImage[];
 
   // SubjectBangumiData
   bangumi?: unknown;
