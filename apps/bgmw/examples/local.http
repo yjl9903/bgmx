@@ -4,6 +4,9 @@ GET http://localhost:8787/health
 ### get bangumi subject
 GET http://localhost:8787/bangumi/subject/528438
 
+### get bangumi subject poster
+GET http://localhost:8787/bangumi/subject/528438/poster.jpg?quality=common
+
 ### post bangumi subject
 POST http://localhost:8787/bangumi/subject/528438
 Authorization: Bearer 123456

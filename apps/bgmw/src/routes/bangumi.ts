@@ -2,18 +2,31 @@ import { z } from 'zod';
 import { Hono } from 'hono';
 import { asc, gt } from 'drizzle-orm';
 
-import { BgmFetchError } from 'bgmc';
+import { BgmFetchError, type SubjectInformation } from 'bgmc';
 
 import type { AppEnv } from '../env';
 
 import { bangumis } from '../schema/subject';
 import { client, fetchAndUpdateBangumiSubject } from '../bangumi';
+import { fetchBangumiById } from '../subject/database';
 
 import { zValidator } from './middlewares/zod';
 import { authorization } from './middlewares/auth';
 import { publicCache } from './middlewares/cache';
 
 const router = new Hono<AppEnv>();
+
+const posterQualities = [
+  'small',
+  'grid',
+  'large',
+  'medium',
+  'common'
+] as const satisfies readonly (keyof SubjectInformation['images'])[];
+
+const posterQuerySchema = z.object({
+  quality: z.enum(posterQualities).default('common')
+});
 
 // 查询 bangumi calendar
 router.get('/bangumi/calendar', publicCache(), async (c) => {
@@ -64,6 +77,129 @@ router.get(
         {
           ok: false,
           error: 'Failed to fetch subject'
+        },
+        502
+      );
+    }
+  }
+);
+
+// 反向代理 bangumi subject poster
+router.get(
+  '/bangumi/subject/:id/:poster{poster\\.[a-zA-Z0-9]+}',
+  zValidator(
+    'param',
+    z.object({
+      id: z.coerce.number().int().positive(),
+      poster: z.string()
+    })
+  ),
+  publicCache(),
+  async (c) => {
+    const requestId = c.get('requestId');
+    const subjectId = c.req.valid('param').id;
+    const query = posterQuerySchema.safeParse(c.req.query());
+
+    if (!query.success) {
+      return c.json(
+        {
+          ok: false,
+          error: 'Invalid poster quality'
+        },
+        400
+      );
+    }
+
+    const { quality } = query.data;
+
+    let subject: SubjectInformation | undefined;
+
+    try {
+      const cached = await fetchBangumiById(c, subjectId);
+      subject = cached?.data;
+
+      if (!subject) {
+        subject = await client.subject(subjectId);
+      }
+    } catch (error) {
+      if (error instanceof BgmFetchError && error.response.status === 404) {
+        return c.json(
+          {
+            ok: false,
+            error: 'Subject not found'
+          },
+          404
+        );
+      }
+
+      console.error('[bgmw] failed to fetch subject for poster', error, {
+        requestId,
+        subjectId,
+        quality
+      });
+
+      return c.json(
+        {
+          ok: false,
+          error: 'Failed to fetch subject poster'
+        },
+        502
+      );
+    }
+
+    const posterUrl = subject.images?.[quality];
+
+    if (!posterUrl) {
+      return c.json(
+        {
+          ok: false,
+          error: 'Subject poster not found'
+        },
+        404
+      );
+    }
+
+    try {
+      const url = new URL(posterUrl);
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+        throw new TypeError(`Unsupported poster URL protocol: ${url.protocol}`);
+      }
+
+      const response = await fetch(url);
+      const contentType = response.headers.get('Content-Type');
+
+      if (!response.ok || (contentType && !contentType.toLowerCase().startsWith('image/'))) {
+        await response.body?.cancel();
+
+        console.error('[bgmw] failed to fetch subject poster image', {
+          requestId,
+          subjectId,
+          quality,
+          status: response.status,
+          contentType
+        });
+
+        return c.json(
+          {
+            ok: false,
+            error: 'Failed to fetch subject poster'
+          },
+          502
+        );
+      }
+
+      return new Response(response.body, response);
+    } catch (error) {
+      console.error('[bgmw] failed to proxy subject poster', error, {
+        requestId,
+        subjectId,
+        quality
+      });
+
+      return c.json(
+        {
+          ok: false,
+          error: 'Failed to fetch subject poster'
         },
         502
       );

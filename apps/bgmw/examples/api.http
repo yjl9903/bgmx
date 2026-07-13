@@ -4,5 +4,8 @@ GET https://bgm.animes.garden/health
 ### bangumi subject
 GET https://bgm.animes.garden/bangumi/subject/528438
 
+### bangumi subject poster
+GET https://bgm.animes.garden/bangumi/subject/528438/poster.jpg?quality=common
+
 ### get calendar
 GET https://bgm.animes.garden/calendar

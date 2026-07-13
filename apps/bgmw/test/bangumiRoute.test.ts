@@ -11,12 +11,17 @@ vi.mock('../src/bangumi', () => ({
   fetchAndUpdateBangumiSubject: vi.fn()
 }));
 
+vi.mock('../src/subject/database', () => ({
+  fetchBangumiById: vi.fn()
+}));
+
 vi.mock('drizzle-orm', () => ({
   asc: vi.fn((column) => ({ type: 'asc', column })),
   gt: vi.fn((column, value) => ({ type: 'gt', column, value }))
 }));
 
 import { client } from '../src/bangumi';
+import { fetchBangumiById } from '../src/subject/database';
 import { bangumiRoute } from '../src/routes/bangumi';
 import { PUBLIC_CACHE_CONTROL } from '../src/routes/middlewares/cache';
 
@@ -52,6 +57,7 @@ function createDatabase(rows: unknown[]) {
 describe('bangumi route cache headers', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('caches public bangumi calendar responses', async () => {
@@ -95,6 +101,123 @@ describe('bangumi route cache headers', () => {
 
       expect(resp.status).toBe(502);
       expect(resp.headers.get('Cache-Control')).toBeNull();
+      expect(consoleError).toHaveBeenCalledOnce();
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+});
+
+describe('bangumi subject poster route', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  function createSubjectData() {
+    return {
+      images: {
+        small: 'https://lain.bgm.tv/small.jpg',
+        grid: 'https://lain.bgm.tv/grid.jpg',
+        large: 'https://lain.bgm.tv/large.jpg',
+        medium: 'https://lain.bgm.tv/medium.jpg',
+        common: 'https://lain.bgm.tv/common.jpg'
+      }
+    } as any;
+  }
+
+  function mockCachedSubjectImages() {
+    vi.mocked(fetchBangumiById).mockResolvedValueOnce({
+      data: createSubjectData()
+    } as any);
+  }
+
+  it('proxies the common poster by default', async () => {
+    mockCachedSubjectImages();
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValueOnce(
+      new Response('common poster', {
+        headers: {
+          'Content-Type': 'image/jpeg',
+          ETag: 'poster-etag'
+        }
+      })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const resp = await createTestApp().request('/bangumi/subject/1/poster.jpg');
+
+    expect(resp.status).toBe(200);
+    expect(resp.headers.get('Content-Type')).toBe('image/jpeg');
+    expect(resp.headers.get('ETag')).toBe('poster-etag');
+    expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
+    expect(await resp.text()).toBe('common poster');
+    expect(fetchMock).toHaveBeenCalledWith(new URL('https://lain.bgm.tv/common.jpg'));
+    expect(fetchBangumiById).toHaveBeenCalledWith(expect.anything(), 1);
+    expect(client.subject).not.toHaveBeenCalled();
+  });
+
+  it('selects the requested poster quality independently of the extension', async () => {
+    mockCachedSubjectImages();
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response('large poster', { headers: { 'Content-Type': 'image/jpeg' } })
+      );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const resp = await createTestApp().request('/bangumi/subject/1/poster.png?quality=large');
+
+    expect(resp.status).toBe(200);
+    expect(await resp.text()).toBe('large poster');
+    expect(fetchMock).toHaveBeenCalledWith(new URL('https://lain.bgm.tv/large.jpg'));
+  });
+
+  it('falls back to Bangumi when the subject is not cached', async () => {
+    vi.mocked(fetchBangumiById).mockResolvedValueOnce(undefined);
+    vi.mocked(client.subject).mockResolvedValueOnce(createSubjectData());
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response('fallback poster', { headers: { 'Content-Type': 'image/jpeg' } })
+      );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const resp = await createTestApp().request('/bangumi/subject/1/poster.jpg');
+
+    expect(resp.status).toBe(200);
+    expect(await resp.text()).toBe('fallback poster');
+    expect(client.subject).toHaveBeenCalledWith(1);
+    expect(fetchMock).toHaveBeenCalledWith(new URL('https://lain.bgm.tv/common.jpg'));
+  });
+
+  it('rejects an unsupported poster quality', async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    vi.stubGlobal('fetch', fetchMock);
+
+    const resp = await createTestApp().request('/bangumi/subject/1/poster.webp?quality=original');
+
+    expect(resp.status).toBe(400);
+    expect(client.subject).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('returns an uncached gateway error when the poster origin fails', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockCachedSubjectImages();
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response('upstream error', { status: 503 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    try {
+      const resp = await createTestApp().request('/bangumi/subject/1/poster.jpg');
+
+      expect(resp.status).toBe(502);
+      expect(resp.headers.get('Cache-Control')).toBeNull();
+      expect(await resp.json()).toEqual({
+        ok: false,
+        error: 'Failed to fetch subject poster'
+      });
       expect(consoleError).toHaveBeenCalledOnce();
     } finally {
       consoleError.mockRestore();
