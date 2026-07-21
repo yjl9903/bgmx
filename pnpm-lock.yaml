@@ -84,8 +84,8 @@ importers:
         specifier: 4.12.31
         version: 4.12.31
       p-limit:
-        specifier: 7.3.0
-        version: 7.3.0
+        specifier: 7.3.1
+        version: 7.3.1
       tmdbc:
         specifier: workspace:*
         version: link:../../packages/tmdbc
@@ -129,8 +129,8 @@ importers:
         specifier: ^29.1.1
         version: 29.1.1
       p-limit:
-        specifier: 7.3.0
-        version: 7.3.0
+        specifier: 7.3.1
+        version: 7.3.1
       rimraf:
         specifier: ^6.1.3
         version: 6.1.3
@@ -2300,8 +2300,8 @@ packages:
     resolution: {integrity: sha512-/HfRU/lPPr4T2VigM+cvM3cU77es+XF4OEAa4aE5zpdvrxHGD2NmH0AFIWpMNAb+CsZL45rlcIO49Re0ZcRseg==}
     engines: {node: '>=20'}
 
-  p-limit@7.3.0:
-    resolution: {integrity: sha512-7cIXg/Z0M5WZRblrsOla88S4wAK+zOQQWeBYfV3qJuJXMr+LnbYjaadrFaS0JILfEDPVqHyKnZ1Z/1d6J9VVUw==}
+  p-limit@7.3.1:
+    resolution: {integrity: sha512-0trZaiG7Y7kN/Egy9a8j47t9osC0Tch4PaIWd9yGF6bvmlk7muExRvGNYb8sXBwEKMoNKsbNN9P8EefuQekE4Q==}
     engines: {node: '>=20'}
 
   pac-proxy-agent@8.0.0:
@@ -4522,7 +4522,7 @@ snapshots:
       macos-release: 3.5.1
       windows-release: 7.1.1
 
-  p-limit@7.3.0:
+  p-limit@7.3.1:
     dependencies:
       yocto-queue: 1.2.2
 
