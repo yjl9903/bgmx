@@ -158,7 +158,7 @@ importers:
         version: 1.0.0-beta.17
     devDependencies:
       js-yaml:
-        specifier: ^5.2.0
+        specifier: ^5.2.1
         version: 5.2.1
       openapi-typescript:
         specifier: ^7.13.0
