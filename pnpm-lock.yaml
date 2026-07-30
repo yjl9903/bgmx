@@ -108,8 +108,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/bgmt
       breadc:
-        specifier: ^1.0.0-beta.17
-        version: 1.0.0-beta.17
+        specifier: ^1.0.0-beta.18
+        version: 1.0.0-beta.18
       consola:
         specifier: ^3.4.2
         version: 3.4.2
@@ -154,8 +154,8 @@ importers:
   packages/bgmc:
     dependencies:
       breadc:
-        specifier: ^1.0.0-beta.17
-        version: 1.0.0-beta.17
+        specifier: ^1.0.0-beta.18
+        version: 1.0.0-beta.18
     devDependencies:
       js-yaml:
         specifier: ^5.2.2
@@ -176,8 +176,8 @@ importers:
   packages/tmdbc:
     dependencies:
       breadc:
-        specifier: ^1.0.0-beta.17
-        version: 1.0.0-beta.17
+        specifier: ^1.0.0-beta.18
+        version: 1.0.0-beta.18
 
 packages:
 
@@ -212,17 +212,17 @@ packages:
     resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
     hasBin: true
 
-  '@breadc/color@1.0.0-beta.17':
-    resolution: {integrity: sha512-dSYneiJL+nuMv7PcQ2ZnllSuggZX9vuyfYZ+AkB3+e0fUwBuhJsQvLoUDL+ok5MjtO2orV+NvsNxaVDxsXAMmA==}
+  '@breadc/color@1.0.0-beta.18':
+    resolution: {integrity: sha512-vClJTkTXJSScmk9kzX0N4C0a0a282X9fb0KYU/2emaHvseAUidrh7FBrueE3vzfHTuYiE2o4PHBfPTr0wOBsdQ==}
 
-  '@breadc/core@1.0.0-beta.17':
-    resolution: {integrity: sha512-c+8h+N58KjOhYgm1oA41yNNfwKhSglwEatQIpzZ81sR0N8jOUs7n6ohmXmNaR+Id/oZiZ7c1aum1L46jXqDP1Q==}
+  '@breadc/core@1.0.0-beta.18':
+    resolution: {integrity: sha512-PMAB7Gwh8M1+/yYb8gK5mjUzPSjMtaJrpA6e0hPIm0V0+rukNLOczul26Gn47Ivbju/XyL3PK0UDapnuI8difQ==}
 
-  '@breadc/death@1.0.0-beta.17':
-    resolution: {integrity: sha512-4Gt0HRsul5RnBR2UVXiRHvI8cvqm88i04tVoNIMjlt+pc5EQdH7yvJF8/0YNWFAAvJnRjh81WM1fyWDPQTf7Qg==}
+  '@breadc/death@1.0.0-beta.18':
+    resolution: {integrity: sha512-cunyKh7QPgY6mSmazqikkQ1n7QFHiTPP885H093QY/mCTKLyvIFM6MsT8yo6J3CeLtBzN30EiEVRqMlJT3ZMbA==}
 
-  '@breadc/tui@1.0.0-beta.17':
-    resolution: {integrity: sha512-whsiEmvXbvp0WofrYWyHJPjbv5xkMD1Qu02xgUvvwaCcS5paMonmyw9HZOpfEHJJoscrn/M6YWKszendaixxLA==}
+  '@breadc/tui@1.0.0-beta.18':
+    resolution: {integrity: sha512-q3d2OkuoLsT9aYHroUqfbBo1yX5TCtbFvi7e4P857m7MDAZisfpOHY9/mXd59u4bH69vcC4rmrfYZ5YIO8GqvQ==}
 
   '@clack/core@1.4.3':
     resolution: {integrity: sha512-/kr3UWNtdJfxZtPgDqUOmG2pvwlmcLGheex5yiZKdwbzZJxhV+HMNR9QNmyY5cGwTNV6LrR7Jtp+KjhUAP1qBQ==}
@@ -1817,8 +1817,8 @@ packages:
     resolution: {integrity: sha512-JZyDyq3D4AUifKTPOB7DELf6XsB3WdPuNxCtob1vFXPsSXhdAiHBWJ/tJ8HAc9aH84BK+5JFZLNkJKx3G9kzQg==}
     engines: {node: 20 || >=22}
 
-  breadc@1.0.0-beta.17:
-    resolution: {integrity: sha512-xLmWETFx5SReU2WS453Y0dfOGXnihLnwQt+00clK8f4wrEzlqsUjdg39o7IxVW6+4IR2iK2eE3y0ljxF/gq9Mw==}
+  breadc@1.0.0-beta.18:
+    resolution: {integrity: sha512-L/gKQSCc0yY1VtV/y4y4EKI52FVSX0gLRy29rV6jd+S1xrIQTxV8cBtAY75r542lB2clNh1kxMGB8ia9yjz33A==}
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
@@ -3124,20 +3124,20 @@ snapshots:
     dependencies:
       css-tree: 3.2.1
 
-  '@breadc/color@1.0.0-beta.17': {}
+  '@breadc/color@1.0.0-beta.18': {}
 
-  '@breadc/core@1.0.0-beta.17':
+  '@breadc/core@1.0.0-beta.18':
     dependencies:
-      '@breadc/color': 1.0.0-beta.17
+      '@breadc/color': 1.0.0-beta.18
 
-  '@breadc/death@1.0.0-beta.17': {}
+  '@breadc/death@1.0.0-beta.18': {}
 
-  '@breadc/tui@1.0.0-beta.17':
+  '@breadc/tui@1.0.0-beta.18':
     dependencies:
-      '@breadc/color': 1.0.0-beta.17
-      get-east-asian-width: 1.6.0
+      '@breadc/color': 1.0.0-beta.18
+      '@breadc/death': 1.0.0-beta.18
+      fast-string-width: 3.0.2
       std-env: 4.2.0
-      strip-ansi: 7.2.0
 
   '@clack/core@1.4.3':
     dependencies:
@@ -4220,12 +4220,12 @@ snapshots:
     dependencies:
       balanced-match: 4.0.4
 
-  breadc@1.0.0-beta.17:
+  breadc@1.0.0-beta.18:
     dependencies:
-      '@breadc/color': 1.0.0-beta.17
-      '@breadc/core': 1.0.0-beta.17
-      '@breadc/death': 1.0.0-beta.17
-      '@breadc/tui': 1.0.0-beta.17
+      '@breadc/color': 1.0.0-beta.18
+      '@breadc/core': 1.0.0-beta.18
+      '@breadc/death': 1.0.0-beta.18
+      '@breadc/tui': 1.0.0-beta.18
 
   buffer-from@1.1.2: {}
 
