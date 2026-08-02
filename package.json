@@ -20,7 +20,7 @@
     "postversion": "turbo run build"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260730.1",
+    "@cloudflare/workers-types": "^5.20260801.1",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.13.3",
     "bangumi-data": ">=0.3.214",
@@ -36,7 +36,7 @@
     "typescript": "^7.0.2",
     "vite": "^8.2.0",
     "vitest": "^4.1.10",
-    "wrangler": "^4.116.0"
+    "wrangler": "^4.118.0"
   },
   "packageManager": "pnpm@11.18.0",
   "engines": {
