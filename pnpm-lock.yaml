@@ -63,11 +63,11 @@ importers:
   apps/bgmw:
     dependencies:
       '@hono/node-server':
-        specifier: 2.0.12
-        version: 2.0.12(hono@4.12.33)
+        specifier: 2.1.0
+        version: 2.1.0(hono@4.13.1)
       '@hono/zod-validator':
         specifier: 0.9.0
-        version: 0.9.0(hono@4.12.33)(zod@4.4.3)
+        version: 0.9.0(hono@4.13.1)(zod@4.4.3)
       bgmc:
         specifier: workspace:*
         version: link:../../packages/bgmc
@@ -81,8 +81,8 @@ importers:
         specifier: 0.45.2
         version: 0.45.2(@cloudflare/workers-types@5.20260809.1)
       hono:
-        specifier: 4.12.33
-        version: 4.12.33
+        specifier: 4.13.1
+        version: 4.13.1
       p-limit:
         specifier: 7.3.1
         version: 7.3.1
@@ -934,8 +934,8 @@ packages:
       '@noble/hashes':
         optional: true
 
-  '@hono/node-server@2.0.12':
-    resolution: {integrity: sha512-eWpQYr67tqJLeaSUl0Q+TquuYfUdTibpOJlUMV2FfUP7+KqCC5TufnwnlXL6mobZBJbGAYRd7ZvEBDCbLInjhg==}
+  '@hono/node-server@2.1.0':
+    resolution: {integrity: sha512-XovyyCCnBzW+zKu+z/zq8hwNs4KOR5rEMAOxo2f40Q5xoOI37IMm6MIg2COOUtUApo0i6850MTBKH2u4QLGIqg==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -2233,8 +2233,8 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  hono@4.12.33:
-    resolution: {integrity: sha512-+SwvkaiJtxsiPjhy9LivY/1m7UsNqCJetM1BrZl9A5DkQhlbHQDU730mMiDPWjnoCYOM8Chf3WrCJw27kNTPFQ==}
+  hono@4.13.1:
+    resolution: {integrity: sha512-kdJoFVv2xmayw6cY09H7AbMJMt8Jn5jdlEdXsP7AGBdF2DIptVlKlOLKXP41yPip4/a3yQPv9gVcJYI8YY04dw==}
     engines: {node: '>=16.9.0'}
 
   hookable@6.1.1:
@@ -3555,13 +3555,13 @@ snapshots:
 
   '@exodus/bytes@1.15.1': {}
 
-  '@hono/node-server@2.0.12(hono@4.12.33)':
+  '@hono/node-server@2.1.0(hono@4.13.1)':
     dependencies:
-      hono: 4.12.33
+      hono: 4.13.1
 
-  '@hono/zod-validator@0.9.0(hono@4.12.33)(zod@4.4.3)':
+  '@hono/zod-validator@0.9.0(hono@4.13.1)(zod@4.4.3)':
     dependencies:
-      hono: 4.12.33
+      hono: 4.13.1
       zod: 4.4.3
 
   '@img/colour@1.1.0': {}
@@ -4583,7 +4583,7 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  hono@4.12.33: {}
+  hono@4.13.1: {}
 
   hookable@6.1.1: {}
 
