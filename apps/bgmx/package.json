@@ -55,7 +55,7 @@
     "yaml": "^2.9.0"
   },
   "devDependencies": {
-    "@types/jsdom": "^28.0.3",
+    "@types/jsdom": "^30.0.0",
     "bangumi-data": ">=0.3.214"
   },
   "peerDependencies": {
