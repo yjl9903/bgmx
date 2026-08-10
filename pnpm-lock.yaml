@@ -33,8 +33,8 @@ importers:
         specifier: ^3.9.6
         version: 3.9.6
       release-it:
-        specifier: ^21.0.1
-        version: 21.0.1(@types/node@24.13.3)(supports-color@10.2.2)
+        specifier: ^21.0.2
+        version: 21.0.2(@types/node@24.13.3)(supports-color@10.2.2)
       rimraf:
         specifier: ^6.1.3
         version: 6.1.3
@@ -2658,8 +2658,8 @@ packages:
     resolution: {integrity: sha512-Kko+Y5XQ6fM+Ce3dq3m9YGxnacYZYl9cA1wZjaF3Vbry2L3i1qVg8+CAgNPsXRArPMUMCaOR7oa9Nqntc43JKA==}
     engines: {node: '>= 20.19.0'}
 
-  release-it@21.0.1:
-    resolution: {integrity: sha512-xbPuv2tau3gb0Xw0NVqV3QjOhytFvbsBZDqzmURqlwtgNpFIlIbpDbuZG64ptytFOX4H/7k65bbPSLTwAL34/g==}
+  release-it@21.0.2:
+    resolution: {integrity: sha512-QwyDnWiQNB4d8Hc2b5FLMHcsKz9S2O1dMNnPB7w+0knsL5r8+qbnznDA1X7Bw5D863+Ud7eRHc71Cfth5Tlrgg==}
     engines: {node: ^22.21.0 || >=24.0.0}
     hasBin: true
 
@@ -4990,7 +4990,7 @@ snapshots:
 
   readdirp@5.1.1: {}
 
-  release-it@21.0.1(@types/node@24.13.3)(supports-color@10.2.2):
+  release-it@21.0.2(@types/node@24.13.3)(supports-color@10.2.2):
     dependencies:
       '@inquirer/prompts': 8.5.2(@types/node@24.13.3)
       '@octokit/rest': 22.0.1
