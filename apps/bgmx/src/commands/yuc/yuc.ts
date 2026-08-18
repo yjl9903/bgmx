@@ -2,8 +2,9 @@ import fs from 'fs-extra';
 import path from 'path';
 import { parse, stringify } from 'yaml';
 
+import type { YucCalendarItem, YucCategoryItem, YucItem } from './types';
+
 import { fetchYucPage } from './fetch';
-import { YucCalendarItem, YucItem } from './types';
 
 export interface FetchYucDataOptions {
   /**
@@ -38,7 +39,13 @@ export async function fetchYucData(options: FetchYucDataOptions) {
   const sessionFile = options.session ?? `yuc-${year}-${('' + month).padStart(2, '0')}.yaml`;
 
   const session = options.force ? undefined : await readSession(sessionFile);
-  const { items, calendar, web } = session ?? (await fetchYucPage(year, month));
+  const source = session ?? (await fetchYucPage(year, month));
+  const { items, calendar, web } = source;
+  // Sessions written before yuc.wiki introduced the compact category section do not have these keys.
+  const korean = source.korean ?? [];
+  const short = source.short ?? [];
+  const motion = source.motion ?? [];
+  const adult = source.adult ?? [];
 
   let valid = true;
   for (const item of items) {
@@ -55,14 +62,28 @@ export async function fetchYucData(options: FetchYucDataOptions) {
       }
     }
   }
-  for (const item of web) {
-    if (item.id === -1) {
-      valid = false;
-      break;
+  for (const list of [web, korean, short, motion, adult]) {
+    for (const item of list) {
+      if (item.id === -1) {
+        valid = false;
+        break;
+      }
     }
   }
 
-  return { session: sessionFile, year, month, items, calendar, web, valid };
+  return {
+    session: sessionFile,
+    year,
+    month,
+    items,
+    calendar,
+    web,
+    korean,
+    short,
+    motion,
+    adult,
+    valid
+  };
 }
 
 export async function readSession(file: string): Promise<
@@ -72,6 +93,10 @@ export async function readSession(file: string): Promise<
       items: YucItem[];
       calendar: YucCalendarItem[][];
       web: YucCalendarItem[];
+      korean?: YucCategoryItem[];
+      short?: YucCategoryItem[];
+      motion?: YucCategoryItem[];
+      adult?: YucCategoryItem[];
     }
   | undefined
 > {
@@ -96,6 +121,10 @@ export async function writeSession(
     items: YucItem[];
     calendar: YucCalendarItem[][];
     web: YucCalendarItem[];
+    korean: YucCategoryItem[];
+    short: YucCategoryItem[];
+    motion: YucCategoryItem[];
+    adult: YucCategoryItem[];
   }
 ) {
   await fs.ensureDir(path.dirname(file));
@@ -106,7 +135,11 @@ export async function writeSession(
       month: data.month,
       items: data.items,
       calendar: data.calendar,
-      web: data.web
+      web: data.web,
+      korean: data.korean,
+      short: data.short,
+      motion: data.motion,
+      adult: data.adult
     }),
     'utf-8'
   );

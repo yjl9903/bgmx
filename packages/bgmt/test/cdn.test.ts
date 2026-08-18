@@ -16,9 +16,13 @@ describe('cdn', { timeout: 30 * 1000 }, () => {
   });
 
   it('should fetch calendar subjects', async () => {
-    const { version, calendar, web } = await fetchCalendarSubjects();
+    const { version, calendar, web, korean, short, motion, adult } = await fetchCalendarSubjects();
     expect(/0\.\d{8}\.\d+/.test(version)).toBeTruthy();
     expect(calendar).toBeInstanceOf(Array);
     expect(web).toBeInstanceOf(Array);
+    expect(korean).toBeInstanceOf(Array);
+    expect(short).toBeInstanceOf(Array);
+    expect(motion).toBeInstanceOf(Array);
+    expect(adult).toBeInstanceOf(Array);
   });
 });

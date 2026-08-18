@@ -3,6 +3,7 @@ import type { BatchItem } from 'drizzle-orm/batch';
 
 import type { Context } from '../env';
 import type {
+  CalendarPlatform,
   CalendarSummary,
   CalendarInput,
   CalendarUpdateInput,
@@ -193,7 +194,7 @@ export async function deleteCalendar(ctx: Context, season: string) {
 
 function getCalendarRelationKey(row: {
   subject_id: number;
-  platform: 'tv' | 'web';
+  platform: CalendarPlatform;
   weekday: number | null;
 }) {
   return `${row.subject_id}:${row.platform}:${row.weekday ?? ''}`;

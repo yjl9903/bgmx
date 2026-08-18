@@ -38,3 +38,8 @@ export interface YucCalendarItem {
 
   cover: string;
 }
+
+export interface YucCategoryItem extends YucCalendarItem {
+  /** yuc.wiki 上显示的来源标签，例如「漫改」「子供」。 */
+  tags: string[];
+}

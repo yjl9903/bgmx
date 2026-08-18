@@ -54,7 +54,7 @@ describe('calendar route', () => {
     vi.resetAllMocks();
   });
 
-  it('returns empty calendar and web when no active seasons match', async () => {
+  it('returns empty calendar categories when no active seasons match', async () => {
     vi.mocked(fetchCalendarRows).mockResolvedValueOnce([]);
 
     const resp = await createTestApp().request('/calendar');
@@ -69,7 +69,11 @@ describe('calendar route', () => {
         seasons: [],
         updated_at: null,
         calendar: [[], [], [], [], [], [], []],
-        web: []
+        web: [],
+        korean: [],
+        short: [],
+        motion: [],
+        adult: []
       }
     });
   });
@@ -91,11 +95,15 @@ describe('calendar route', () => {
       seasons: ['2026-07'],
       updated_at: '2026-07-01T00:00:00.000Z',
       calendar: [[], [], [], [], [], [], []],
-      web: []
+      web: [],
+      korean: [],
+      short: [],
+      motion: [],
+      adult: []
     });
   });
 
-  it('merges queried seasons into the old calendar response shape', async () => {
+  it('merges queried seasons into calendar categories', async () => {
     vi.mocked(fetchCalendarRows).mockResolvedValueOnce([
       {
         calendar: createCalendar('2026-04', new Date('2026-04-01T00:00:00.000Z')),
@@ -140,6 +148,17 @@ describe('calendar route', () => {
           weekday: null
         },
         subject: createSubject(2)
+      },
+      {
+        calendar: createCalendar('2026-07', new Date('2026-07-01T00:00:00.000Z')),
+        relation: {
+          id: 5,
+          season: '2026-07',
+          subject_id: 4,
+          platform: 'motion',
+          weekday: null
+        },
+        subject: createSubject(4)
       }
     ]);
 
@@ -158,6 +177,14 @@ describe('calendar route', () => {
       platform: 'web',
       weekday: null
     });
+    expect(json.data.motion[0]).toMatchObject({
+      id: 4,
+      platform: 'motion',
+      weekday: null
+    });
+    expect(json.data.korean).toEqual([]);
+    expect(json.data.short).toEqual([]);
+    expect(json.data.adult).toEqual([]);
   });
 
   it('lists all calendar seasons', async () => {
@@ -245,6 +272,11 @@ describe('calendar route', () => {
             subject_id: 1,
             platform: 'tv',
             weekday: 0
+          },
+          {
+            subject_id: 2,
+            platform: 'adult',
+            weekday: null
           }
         ]
       }
@@ -265,6 +297,10 @@ describe('calendar route', () => {
               subject_id: 1,
               platform: 'tv',
               weekday: 0
+            },
+            {
+              subject_id: 2,
+              platform: 'adult'
             }
           ]
         })
@@ -284,6 +320,11 @@ describe('calendar route', () => {
           subject_id: 1,
           platform: 'tv',
           weekday: 0
+        },
+        {
+          subject_id: 2,
+          platform: 'adult',
+          weekday: null
         }
       ]
     });

@@ -4,6 +4,7 @@ import { getSubjectAlias } from 'bgmt';
 
 import type {
   CalendarSubject,
+  CalendarResult,
   DatabaseBangumi,
   DatabaseRevision,
   DatabaseSubject
@@ -93,7 +94,11 @@ export function printSubject(data: { subject: DatabaseSubject; revisions: Databa
   }
 }
 
-export function printCalendar(calendar: CalendarSubject[][], web: CalendarSubject[]) {
+export function printCalendar(
+  calendar: CalendarSubject[][],
+  web: CalendarSubject[],
+  categories?: Pick<CalendarResult, 'korean' | 'short' | 'motion' | 'adult'>
+) {
   for (let i = 0; i < calendar.length; i++) {
     console.log(bold(['周一', '周二', '周三', '周四', '周五', '周六', '周日'][i]));
     for (const item of calendar[i]) {
@@ -105,5 +110,14 @@ export function printCalendar(calendar: CalendarSubject[][], web: CalendarSubjec
   console.log(`${bold('web')}`);
   for (const item of web) {
     console.log(`${item.title} (id: ${item.id}, ${item.onair_date})`);
+  }
+
+  for (const category of ['korean', 'short', 'motion', 'adult'] as const) {
+    const subjects = categories?.[category] ?? [];
+    console.log();
+    console.log(`${bold(category)}`);
+    for (const item of subjects) {
+      console.log(`${item.title} (id: ${item.id}, ${item.onair_date})`);
+    }
   }
 }

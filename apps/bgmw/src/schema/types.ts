@@ -62,17 +62,21 @@ export type CalendarSummary = Calendar & {
   count: number;
 };
 
+export type CalendarPlatform = 'tv' | 'web' | 'korean' | 'short' | 'motion' | 'adult';
+
+export type CalendarCategory = Exclude<CalendarPlatform, 'tv'>;
+
 export type CalendarRelation = {
   id: number;
   season: string;
   subject_id: number;
-  platform: 'tv' | 'web';
+  platform: CalendarPlatform;
   weekday: number | null;
 };
 
 export type CalendarInput = {
   subject_id: number;
-  platform: 'tv' | 'web';
+  platform: CalendarPlatform;
   weekday?: number | null;
 };
 
@@ -90,7 +94,7 @@ export type CalendarUpdateResult = {
 };
 
 export type CalendarSubject = Subject & {
-  platform: 'tv' | 'web';
+  platform: CalendarPlatform;
   weekday: number | undefined | null;
 };
 
@@ -99,6 +103,10 @@ export type CalendarResult = {
   updated_at: Date | null;
   calendar: CalendarSubject[][];
   web: CalendarSubject[];
+  korean: CalendarSubject[];
+  short: CalendarSubject[];
+  motion: CalendarSubject[];
+  adult: CalendarSubject[];
 };
 
 export type RevisionDetail =

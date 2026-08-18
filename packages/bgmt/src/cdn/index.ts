@@ -55,6 +55,10 @@ export async function fetchCalendarSubjects(options: CdnOptions = {}): Promise<{
     BasicSubject[]
   ];
   web: BasicSubject[];
+  korean: BasicSubject[];
+  short: BasicSubject[];
+  motion: BasicSubject[];
+  adult: BasicSubject[];
 }> {
   const { version = '0', baseURL = 'https://unpkg.com' } = options;
   const resp = await fetch(`${baseURL}/bgmd@${version}/dist/calendar.json`);
@@ -62,5 +66,11 @@ export async function fetchCalendarSubjects(options: CdnOptions = {}): Promise<{
     throw new Error(`Fetch bgmd calendar.json failed`, { cause: resp });
   }
   const data = (await resp.json()) as any;
-  return data;
+  return {
+    ...data,
+    korean: data.korean ?? [],
+    short: data.short ?? [],
+    motion: data.motion ?? [],
+    adult: data.adult ?? []
+  };
 }

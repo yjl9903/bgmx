@@ -26,17 +26,8 @@ const subject = {
 } as any;
 
 describe('transformDatabaseSubject', () => {
-  it('keeps parsed images only for full output', () => {
-    expect(transformDatabaseSubject(subject, { full: true })).toMatchObject({
-      images: [
-        { provider: 'bgm', quality: 'large', src: 'large.jpg' },
-        { provider: 'bgm', quality: 'common', src: 'common.jpg' },
-        { provider: 'bgm', quality: 'medium', src: 'medium.jpg' },
-        { provider: 'bgm', quality: 'small', src: 'small.jpg' },
-        { provider: 'bgm', quality: 'grid', src: 'grid.jpg' }
-      ]
-    });
-
+  it('does not expose parsed images', () => {
+    expect(transformDatabaseSubject(subject, { full: true })).not.toHaveProperty('images');
     expect(transformDatabaseSubject(subject)).not.toHaveProperty('images');
   });
 });

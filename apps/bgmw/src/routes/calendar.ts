@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { Hono } from 'hono';
 
 import type { AppEnv } from '../env';
-import type { CalendarSubject } from '../schema/types';
+import type { CalendarCategory, CalendarSubject } from '../schema/types';
 
 import {
   deleteCalendar,
@@ -21,7 +21,7 @@ const seasonSchema = z.string().regex(/^\d{4}-(?:01|04|07|10)$/);
 
 const calendarInputSchema = z.object({
   subject_id: z.coerce.number().int().gt(0),
-  platform: z.enum(['tv', 'web']),
+  platform: z.enum(['tv', 'web', 'korean', 'short', 'motion', 'adult']),
   weekday: z.coerce.number().int().min(0).max(6).nullable().optional().default(null)
 });
 
@@ -61,7 +61,13 @@ router.get('/calendar', publicCache(), async (c) => {
     const resp = await fetchCalendarRows(c, seasons?.data);
 
     const calendar: CalendarSubject[][] = [[], [], [], [], [], [], []];
-    const web: CalendarSubject[] = [];
+    const categories: Record<CalendarCategory, CalendarSubject[]> = {
+      web: [],
+      korean: [],
+      short: [],
+      motion: [],
+      adult: []
+    };
     const effectiveSeasons = new Set<string>();
     let updatedAt: Date | null = null;
 
@@ -78,16 +84,20 @@ router.get('/calendar', publicCache(), async (c) => {
         platform: item.relation.platform,
         weekday: item.relation.weekday
       };
-      if (item.relation.platform === 'tv' && item.relation.weekday !== null) {
-        calendar[item.relation.weekday]?.push(subject);
+      if (item.relation.platform === 'tv') {
+        if (item.relation.weekday !== null) {
+          calendar[item.relation.weekday]?.push(subject);
+        }
       } else {
-        web.push(subject);
+        categories[item.relation.platform].push(subject);
       }
     }
     for (const row of calendar) {
       dedupeAndSortCalendarSubjects(row);
     }
-    dedupeAndSortCalendarSubjects(web);
+    for (const subjects of Object.values(categories)) {
+      dedupeAndSortCalendarSubjects(subjects);
+    }
 
     return c.json({
       ok: true,
@@ -95,7 +105,7 @@ router.get('/calendar', publicCache(), async (c) => {
         seasons: [...effectiveSeasons],
         updated_at: updatedAt,
         calendar,
-        web
+        ...categories
       }
     });
   } catch (error) {

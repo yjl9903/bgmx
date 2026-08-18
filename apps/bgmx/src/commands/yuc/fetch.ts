@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module';
 
-import type { YucItem, YucCalendarItem } from './types';
+import type { YucItem, YucCalendarItem, YucCategoryItem } from './types';
 
 const require = createRequire(import.meta.url);
 const { JSDOM } = require('jsdom') as typeof import('jsdom');
@@ -10,13 +10,18 @@ export async function fetchYucPage(year: number, month: number) {
   const url = `https://yuc.wiki/${page}/`;
   const resp = await fetch(url);
   const html = await resp.text();
+  return parseYucPage(html);
+}
+
+export function parseYucPage(html: string) {
   const doc = new JSDOM(html);
 
   const items = extractAnime(doc.window.document);
 
   const { calendar, web } = extractCalendar(doc.window.document);
+  const { korean, short, motion, adult } = extractCategories(doc.window.document);
 
-  return { items, calendar, web };
+  return { items, calendar, web, korean, short, motion, adult };
 }
 
 function extractAnime(doc: Document) {
@@ -114,6 +119,49 @@ function extractCalendar(doc: Document) {
   }
 
   return { calendar, web };
+}
+
+const CATEGORY_MAP = {
+  韩番: 'korean',
+  泡面番: 'short',
+  动态漫: 'motion',
+  限制级: 'adult'
+} as const;
+
+function extractCategories(doc: Document) {
+  const categories: Record<(typeof CATEGORY_MAP)[keyof typeof CATEGORY_MAP], YucCategoryItem[]> = {
+    korean: [],
+    short: [],
+    motion: [],
+    adult: []
+  };
+
+  for (const dom of doc.querySelectorAll('.future_div')) {
+    const categoryLabel = dom.querySelector('.future_date')?.textContent?.trim();
+    const category = categoryLabel
+      ? CATEGORY_MAP[categoryLabel as keyof typeof CATEGORY_MAP]
+      : undefined;
+    const container = dom.parentElement;
+    const name = container
+      ?.querySelector('td.future_title_, td.future_title__')
+      ?.textContent?.trim();
+    const cover = dom.querySelector('img')?.getAttribute('data-src')?.trim();
+    const tag = dom.querySelector('.future_type_b')?.textContent?.trim();
+
+    if (!category || !name || !cover) {
+      console.error('unknown yuc category item', categoryLabel, name, cover, container?.innerHTML);
+      continue;
+    }
+
+    categories[category].push({
+      id: -1,
+      name,
+      cover,
+      tags: tag ? [tag] : []
+    });
+  }
+
+  return categories;
 }
 
 function parseTags(text?: string) {

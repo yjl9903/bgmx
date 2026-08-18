@@ -219,8 +219,10 @@ cli
           await match(item, [item.name]);
         }
       }
-      for (const item of data.web) {
-        await match(item, [item.name]);
+      for (const list of [data.web, data.korean, data.short, data.motion, data.adult]) {
+        for (const item of list) {
+          await match(item, [item.name]);
+        }
       }
 
       await writeSession(data.session, data);
@@ -240,13 +242,21 @@ cli
         });
       }
     }
-    for (let i = 0; i < data.web.length; i++) {
-      const item = data.web[i];
-      calendar.push({
-        subject_id: item.id,
-        platform: 'web',
-        weekday: null
-      });
+    const categories = [
+      ['web', data.web],
+      ['korean', data.korean],
+      ['short', data.short],
+      ['motion', data.motion],
+      ['adult', data.adult]
+    ] as const;
+    for (const [platform, items] of categories) {
+      for (const item of items) {
+        calendar.push({
+          subject_id: item.id,
+          platform,
+          weekday: null
+        });
+      }
     }
 
     if (secret && options.updateServer) {
@@ -271,13 +281,14 @@ cli
             }
           }
         }
-        for (let i = 0; i < data.web.length; i++) {
-          const item = data.web[i];
-          if (item.id === -1) {
-            throw new Error(`存在位置 subject ${item.name}`);
-          }
-          if (!allSubjects.has(item.id)) {
-            missing.push(item.id);
+        for (const [, items] of categories) {
+          for (const item of items) {
+            if (item.id === -1) {
+              throw new Error(`存在未知 subject ${item.name}`);
+            }
+            if (!allSubjects.has(item.id)) {
+              missing.push(item.id);
+            }
           }
         }
         for (const id of missing) {
@@ -312,12 +323,13 @@ cli
       seasons: parseSeasonOption(options.season)
     });
 
-    printCalendar(resp.calendar, resp.web);
+    printCalendar(resp.calendar, resp.web, resp);
 
     if (options.out) {
       await dumpCalendar(options.out, resp.calendar, resp.web, {
         full: options.full,
-        version: options.version
+        version: options.version,
+        categories: resp
       });
     }
   });

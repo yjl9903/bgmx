@@ -1,5 +1,7 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
+import type { CalendarPlatform } from './types';
+
 import { subjects } from './subject';
 
 export const calendars = sqliteTable('calendars', {
@@ -18,6 +20,6 @@ export const calendarRelations = sqliteTable('calendar_relations', {
   subject_id: integer('subject_id')
     .notNull()
     .references(() => subjects.id),
-  platform: text('platform').$type<'tv' | 'web'>().notNull(),
+  platform: text('platform').$type<CalendarPlatform>().notNull(),
   weekday: integer('weekday')
 });

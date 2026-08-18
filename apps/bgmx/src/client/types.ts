@@ -3,6 +3,8 @@ export type {
   Subject as DatabaseSubject,
   Calendar,
   CalendarSummary,
+  CalendarPlatform,
+  CalendarCategory,
   CalendarInput,
   CalendarResult,
   CalendarSubject,

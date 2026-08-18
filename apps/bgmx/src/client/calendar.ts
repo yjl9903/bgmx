@@ -29,7 +29,15 @@ export async function fetchCalendar(options: FetchCalendarOptions = {}) {
   const path = search.size > 0 ? `/calendar?${search.toString()}` : '/calendar';
   const resp = await fetchAPI<any>(path, { method: 'GET' }, options);
   if (resp.ok) {
-    return resp.data as CalendarResult;
+    const data = resp.data as Partial<CalendarResult> &
+      Pick<CalendarResult, 'seasons' | 'updated_at' | 'calendar' | 'web'>;
+    return {
+      ...data,
+      korean: data.korean ?? [],
+      short: data.short ?? [],
+      motion: data.motion ?? [],
+      adult: data.adult ?? []
+    };
   }
   throw new Error(`Fetch calendar failed`, { cause: resp });
 }

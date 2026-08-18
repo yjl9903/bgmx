@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { mkdir, writeFile } from 'node:fs/promises';
 
-import type { CalendarSubject } from '../client';
+import type { CalendarResult, CalendarSubject } from '../client';
 
 import { transformCalendarSubject } from '../transform';
 
@@ -39,7 +39,11 @@ export async function dumpCalendar(
   file: string,
   calendar: CalendarSubject[][],
   web: CalendarSubject[],
-  options: { full?: boolean; version?: string } = {}
+  options: {
+    full?: boolean;
+    version?: string;
+    categories?: Pick<CalendarResult, 'korean' | 'short' | 'motion' | 'adult'>;
+  } = {}
 ) {
   await writeFile(
     file,
@@ -47,7 +51,11 @@ export async function dumpCalendar(
       {
         version: options.version,
         calendar: calendar.map((r) => r.map((t) => transformCalendarSubject(t, options))),
-        web: web.map((t) => transformCalendarSubject(t, options))
+        web: web.map((t) => transformCalendarSubject(t, options)),
+        korean: (options.categories?.korean ?? []).map((t) => transformCalendarSubject(t, options)),
+        short: (options.categories?.short ?? []).map((t) => transformCalendarSubject(t, options)),
+        motion: (options.categories?.motion ?? []).map((t) => transformCalendarSubject(t, options)),
+        adult: (options.categories?.adult ?? []).map((t) => transformCalendarSubject(t, options))
       },
       null,
       2
