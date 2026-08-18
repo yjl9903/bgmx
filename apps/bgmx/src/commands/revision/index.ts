@@ -7,7 +7,7 @@ import {
 } from '../../client';
 
 export async function createRevision(subject: DatabaseSubject, options: FetchOptions) {
-  intro(`为 ${subject.id} 创建修订`);
+  intro(`为 ${subject.bangumi.name} 创建修订`);
 
   const field = await select({
     message: '选择修改的字段',

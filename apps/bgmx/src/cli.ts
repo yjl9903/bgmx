@@ -382,6 +382,9 @@ cli
     });
 
     if (resp) {
+      printSubject(resp);
+      console.log('');
+
       const updated = await createRevision(resp.subject, {
         baseURL: options.baseUrl,
         secret
