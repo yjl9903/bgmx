@@ -1,3 +1,5 @@
+import type { RelatedSubject } from 'bgmc';
+
 import type { Context } from '../env';
 
 import { updateSubject, fetchSubjectRevisions } from '../subject';
@@ -18,7 +20,7 @@ export type FetchAndUpdateBangumiSubjectResult =
       error: any;
     };
 
-export async function fetchAndUpdateBangumiSubject(
+async function fetchAndUpdateSingleBangumiSubject(
   ctx: Context,
   bgmId: number
 ): Promise<FetchAndUpdateBangumiSubjectResult> {
@@ -68,6 +70,50 @@ export async function fetchAndUpdateBangumiSubject(
       error
     };
   }
+}
+
+export async function fetchAndUpdateRelatedBangumiSubjects(
+  ctx: Context,
+  relations: RelatedSubject[]
+): Promise<{ ok: true; data: DatabaseBangumi[] } | { ok: false; error: unknown }> {
+  const subjectIds = [
+    ...new Set(
+      relations
+        .filter((relation) => relation.type === BANGUMI_ANIME_TYPE)
+        .map((relation) => relation.id)
+    )
+  ];
+
+  const results = await Promise.all(
+    subjectIds.map((subjectId) => fetchAndUpdateSingleBangumiSubject(ctx, subjectId))
+  );
+  const data: DatabaseBangumi[] = [];
+
+  for (const result of results) {
+    if (!result.ok) return result;
+    data.push(result.data);
+  }
+
+  return {
+    ok: true,
+    data
+  };
+}
+
+export async function fetchAndUpdateBangumiSubject(
+  ctx: Context,
+  bgmId: number
+): Promise<FetchAndUpdateBangumiSubjectResult> {
+  const result = await fetchAndUpdateSingleBangumiSubject(ctx, bgmId);
+  if (!result.ok) return result;
+
+  const related = await fetchAndUpdateRelatedBangumiSubjects(
+    ctx,
+    result.data.subjects.filter((relation) => relation.id !== bgmId)
+  );
+  if (!related.ok) return related;
+
+  return result;
 }
 
 export async function updateDatabaseBangumi(

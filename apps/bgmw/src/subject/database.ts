@@ -31,6 +31,38 @@ export async function fetchSubjectById(ctx: Context, subjectId: number) {
   });
 }
 
+export async function fetchSubjectDetailById(ctx: Context, subjectId: number) {
+  const database = ctx.get('database');
+
+  const [detail] = await database
+    .select({
+      subject: subjectsSchema,
+      relations: bangumisSchema.subjects,
+      bangumi_updated_at: bangumisSchema.updated_at
+    })
+    .from(subjectsSchema)
+    .innerJoin(bangumisSchema, eq(subjectsSchema.id, bangumisSchema.id))
+    .where(eq(subjectsSchema.id, subjectId))
+    .limit(1);
+
+  return detail;
+}
+
+export async function fetchSubjectDetailsByIds(ctx: Context, subjectIds: number[]) {
+  if (subjectIds.length === 0) return [];
+
+  const database = ctx.get('database');
+
+  return database
+    .select({
+      subject: subjectsSchema,
+      bangumi_updated_at: bangumisSchema.updated_at
+    })
+    .from(subjectsSchema)
+    .innerJoin(bangumisSchema, eq(subjectsSchema.id, bangumisSchema.id))
+    .where(inArray(subjectsSchema.id, subjectIds));
+}
+
 export async function fetchBangumiById(ctx: Context, subjectId: number) {
   const database = ctx.get('database');
 

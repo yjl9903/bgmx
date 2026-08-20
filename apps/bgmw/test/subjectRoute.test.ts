@@ -11,6 +11,8 @@ vi.mock('../src/subject/database', () => ({
   fetchBangumiById: vi.fn(),
   fetchSubjectAllRevisions: vi.fn(),
   fetchSubjectById: vi.fn(),
+  fetchSubjectDetailById: vi.fn(),
+  fetchSubjectDetailsByIds: vi.fn(),
   fetchSubjectRevisions: vi.fn(),
   fetchSubjectsAfterCursor: vi.fn(),
   fetchSubjectsBySearchTitle: vi.fn(),
@@ -18,7 +20,8 @@ vi.mock('../src/subject/database', () => ({
 }));
 
 vi.mock('../src/bangumi', () => ({
-  fetchAndUpdateBangumiSubject: vi.fn()
+  fetchAndUpdateBangumiSubject: vi.fn(),
+  fetchAndUpdateRelatedBangumiSubjects: vi.fn()
 }));
 
 import {
@@ -26,11 +29,13 @@ import {
   fetchBangumiById,
   fetchSubjectAllRevisions,
   fetchSubjectById,
+  fetchSubjectDetailById,
+  fetchSubjectDetailsByIds,
   fetchSubjectRevisions,
   fetchSubjectsAfterCursor,
   fetchSubjectsBySearchTitle
 } from '../src/subject/database';
-import { fetchAndUpdateBangumiSubject } from '../src/bangumi';
+import { fetchAndUpdateBangumiSubject, fetchAndUpdateRelatedBangumiSubjects } from '../src/bangumi';
 import { subjectRoute } from '../src/routes/subject';
 import { PUBLIC_CACHE_CONTROL } from '../src/routes/middlewares/cache';
 
@@ -50,10 +55,22 @@ function createSubject(id: number, updated_at = new Date()) {
   return {
     id,
     title: `subject ${id}`,
-    data: {},
-    search: {},
+    alias: { zh: [`条目 ${id}`] },
+    poster: `poster-${id}.jpg`,
+    onair_date: '2026-07-01',
+    search: { include: [] },
+    bangumi: {},
+    tmdb: null,
     updated_at
   } as any;
+}
+
+function createSubjectDetail(id: number, bangumi_updated_at = new Date()) {
+  return {
+    subject: createSubject(id),
+    relations: [],
+    bangumi_updated_at
+  };
 }
 
 describe('subject route cache headers', () => {
@@ -62,7 +79,7 @@ describe('subject route cache headers', () => {
   });
 
   it('caches public subject detail responses', async () => {
-    vi.mocked(fetchSubjectById).mockResolvedValueOnce(createSubject(1));
+    vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce(createSubjectDetail(1));
     vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
 
     const resp = await createTestApp().request('/subject/1');
@@ -70,6 +87,56 @@ describe('subject route cache headers', () => {
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
     expect(fetchAndUpdateBangumiSubject).not.toHaveBeenCalled();
+  });
+
+  it('returns anime relations without their type', async () => {
+    const relatedSubject = createSubject(20);
+    vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce({
+      ...createSubjectDetail(1),
+      relations: [
+        { id: 10, type: 1, name: 'book', name_cn: '书籍', relation: '书籍' },
+        {
+          id: 20,
+          type: 2,
+          name: 'anime',
+          name_cn: '动画',
+          relation: '前传',
+          images: {
+            small: 'small.jpg',
+            grid: 'grid.jpg',
+            large: 'large.jpg',
+            medium: 'medium.jpg',
+            common: 'common.jpg'
+          }
+        },
+        { id: 30, type: 3, name: 'music', name_cn: '音乐', relation: '片头曲' }
+      ]
+    });
+    vi.mocked(fetchSubjectDetailsByIds).mockResolvedValueOnce([
+      { subject: relatedSubject, bangumi_updated_at: new Date() }
+    ]);
+    vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
+
+    const resp = await createTestApp().request('/subject/1');
+    const json = (await resp.json()) as any;
+
+    expect(json.data.relations).toEqual([
+      {
+        id: 20,
+        title: 'subject 20',
+        alias: { zh: ['条目 20'] },
+        poster: 'poster-20.jpg',
+        onair_date: '2026-07-01',
+        relation: '前传'
+      }
+    ]);
+    expect(json.data.relations[0]).not.toHaveProperty('type');
+    expect(json.data.relations[0]).not.toHaveProperty('name');
+    expect(json.data.relations[0]).not.toHaveProperty('search');
+    expect(json.data.relations[0]).not.toHaveProperty('bangumi');
+    expect(json.data.relations[0]).not.toHaveProperty('tmdb');
+    expect(json.data.relations[0]).not.toHaveProperty('updated_at');
+    expect(fetchSubjectDetailsByIds).toHaveBeenCalledWith(expect.anything(), [20]);
   });
 
   it('caches public subject list responses', async () => {
@@ -97,9 +164,9 @@ describe('subject route cache headers', () => {
   });
 
   it('refreshes missing subject responses before returning', async () => {
-    vi.mocked(fetchSubjectById)
+    vi.mocked(fetchSubjectDetailById)
       .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(createSubject(404));
+      .mockResolvedValueOnce(createSubjectDetail(404));
     vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
     vi.mocked(fetchAndUpdateBangumiSubject).mockResolvedValueOnce({ ok: true, data: {} } as any);
 
@@ -111,8 +178,8 @@ describe('subject route cache headers', () => {
   });
 
   it('does not return stale subject when refresh fails', async () => {
-    vi.mocked(fetchSubjectById).mockResolvedValueOnce(
-      createSubject(1, new Date('2026-01-01T00:00:00.000Z'))
+    vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce(
+      createSubjectDetail(1, new Date('2026-01-01T00:00:00.000Z'))
     );
     vi.mocked(fetchAndUpdateBangumiSubject).mockResolvedValueOnce({
       ok: false,
@@ -126,6 +193,61 @@ describe('subject route cache headers', () => {
     expect(resp.headers.get('Cache-Control')).toBeNull();
     expect(json).toEqual({ ok: false, error: 'Failed to refresh subject' });
     expect(fetchSubjectRevisions).not.toHaveBeenCalled();
+  });
+
+  it('returns refreshed relations when Bangumi data is stale', async () => {
+    vi.mocked(fetchSubjectDetailById)
+      .mockResolvedValueOnce(createSubjectDetail(1, new Date('2026-01-01T00:00:00.000Z')))
+      .mockResolvedValueOnce({
+        ...createSubjectDetail(1),
+        relations: [{ id: 20, type: 2, name: 'anime', name_cn: '动画', relation: '前传' }]
+      });
+    vi.mocked(fetchAndUpdateBangumiSubject).mockResolvedValueOnce({
+      ok: true,
+      data: {}
+    } as any);
+    vi.mocked(fetchSubjectDetailsByIds).mockResolvedValueOnce([
+      { subject: createSubject(20), bangumi_updated_at: new Date() }
+    ]);
+    vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
+
+    const resp = await createTestApp().request('/subject/1');
+    const json = (await resp.json()) as any;
+
+    expect(resp.status).toBe(200);
+    expect(fetchAndUpdateBangumiSubject).toHaveBeenCalledOnce();
+    expect(json.data.relations[0]).toMatchObject({ id: 20, relation: '前传' });
+  });
+
+  it('upserts missing related anime subjects before returning them', async () => {
+    const relation = {
+      id: 20,
+      type: 2,
+      name: 'anime',
+      name_cn: '动画',
+      relation: '前传'
+    };
+    vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce({
+      ...createSubjectDetail(1),
+      relations: [relation]
+    });
+    vi.mocked(fetchSubjectDetailsByIds)
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ subject: createSubject(20), bangumi_updated_at: new Date() }]);
+    vi.mocked(fetchAndUpdateRelatedBangumiSubjects).mockResolvedValueOnce({
+      ok: true,
+      data: []
+    });
+    vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
+
+    const resp = await createTestApp().request('/subject/1');
+    const json = (await resp.json()) as any;
+
+    expect(resp.status).toBe(200);
+    expect(fetchAndUpdateRelatedBangumiSubjects).toHaveBeenCalledWith(expect.anything(), [
+      relation
+    ]);
+    expect(json.data.relations[0]).toMatchObject({ id: 20, relation: '前传' });
   });
 
   it('does not cache authenticated revision responses', async () => {

@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { Hono } from 'hono';
 
 import type { AppEnv } from '../env';
-import type { Subject } from '../schema/types';
+import type { Bangumi, SubjectRelation } from '../schema/types';
 
-import { fetchAndUpdateBangumiSubject } from '../bangumi';
+import { fetchAndUpdateBangumiSubject, fetchAndUpdateRelatedBangumiSubjects } from '../bangumi';
 import {
   createSubjectRevision,
   deleteSubjectData,
@@ -13,6 +13,8 @@ import {
   fetchBangumiById,
   fetchSubjectAllRevisions,
   fetchSubjectById,
+  fetchSubjectDetailById,
+  fetchSubjectDetailsByIds,
   fetchSubjectRevisions,
   fetchSubjectsAfterCursor,
   fetchSubjectsBySearchTitle,
@@ -27,8 +29,12 @@ const router = new Hono<AppEnv>();
 
 const SUBJECT_STALE_MS = 24 * 60 * 60 * 1000;
 
-function isSubjectStale(subject: Pick<Subject, 'updated_at'>) {
+function isSubjectStale(subject: Pick<Bangumi, 'updated_at'>) {
   return Date.now() - new Date(subject.updated_at).getTime() > SUBJECT_STALE_MS;
+}
+
+function getAnimeRelations(relations: Bangumi['subjects']) {
+  return relations.filter((relation) => relation.type === 2);
 }
 
 // 查询数据库中的单个 subject
@@ -41,9 +47,9 @@ router.get(
     const subjectId = c.req.valid('param').id;
 
     try {
-      let subject = await fetchSubjectById(c, subjectId);
+      let detail = await fetchSubjectDetailById(c, subjectId);
 
-      if (!subject || isSubjectStale(subject)) {
+      if (!detail || isSubjectStale({ updated_at: detail.bangumi_updated_at })) {
         const refreshed = await fetchAndUpdateBangumiSubject(c, subjectId);
         if (!refreshed.ok) {
           return c.json(
@@ -55,10 +61,10 @@ router.get(
           );
         }
 
-        subject = await fetchSubjectById(c, subjectId);
+        detail = await fetchSubjectDetailById(c, subjectId);
       }
 
-      if (!subject) {
+      if (!detail) {
         return c.json(
           {
             ok: false,
@@ -68,6 +74,50 @@ router.get(
         );
       }
 
+      const animeRelations = getAnimeRelations(detail.relations);
+      const relatedSubjectIds = [...new Set(animeRelations.map((relation) => relation.id))];
+      let relatedDetails =
+        relatedSubjectIds.length > 0 ? await fetchSubjectDetailsByIds(c, relatedSubjectIds) : [];
+      let relatedById = new Map(relatedDetails.map((item) => [item.subject.id, item]));
+      const staleRelations = animeRelations.filter((relation) => {
+        const related = relatedById.get(relation.id);
+        return !related || isSubjectStale({ updated_at: related.bangumi_updated_at });
+      });
+
+      if (staleRelations.length > 0) {
+        const refreshed = await fetchAndUpdateRelatedBangumiSubjects(c, staleRelations);
+        if (!refreshed.ok) {
+          return c.json(
+            {
+              ok: false,
+              error: 'Failed to refresh subject relations'
+            },
+            502
+          );
+        }
+
+        relatedDetails = await fetchSubjectDetailsByIds(c, relatedSubjectIds);
+        relatedById = new Map(relatedDetails.map((item) => [item.subject.id, item]));
+      }
+
+      const relations = animeRelations.map((relation): SubjectRelation => {
+        const related = relatedById.get(relation.id);
+        if (!related) {
+          throw new Error(`Related subject ${relation.id} not found after refresh`);
+        }
+
+        const { id, title, alias, poster, onair_date } = related.subject;
+
+        return {
+          id,
+          title,
+          alias,
+          poster,
+          onair_date,
+          relation: relation.relation
+        };
+      });
+
       const revisions = await fetchSubjectRevisions(c, subjectId);
 
       return c.json(
@@ -75,7 +125,8 @@ router.get(
           ok: true,
           data: {
             revisions,
-            subject
+            subject: detail.subject,
+            relations
           }
         },
         200

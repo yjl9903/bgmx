@@ -21,6 +21,10 @@ export type Subject = {
   updated_at: Date;
 };
 
+export type SubjectRelation = Pick<Subject, 'id' | 'title' | 'alias' | 'poster' | 'onair_date'> & {
+  relation: string;
+};
+
 export type SubjectBangumiData = {
   id: SubjectInformation['id'];
   type: SubjectInformation['type'];

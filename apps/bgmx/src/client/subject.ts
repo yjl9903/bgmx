@@ -2,6 +2,7 @@ import type {
   FetchOptions,
   DatabaseBangumi,
   DatabaseSubject,
+  SubjectRelation,
   RevisionDetail,
   DatabaseRevision
 } from './types';
@@ -11,7 +12,11 @@ import { fetchAPI } from './base';
 export async function fetchSubject(
   subjectId: number,
   options?: FetchOptions
-): Promise<{ subject: DatabaseSubject; revisions: DatabaseRevision[] }> {
+): Promise<{
+  subject: DatabaseSubject;
+  revisions: DatabaseRevision[];
+  relations: SubjectRelation[];
+}> {
   const resp = await fetchAPI<any>(`/subject/${subjectId}`, {}, options);
   if (resp.ok) {
     return resp.data;
