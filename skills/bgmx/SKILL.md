@@ -51,11 +51,11 @@ Use this when the user asks to refresh bgmx subject data from Bangumi.
 After syncing, inspect the log for unknown subjects and failures. If the user asks for a release or
 PR, mention the sync count and any error count.
 
-## Create Subject Revisions
+## Manage Subject Revisions
 
 Use revisions for manual corrections to a bgmx subject's search behavior. The CLI is interactive.
 
-1. Inspect the subject:
+1. Inspect the currently effective subject and enabled revisions:
    ```bash
    bgmx subject <subject_id>
    ```
@@ -71,9 +71,18 @@ Use revisions for manual corrections to a bgmx subject's search behavior. The CL
    - `search.after`
 4. For set fields, choose `set.add`, `set.delete`, or `field.set`. For `before`/`after`, enter a
    parseable datetime.
-5. Verify the result:
+5. List all revisions, including disabled revisions:
    ```bash
    bgmx subject revision list <subject_id>
+   ```
+6. Enable or disable an existing revision:
+   ```bash
+   bgmx subject revision enable <subject_id> <revision_id>
+   bgmx subject revision disable <subject_id> <revision_id>
+   ```
+7. Permanently delete a revision only when the user explicitly asks for deletion:
+   ```bash
+   bgmx subject revision delete <subject_id> <revision_id>
    ```
 
 Prefer small, targeted revisions. Do not edit database rows directly unless the user explicitly asks

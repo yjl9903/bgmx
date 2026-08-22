@@ -3,6 +3,7 @@ import type { Calendar, SubjectInformation } from 'bgmc';
 import type { FetchOptions, DatabaseBangumi } from './types';
 
 import { fetchAPI } from './base';
+import { deserializeBangumi } from './deserialize';
 
 export async function fetchBangumiCalendar(options: FetchOptions = {}): Promise<Calendar> {
   const resp = await fetchAPI<any>('/bangumi/calendar', {}, options);
@@ -32,7 +33,7 @@ export async function* fetchBangumiSubjects(
 
     if (resp.ok) {
       for (const subject of resp.data) {
-        yield subject;
+        yield deserializeBangumi(subject);
       }
 
       cursor = resp.next_cursor;
@@ -51,7 +52,7 @@ export async function fetchAndUpdateBangumiSubject(
 ): Promise<DatabaseBangumi> {
   const resp = await fetchAPI<any>(`/bangumi/subject/${bgmId}`, { method: 'POST' }, options);
   if (resp.ok) {
-    return resp.data;
+    return deserializeBangumi(resp.data);
   }
   throw new Error(`Fetch bangumi subject failed`, { cause: resp });
 }

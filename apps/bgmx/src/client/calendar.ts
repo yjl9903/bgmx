@@ -7,6 +7,11 @@ import type {
 } from './types';
 
 import { fetchAPI } from './base';
+import {
+  deserializeCalendarResult,
+  deserializeCalendarSummary,
+  deserializeCalendarUpdateResult
+} from './deserialize';
 
 export type FetchCalendarOptions = FetchOptions & {
   seasons?: string[];
@@ -15,7 +20,7 @@ export type FetchCalendarOptions = FetchOptions & {
 export async function fetchCalendars(options: FetchOptions = {}): Promise<CalendarSummary[]> {
   const resp = await fetchAPI<any>('/calendars', { method: 'GET' }, options);
   if (resp.ok) {
-    return resp.data as CalendarSummary[];
+    return (resp.data as CalendarSummary[]).map(deserializeCalendarSummary);
   }
   throw new Error(`Fetch calendars failed`, { cause: resp });
 }
@@ -31,13 +36,13 @@ export async function fetchCalendar(options: FetchCalendarOptions = {}) {
   if (resp.ok) {
     const data = resp.data as Partial<CalendarResult> &
       Pick<CalendarResult, 'seasons' | 'updated_at' | 'calendar' | 'web'>;
-    return {
+    return deserializeCalendarResult({
       ...data,
       korean: data.korean ?? [],
       short: data.short ?? [],
       motion: data.motion ?? [],
       adult: data.adult ?? []
-    };
+    });
   }
   throw new Error(`Fetch calendar failed`, { cause: resp });
 }
@@ -71,7 +76,7 @@ export async function updateCalendar(
     options
   );
   if (resp.ok) {
-    return resp.data;
+    return deserializeCalendarUpdateResult(resp.data);
   }
   throw new Error(`Update calendar failed`, { cause: resp });
 }

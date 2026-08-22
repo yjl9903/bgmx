@@ -7,9 +7,8 @@ import type { Bangumi, SubjectRelation } from '../schema/types';
 import { fetchAndUpdateBangumiSubject, fetchAndUpdateRelatedBangumiSubjects } from '../bangumi';
 import {
   createSubjectRevision,
+  deleteSubjectRevision,
   deleteSubjectData,
-  disableSubjectRevision,
-  enableSubjectRevision,
   fetchBangumiById,
   fetchSubjectAllRevisions,
   fetchSubjectById,
@@ -18,7 +17,8 @@ import {
   fetchSubjectRevisions,
   fetchSubjectsAfterCursor,
   fetchSubjectsBySearchTitle,
-  updateSubject
+  updateSubject,
+  updateSubjectRevision
 } from '../subject/database';
 
 import { zValidator } from './middlewares/zod';
@@ -297,6 +297,17 @@ router.get(
       }
 
       const subject = await fetchSubjectById(c, subjectId);
+
+      if (!subject) {
+        return c.json(
+          {
+            ok: false,
+            error: 'Subject not found'
+          },
+          404
+        );
+      }
+
       const revisions = await fetchSubjectAllRevisions(c, subjectId);
 
       return c.json(
@@ -326,7 +337,65 @@ router.get(
   }
 );
 
-// 禁用该 subject 下的某一条 revision
+// 更新该 subject 下某一条 revision 的启用状态
+router.patch(
+  '/subject/:id/revision/:rid',
+  authorization,
+  zValidator(
+    'param',
+    z.object({ id: z.coerce.number().int().gt(0), rid: z.coerce.number().int().gte(0) })
+  ),
+  zValidator('json', z.object({ enabled: z.boolean() })),
+  async (c) => {
+    const requestId = c.get('requestId');
+    const subjectId = c.req.valid('param').id;
+    const revisionId = c.req.valid('param').rid;
+    const { enabled } = c.req.valid('json');
+
+    try {
+      const bangumi = await fetchBangumiById(c, subjectId);
+
+      if (!bangumi) {
+        return c.json(
+          {
+            ok: false,
+            error: 'Subject not found'
+          },
+          404
+        );
+      }
+
+      const revisions = await updateSubjectRevision(c, subjectId, revisionId, { enabled });
+      const updated = await updateSubject(c, bangumi, revisions);
+
+      return c.json(
+        {
+          ok: true,
+          data: {
+            revisions,
+            subject: updated.data
+          }
+        },
+        200
+      );
+    } catch (error) {
+      console.error('[bgmw] failed to update revision enabled state', error, {
+        requestId,
+        subjectId
+      });
+
+      return c.json(
+        {
+          ok: false,
+          error: 'Failed to update revision enabled state'
+        },
+        500
+      );
+    }
+  }
+);
+
+// 物理删除该 subject 下的某一条 revision
 router.delete(
   '/subject/:id/revision/:rid',
   authorization,
@@ -352,7 +421,7 @@ router.delete(
         );
       }
 
-      const revisions = await disableSubjectRevision(c, subjectId, revisionId);
+      const revisions = await deleteSubjectRevision(c, subjectId, revisionId);
       const updated = await updateSubject(c, bangumi, revisions);
 
       return c.json(
@@ -366,7 +435,7 @@ router.delete(
         200
       );
     } catch (error) {
-      console.error('[bgmw] failed to disable revision', error, {
+      console.error('[bgmw] failed to delete revision', error, {
         requestId,
         subjectId
       });
@@ -374,63 +443,7 @@ router.delete(
       return c.json(
         {
           ok: false,
-          error: 'Failed to disable revision'
-        },
-        500
-      );
-    }
-  }
-);
-
-// 启用该 subject 下的某一条 revision
-router.put(
-  '/subject/:id/revision/:rid',
-  authorization,
-  zValidator(
-    'param',
-    z.object({ id: z.coerce.number().int().gt(0), rid: z.coerce.number().int().gte(0) })
-  ),
-  async (c) => {
-    const requestId = c.get('requestId');
-    const subjectId = c.req.valid('param').id;
-    const revisionId = c.req.valid('param').rid;
-
-    try {
-      const bangumi = await fetchBangumiById(c, subjectId);
-
-      if (!bangumi) {
-        return c.json(
-          {
-            ok: false,
-            error: 'Subject not found'
-          },
-          404
-        );
-      }
-
-      const revisions = await enableSubjectRevision(c, subjectId, revisionId);
-      const updated = await updateSubject(c, bangumi, revisions);
-
-      return c.json(
-        {
-          ok: true,
-          data: {
-            revisions,
-            subject: updated.data
-          }
-        },
-        200
-      );
-    } catch (error) {
-      console.error('[bgmw] failed to enable revision', error, {
-        requestId,
-        subjectId
-      });
-
-      return c.json(
-        {
-          ok: false,
-          error: 'Failed to enable revision'
+          error: 'Failed to delete revision'
         },
         500
       );

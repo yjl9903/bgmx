@@ -8,6 +8,11 @@ import type {
 } from './types';
 
 import { fetchAPI } from './base';
+import {
+  deserializeBangumi,
+  deserializeRevisionResponse,
+  deserializeSubject
+} from './deserialize';
 
 export async function fetchSubject(
   subjectId: number,
@@ -19,7 +24,7 @@ export async function fetchSubject(
 }> {
   const resp = await fetchAPI<any>(`/subject/${subjectId}`, {}, options);
   if (resp.ok) {
-    return resp.data;
+    return deserializeRevisionResponse(resp.data);
   }
   throw new Error(`Fetch subject failed`, { cause: resp });
 }
@@ -30,7 +35,7 @@ export async function refreshSubject(
 ): Promise<DatabaseBangumi> {
   const resp = await fetchAPI<any>(`/subject/${subjectId}`, { method: 'POST' }, options);
   if (resp.ok) {
-    return resp.data;
+    return deserializeBangumi(resp.data);
   }
   throw new Error(`Refresh subject failed`, { cause: resp });
 }
@@ -52,9 +57,9 @@ export async function fetchRevisions(
 ): Promise<{ subject: DatabaseSubject; revisions: DatabaseRevision[] }> {
   const resp = await fetchAPI<any>(`/subject/${subjectId}/revisions`, {}, options);
   if (resp.ok) {
-    return resp.data;
+    return deserializeRevisionResponse(resp.data);
   }
-  throw new Error(`Fetch subject failed`, { cause: resp });
+  throw new Error(`Fetch subject revisions failed`, { cause: resp });
 }
 
 export async function createRevision(
@@ -72,7 +77,7 @@ export async function createRevision(
     options
   );
   if (resp.ok) {
-    return resp.data;
+    return deserializeRevisionResponse(resp.data);
   }
   throw new Error(`Create subject revision failed`, { cause: resp });
 }
@@ -84,16 +89,40 @@ export async function enableRevision(
 ): Promise<{ subject: DatabaseSubject; revisions: DatabaseRevision[] }> {
   const resp = await fetchAPI<any>(
     `/subject/${subjectId}/revision/${revisionId}`,
-    { method: 'PUT' },
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ enabled: true }),
+      headers: { 'Content-Type': 'application/json' }
+    },
     options
   );
   if (resp.ok) {
-    return resp.data;
+    return deserializeRevisionResponse(resp.data);
   }
-  throw new Error(`Create subject revision failed`, { cause: resp });
+  throw new Error(`Enable subject revision failed`, { cause: resp });
 }
 
 export async function disableRevision(
+  subjectId: number,
+  revisionId: number,
+  options?: FetchOptions
+): Promise<{ subject: DatabaseSubject; revisions: DatabaseRevision[] }> {
+  const resp = await fetchAPI<any>(
+    `/subject/${subjectId}/revision/${revisionId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ enabled: false }),
+      headers: { 'Content-Type': 'application/json' }
+    },
+    options
+  );
+  if (resp.ok) {
+    return deserializeRevisionResponse(resp.data);
+  }
+  throw new Error(`Disable subject revision failed`, { cause: resp });
+}
+
+export async function deleteRevision(
   subjectId: number,
   revisionId: number,
   options?: FetchOptions
@@ -104,9 +133,9 @@ export async function disableRevision(
     options
   );
   if (resp.ok) {
-    return resp.data;
+    return deserializeRevisionResponse(resp.data);
   }
-  throw new Error(`Create subject revision failed`, { cause: resp });
+  throw new Error(`Delete subject revision failed`, { cause: resp });
 }
 
 const MaxSubjectsLimit = 1000;
@@ -133,7 +162,7 @@ export async function* fetchSubjects(
 
     if (resp.ok) {
       for (const subject of resp.data) {
-        yield subject;
+        yield deserializeSubject(subject);
         count++;
         if (count >= limit) {
           break;

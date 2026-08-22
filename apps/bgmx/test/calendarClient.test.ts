@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchCalendar, updateCalendar } from '../src/client';
+import { fetchCalendar, fetchCalendars, updateCalendar } from '../src/client';
 import { dumpCalendar } from '../src/commands';
 
 let tempDir: string | undefined;
@@ -23,9 +23,9 @@ describe('calendar client', () => {
           ok: true,
           data: {
             seasons: ['2026-04'],
-            updated_at: null,
+            updated_at: '2026-08-22T08:00:00.000Z',
             calendar: [[], [], [], [], [], [], []],
-            web: []
+            web: [{ id: 1, updated_at: '2026-08-21T08:00:00.000Z' }]
           }
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -38,6 +38,31 @@ describe('calendar client', () => {
     expect(data.short).toEqual([]);
     expect(data.motion).toEqual([]);
     expect(data.adult).toEqual([]);
+    expect(data.updated_at).toEqual(new Date('2026-08-22T08:00:00.000Z'));
+    expect(data.web[0]?.updated_at).toEqual(new Date('2026-08-21T08:00:00.000Z'));
+  });
+
+  it('deserializes calendar summary timestamps', async () => {
+    const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          ok: true,
+          data: [
+            {
+              season: '2026-07',
+              is_active: true,
+              count: 1,
+              updated_at: '2026-08-22T08:00:00.000Z'
+            }
+          ]
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    );
+
+    const [calendar] = await fetchCalendars({ baseURL: 'https://example.test', fetch });
+
+    expect(calendar?.updated_at).toEqual(new Date('2026-08-22T08:00:00.000Z'));
   });
 
   it('uploads category relations with the season calendar', async () => {
@@ -45,13 +70,18 @@ describe('calendar client', () => {
       new Response(
         JSON.stringify({
           ok: true,
-          data: { season: '2026-07', is_active: true, updated_at: null, calendar: [] }
+          data: {
+            season: '2026-07',
+            is_active: true,
+            updated_at: '2026-08-22T08:00:00.000Z',
+            calendar: []
+          }
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       )
     );
 
-    await updateCalendar(
+    const result = await updateCalendar(
       {
         season: '2026-07',
         calendar: [{ subject_id: 1, platform: 'motion', weekday: null }]
@@ -63,6 +93,7 @@ describe('calendar client', () => {
       season: '2026-07',
       calendar: [{ subject_id: 1, platform: 'motion', weekday: null }]
     });
+    expect(result.updated_at).toEqual(new Date('2026-08-22T08:00:00.000Z'));
   });
 
   it('writes all categories to calendar JSON', async () => {

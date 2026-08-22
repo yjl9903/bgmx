@@ -5,9 +5,8 @@ import type { AppEnv } from '../src/env';
 
 vi.mock('../src/subject/database', () => ({
   createSubjectRevision: vi.fn(),
+  deleteSubjectRevision: vi.fn(),
   deleteSubjectData: vi.fn(),
-  disableSubjectRevision: vi.fn(),
-  enableSubjectRevision: vi.fn(),
   fetchBangumiById: vi.fn(),
   fetchSubjectAllRevisions: vi.fn(),
   fetchSubjectById: vi.fn(),
@@ -16,7 +15,8 @@ vi.mock('../src/subject/database', () => ({
   fetchSubjectRevisions: vi.fn(),
   fetchSubjectsAfterCursor: vi.fn(),
   fetchSubjectsBySearchTitle: vi.fn(),
-  updateSubject: vi.fn()
+  updateSubject: vi.fn(),
+  updateSubjectRevision: vi.fn()
 }));
 
 vi.mock('../src/bangumi', () => ({
@@ -25,6 +25,7 @@ vi.mock('../src/bangumi', () => ({
 }));
 
 import {
+  deleteSubjectRevision,
   deleteSubjectData,
   fetchBangumiById,
   fetchSubjectAllRevisions,
@@ -33,7 +34,9 @@ import {
   fetchSubjectDetailsByIds,
   fetchSubjectRevisions,
   fetchSubjectsAfterCursor,
-  fetchSubjectsBySearchTitle
+  fetchSubjectsBySearchTitle,
+  updateSubject,
+  updateSubjectRevision
 } from '../src/subject/database';
 import { fetchAndUpdateBangumiSubject, fetchAndUpdateRelatedBangumiSubjects } from '../src/bangumi';
 import { subjectRoute } from '../src/routes/subject';
@@ -87,6 +90,7 @@ describe('subject route cache headers', () => {
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
     expect(fetchAndUpdateBangumiSubject).not.toHaveBeenCalled();
+    expect(fetchSubjectRevisions).toHaveBeenCalledWith(expect.anything(), 1);
   });
 
   it('returns anime relations without their type', async () => {
@@ -250,10 +254,12 @@ describe('subject route cache headers', () => {
     expect(json.data.relations[0]).toMatchObject({ id: 20, relation: '前传' });
   });
 
-  it('does not cache authenticated revision responses', async () => {
+  it('lists all revisions including disabled revisions without caching', async () => {
     vi.mocked(fetchBangumiById).mockResolvedValueOnce(createSubject(1));
     vi.mocked(fetchSubjectById).mockResolvedValueOnce(createSubject(1));
-    vi.mocked(fetchSubjectAllRevisions).mockResolvedValueOnce([]);
+    vi.mocked(fetchSubjectAllRevisions).mockResolvedValueOnce([
+      { id: 2, target_id: 1, enabled: false } as any
+    ]);
 
     const resp = await createTestApp().request(
       '/subject/1/revisions',
@@ -266,9 +272,84 @@ describe('subject route cache headers', () => {
         SECRET: 'secret'
       }
     );
+    const json = (await resp.json()) as any;
 
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBeNull();
+    expect(json.data.revisions).toEqual([{ id: 2, target_id: 1, enabled: false }]);
+  });
+
+  it('returns 404 when the revision list subject record is missing', async () => {
+    vi.mocked(fetchBangumiById).mockResolvedValueOnce(createSubject(1));
+    vi.mocked(fetchSubjectById).mockResolvedValueOnce(undefined);
+
+    const resp = await createTestApp().request(
+      '/subject/1/revisions',
+      {
+        headers: {
+          Authorization: 'Bearer secret'
+        }
+      },
+      {
+        SECRET: 'secret'
+      }
+    );
+    const json = (await resp.json()) as any;
+
+    expect(resp.status).toBe(404);
+    expect(json).toEqual({ ok: false, error: 'Subject not found' });
+    expect(fetchSubjectAllRevisions).not.toHaveBeenCalled();
+  });
+
+  it.each([true, false])('updates revision enabled state to %s through patch', async (enabled) => {
+    const subject = createSubject(1);
+    vi.mocked(fetchBangumiById).mockResolvedValueOnce(subject);
+    vi.mocked(updateSubjectRevision).mockResolvedValueOnce([]);
+    vi.mocked(updateSubject).mockResolvedValueOnce({ ok: true, data: subject });
+
+    const resp = await createTestApp().request(
+      '/subject/1/revision/2',
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: 'Bearer secret',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ enabled })
+      },
+      {
+        SECRET: 'secret'
+      }
+    );
+
+    expect(resp.status).toBe(200);
+    expect(updateSubjectRevision).toHaveBeenCalledWith(expect.anything(), 1, 2, {
+      enabled
+    });
+  });
+
+  it('physically deletes a revision through delete', async () => {
+    const subject = createSubject(1);
+    vi.mocked(fetchBangumiById).mockResolvedValueOnce(subject);
+    vi.mocked(deleteSubjectRevision).mockResolvedValueOnce([]);
+    vi.mocked(updateSubject).mockResolvedValueOnce({ ok: true, data: subject });
+
+    const resp = await createTestApp().request(
+      '/subject/1/revision/2',
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: 'Bearer secret'
+        }
+      },
+      {
+        SECRET: 'secret'
+      }
+    );
+
+    expect(resp.status).toBe(200);
+    expect(deleteSubjectRevision).toHaveBeenCalledWith(expect.anything(), 1, 2);
+    expect(updateSubjectRevision).not.toHaveBeenCalled();
   });
 
   it('refreshes subject through authenticated subject post', async () => {

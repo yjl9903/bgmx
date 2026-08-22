@@ -26,6 +26,7 @@ import {
   fetchSubjects,
   fetchCalendar,
   updateCalendar,
+  deleteRevision,
   enableRevision,
   disableRevision,
   fetchRevisions,
@@ -335,7 +336,7 @@ cli
   });
 
 cli
-  .command('subject <subject_id>', '查询/更新/删除 bgmx 条目')
+  .command('subject <subject_id>', '查询当前生效的 bgmx 条目及已启用修订')
   .option('--post', '更新 bgmx 条目')
   .option('--delete', '删除 bgmx 条目及其关联数据')
   .action(async (subjectId, options) => {
@@ -397,7 +398,7 @@ cli
   });
 
 cli
-  .command('subject revision list <subject_id>', '编辑 bgmx 条目修订列表')
+  .command('subject revision list <subject_id>', '查询 bgmx 条目的全部修订（包括未启用）')
   .action(async (subjectId, options) => {
     const secret = options.secret ?? process.env.SECRET;
 
@@ -411,49 +412,38 @@ cli
     }
   });
 
-// cli
-//   .command('subject revision disable <subject_id> <revision_id>', '禁用某个 bgmx 条目的修订')
-//   .action(async (subjectId, revisionId, options) => {
-//     const secret = options.secret ?? process.env.SECRET;
+cli
+  .command('subject revision disable <subject_id> <revision_id>', '禁用某个 bgmx 条目的修订')
+  .action(async (subjectId, revisionId, options) => {
+    const secret = options.secret ?? process.env.SECRET;
+    const updated = await disableRevision(+subjectId, +revisionId, {
+      baseURL: options.baseUrl,
+      secret
+    });
+    printSubject(updated);
+  });
 
-//     const resp = await fetchSubject(+subjectId, {
-//       baseURL: options.baseUrl,
-//       secret
-//     });
+cli
+  .command('subject revision enable <subject_id> <revision_id>', '启用某个 bgmx 条目的修订')
+  .action(async (subjectId, revisionId, options) => {
+    const secret = options.secret ?? process.env.SECRET;
+    const updated = await enableRevision(+subjectId, +revisionId, {
+      baseURL: options.baseUrl,
+      secret
+    });
+    printSubject(updated);
+  });
 
-//     if (resp) {
-//       const updated = await disableRevision(+subjectId, +revisionId, {
-//         baseURL: options.baseUrl,
-//         secret
-//       });
-
-//       if (updated) {
-//         printSubject(updated);
-//       }
-//     }
-//   });
-
-// cli
-//   .command('subject revision enable <subject_id> <revision_id>', '启用某个 bgmx 条目的修订')
-//   .action(async (subjectId, revisionId, options) => {
-//     const secret = options.secret ?? process.env.SECRET;
-
-//     const resp = await fetchSubject(+subjectId, {
-//       baseURL: options.baseUrl,
-//       secret
-//     });
-
-//     if (resp) {
-//       const updated = await enableRevision(+subjectId, +revisionId, {
-//         baseURL: options.baseUrl,
-//         secret
-//       });
-
-//       if (updated) {
-//         printSubject(updated);
-//       }
-//     }
-//   });
+cli
+  .command('subject revision delete <subject_id> <revision_id>', '永久删除某个 bgmx 条目的修订')
+  .action(async (subjectId, revisionId, options) => {
+    const secret = options.secret ?? process.env.SECRET;
+    const updated = await deleteRevision(+subjectId, +revisionId, {
+      baseURL: options.baseUrl,
+      secret
+    });
+    printSubject(updated);
+  });
 
 cli
   .command('garden <subject_id>', '查询条目对应的 AnimeGarden 资源')

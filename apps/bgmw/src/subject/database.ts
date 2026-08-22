@@ -125,13 +125,19 @@ export async function createSubjectRevision(
   return revisions;
 }
 
-export async function enableSubjectRevision(ctx: Context, subjectId: number, revisionId: number) {
+export async function updateSubjectRevision(
+  ctx: Context,
+  subjectId: number,
+  revisionId: number,
+  options: { enabled: boolean }
+) {
   const database = ctx.get('database');
+  const { enabled } = options;
 
   const [, revisions] = await database.batch([
     database
       .update(revisionsSchema)
-      .set({ enabled: true })
+      .set({ enabled })
       .where(and(eq(revisionsSchema.id, revisionId), eq(revisionsSchema.target_id, subjectId))),
     database.query.revisions.findMany({
       where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.target_id, subjectId)),
@@ -139,18 +145,17 @@ export async function enableSubjectRevision(ctx: Context, subjectId: number, rev
     })
   ]);
 
-  console.log('[bgmw]', 'enable subject revision', subjectId, revisionId, revisions);
+  console.log('[bgmw]', 'update subject revision', subjectId, revisionId, { enabled }, revisions);
 
   return revisions;
 }
 
-export async function disableSubjectRevision(ctx: Context, subjectId: number, revisionId: number) {
+export async function deleteSubjectRevision(ctx: Context, subjectId: number, revisionId: number) {
   const database = ctx.get('database');
 
   const [, revisions] = await database.batch([
     database
-      .update(revisionsSchema)
-      .set({ enabled: false })
+      .delete(revisionsSchema)
       .where(and(eq(revisionsSchema.id, revisionId), eq(revisionsSchema.target_id, subjectId))),
     database.query.revisions.findMany({
       where: (table, { and, eq }) => and(eq(table.enabled, true), eq(table.target_id, subjectId)),
@@ -158,7 +163,7 @@ export async function disableSubjectRevision(ctx: Context, subjectId: number, re
     })
   ]);
 
-  console.log('[bgmw]', 'disable subject revision', subjectId, revisionId, revisions);
+  console.log('[bgmw]', 'delete subject revision', subjectId, revisionId, revisions);
 
   return revisions;
 }
