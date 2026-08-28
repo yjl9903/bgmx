@@ -22,7 +22,7 @@ importers:
         version: 0.3.222
       bumpp:
         specifier: latest
-        version: 12.2.1
+        version: 12.2.2
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
@@ -158,8 +158,8 @@ importers:
         version: 1.0.0-beta.18
     devDependencies:
       js-yaml:
-        specifier: ^5.4.0
-        version: 5.4.0
+        specifier: ^5.4.1
+        version: 5.4.1
       openapi-typescript:
         specifier: ^7.13.0
         version: 7.13.0(typescript@7.0.2)
@@ -1867,8 +1867,8 @@ packages:
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
 
-  bumpp@12.2.1:
-    resolution: {integrity: sha512-8inGPx8PC/BaEOWhzfxrNHGj/x5Srt0EeJatAcTJ9N7AZpQG/HlH4kGp5JWbEL8zffYXI5iBkMjG8SHnJ9e/6g==}
+  bumpp@12.2.2:
+    resolution: {integrity: sha512-tS7KZs+e1mRpN+N9mQU2greqHbqMLZrjBA0iQ4qVS/UB8yFPUgcvQHps4dVvRe37AEMNSOyNlnGuhnoklKlacg==}
     engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
     hasBin: true
 
@@ -2329,8 +2329,8 @@ packages:
     resolution: {integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==}
     hasBin: true
 
-  js-yaml@5.4.0:
-    resolution: {integrity: sha512-jE7vUJIebKzYQI5xu4co5CRBDlDEYnHrdzsxs4O2giCz4v2SbVMYKpmt1D9L38OKQAeCWmrOTRiCV93u0UkaJA==}
+  js-yaml@5.4.1:
+    resolution: {integrity: sha512-28R/k+NAjeuf7+CKlTxWZVExJGwVVLwY06DgEnOMz2gEpfNkDcD7QvyiVPT0xy0XXhU8vHsd4Ot42OOPdJG7dQ==}
     hasBin: true
 
   jsdom@30.0.1:
@@ -4256,7 +4256,7 @@ snapshots:
 
   buffer-from@1.1.2: {}
 
-  bumpp@12.2.1:
+  bumpp@12.2.2:
     dependencies:
       args-tokenizer: 0.3.0
       cac: 7.0.0
@@ -4677,7 +4677,7 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  js-yaml@5.4.0:
+  js-yaml@5.4.1:
     dependencies:
       argparse: 2.0.1
 
