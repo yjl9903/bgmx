@@ -64,10 +64,10 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: 2.1.1
-        version: 2.1.1(hono@4.13.3)
+        version: 2.1.1(hono@4.13.5)
       '@hono/zod-validator':
         specifier: 0.9.0
-        version: 0.9.0(hono@4.13.3)(zod@4.5.4)
+        version: 0.9.0(hono@4.13.5)(zod@4.5.4)
       bgmc:
         specifier: workspace:*
         version: link:../../packages/bgmc
@@ -81,8 +81,8 @@ importers:
         specifier: 0.45.2
         version: 0.45.2(@cloudflare/workers-types@5.20260830.1)
       hono:
-        specifier: 4.13.3
-        version: 4.13.3
+        specifier: 4.13.5
+        version: 4.13.5
       p-limit:
         specifier: 7.3.1
         version: 7.3.1
@@ -2239,8 +2239,8 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  hono@4.13.3:
-    resolution: {integrity: sha512-r8AO2mYHoLxSHkgafNeC/BXyb2vWRxD3jem4Ts+ptav8oTG5FIRifAjuJEmZI4bSvvc2ns0GxmIYiZnHqN3mMw==}
+  hono@4.13.5:
+    resolution: {integrity: sha512-O6+/eCYRkzzzy0rPWwKLiGBR1nFuUPZynnwjxN1MBA62NNqbT0wQEzQyK2gSO5yDIDB336sXQleAhOHrzlYyKw==}
     engines: {node: '>=16.9.0'}
 
   hookable@6.1.1:
@@ -3561,13 +3561,13 @@ snapshots:
 
   '@exodus/bytes@1.15.1': {}
 
-  '@hono/node-server@2.1.1(hono@4.13.3)':
+  '@hono/node-server@2.1.1(hono@4.13.5)':
     dependencies:
-      hono: 4.13.3
+      hono: 4.13.5
 
-  '@hono/zod-validator@0.9.0(hono@4.13.3)(zod@4.5.4)':
+  '@hono/zod-validator@0.9.0(hono@4.13.5)(zod@4.5.4)':
     dependencies:
-      hono: 4.13.3
+      hono: 4.13.5
       zod: 4.5.4
 
   '@img/colour@1.1.0': {}
@@ -4592,7 +4592,7 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  hono@4.13.3: {}
+  hono@4.13.5: {}
 
   hookable@6.1.1: {}
 
