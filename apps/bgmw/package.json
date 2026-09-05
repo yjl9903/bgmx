@@ -45,16 +45,16 @@
     "test:ci": "vitest --run && wrangler deploy --dry-run"
   },
   "dependencies": {
-    "@hono/node-server": "2.0.6",
-    "@hono/zod-validator": "0.8.0",
+    "@hono/node-server": "2.1.1",
+    "@hono/zod-validator": "0.9.1",
     "bgmc": "workspace:*",
     "bgmt": "workspace:*",
     "bgmx": "workspace:*",
     "drizzle-orm": "0.45.2",
-    "hono": "4.12.27",
-    "p-limit": "7.3.0",
+    "hono": "4.13.5",
+    "p-limit": "7.3.2",
     "tmdbc": "workspace:*",
-    "zod": "4.4.3"
+    "zod": "4.5.4"
   },
   "engines": {
     "node": ">=v24.0.0"
