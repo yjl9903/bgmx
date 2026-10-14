@@ -48,7 +48,7 @@
     "simptrad": "^0.3.0"
   },
   "engines": {
-    "node": ">=v24.0.0"
+    "node": ">=24.0.0"
   },
   "release-it": {
     "git": {
