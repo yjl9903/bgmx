@@ -198,10 +198,10 @@ importers:
         version: 6.1.3
       tsdown:
         specifier: ^0.23.1
-        version: 0.23.1(tsx@4.23.13)(typescript@7.0.2)
+        version: 0.23.1(tsx@4.23.15)(typescript@7.0.2)
       tsx:
-        specifier: ^4.23.13
-        version: 4.23.13
+        specifier: ^4.23.15
+        version: 4.23.15
       turbo:
         specifier: ^2.10.12
         version: 2.10.12
@@ -210,10 +210,10 @@ importers:
         version: 7.0.2
       vite:
         specifier: ^8.2.2
-        version: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0)
+        version: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
       vitest:
         specifier: ^5.0.0
-        version: 5.0.0(@types/node@24.13.3)(jsdom@30.0.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
+        version: 5.0.0(@types/node@24.13.3)(jsdom@30.0.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
       wrangler:
         specifier: ^4.129.0
         version: 4.129.0(@cloudflare/workers-types@5.20260905.1)
@@ -2062,10 +2062,6 @@ packages:
       magicast:
         optional: true
 
-  cac@7.0.0:
-    resolution: {integrity: sha512-tixWYgm5ZoOD+3g6UTea91eow5z6AAHaho3g0V9CNSNb45gM8SmflpAc+GRd1InC4AqN/07Unrgp56Y94N9hJQ==}
-    engines: {node: '>=20.19.0'}
-
   cac@7.1.0:
     resolution: {integrity: sha512-LMDU/U2yA4IPIY8KT0NsNPWEYZvAMkbgyspxJ6btJaYV+WMDOHAZCmB0lsTObiHaRS1V/ztKAl7+TSkTqXyeoA==}
     engines: {node: '>=20.19.0'}
@@ -3064,8 +3060,8 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  tsx@4.23.13:
-    resolution: {integrity: sha512-BL5MGkRln6aDYhb0xbQlEAGw743BaZYWdbWtdJOBriYJboKgUUYCadFp2/FpBBZquBC/ezNBn7wMMPx7FDZUDw==}
+  tsx@4.23.15:
+    resolution: {integrity: sha512-Yiex1Ovn8z2xPpOWckIiysV1SSyRMY9BkLF++q0yKiDxCqRhosKfMg3janKkiLBwZ5c/YryloKwGZcrEmtwxKw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -4347,14 +4343,14 @@ snapshots:
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
 
-  '@vitest/mocker@5.0.0(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))':
+  '@vitest/mocker@5.0.0(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@vitest/spy': 5.0.0
       estree-walker: 3.0.3
       magic-string: 1.2.3
     optionalDependencies:
-      vite: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0)
+      vite: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
 
   '@vitest/spy@5.0.0': {}
 
@@ -4457,7 +4453,7 @@ snapshots:
   bumpp@12.3.0:
     dependencies:
       args-tokenizer: 0.3.0
-      cac: 7.0.0
+      cac: 7.1.0
       jsonc-parser: 3.3.1
       package-manager-detector: 1.8.0
       tinyexec: 1.3.1
@@ -4484,8 +4480,6 @@ snapshots:
       perfect-debounce: 2.1.0
       pkg-types: 2.3.1
       rc9: 3.0.1
-
-  cac@7.0.0: {}
 
   cac@7.1.0: {}
 
@@ -4574,7 +4568,7 @@ snapshots:
       '@drizzle-team/brocli': 0.10.2
       '@esbuild-kit/esm-loader': 2.6.5
       esbuild: 0.25.12
-      tsx: 4.23.13
+      tsx: 4.23.15
 
   drizzle-orm@0.45.2(@cloudflare/workers-types@5.20260905.1):
     optionalDependencies:
@@ -5425,7 +5419,7 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  tsdown@0.23.1(tsx@4.23.13)(typescript@7.0.2):
+  tsdown@0.23.1(tsx@4.23.15)(typescript@7.0.2):
     dependencies:
       cac: 7.1.0
       defu: 6.1.7
@@ -5442,7 +5436,7 @@ snapshots:
       unconfig-core: 7.5.0
       verkit: 0.5.0
     optionalDependencies:
-      tsx: 4.23.13
+      tsx: 4.23.15
       typescript: 7.0.2
     transitivePeerDependencies:
       - '@typescript/native-preview'
@@ -5453,7 +5447,7 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tsx@4.23.13:
+  tsx@4.23.15:
     dependencies:
       esbuild: 0.28.2
     optionalDependencies:
@@ -5534,7 +5528,7 @@ snapshots:
 
   verkit@0.5.0: {}
 
-  vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0):
+  vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.5
@@ -5546,13 +5540,13 @@ snapshots:
       esbuild: 0.28.2
       fsevents: 2.3.3
       jiti: 2.7.0
-      tsx: 4.23.13
+      tsx: 4.23.15
       yaml: 2.9.0
 
-  vitest@5.0.0(@types/node@24.13.3)(jsdom@30.0.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0)):
+  vitest@5.0.0(@types/node@24.13.3)(jsdom@30.0.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.0(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
+      '@vitest/mocker': 5.0.0(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
       chai: 6.2.2
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -5563,7 +5557,7 @@ snapshots:
       tinybench: 6.1.4
       tinyexec: 1.3.0
       tinyglobby: 0.2.17
-      vite: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0)
+      vite: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.13.3
