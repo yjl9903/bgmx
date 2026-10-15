@@ -188,8 +188,8 @@ importers:
         specifier: ^0.31.10
         version: 0.31.10
       prettier:
-        specifier: ^3.9.6
-        version: 3.9.6
+        specifier: ^3.9.10
+        version: 3.9.10
       release-it:
         specifier: ^21.0.2
         version: 21.0.2(@types/node@24.13.3)(supports-color@10.2.2)
@@ -2867,8 +2867,8 @@ packages:
     resolution: {integrity: sha512-ZlsFlG7MtSFCoc5xreOvBAozCJ6Pf06opgJjh9ONEv418xpZSAzNjstD36C6+JwOnfSqOW/9uDkqKjezTdxZhw==}
     engines: {node: '>=20'}
 
-  prettier@3.9.6:
-    resolution: {integrity: sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==}
+  prettier@3.9.10:
+    resolution: {integrity: sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -5242,7 +5242,7 @@ snapshots:
 
   powershell-utils@0.2.0: {}
 
-  prettier@3.9.6: {}
+  prettier@3.9.10: {}
 
   protocols@2.0.2: {}
 
