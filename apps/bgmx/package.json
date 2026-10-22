@@ -48,7 +48,7 @@
     "consola": "^3.4.2",
     "date-fns": "^4.4.0",
     "fastest-levenshtein": "^1.0.16",
-    "fs-extra": "^11.4.0",
+    "fs-extra": "^11.4.1",
     "jsdom": "^30.0.1",
     "p-limit": "7.3.2",
     "rimraf": "^6.1.3",
