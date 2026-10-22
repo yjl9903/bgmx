@@ -266,8 +266,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/bgmt
       breadc:
-        specifier: ^1.0.0-beta.18
-        version: 1.0.0-beta.18
+        specifier: ^1.0.0-beta.23
+        version: 1.0.0-beta.23
       consola:
         specifier: ^3.4.2
         version: 3.4.2
@@ -312,8 +312,8 @@ importers:
   packages/bgmc:
     dependencies:
       breadc:
-        specifier: ^1.0.0-beta.18
-        version: 1.0.0-beta.18
+        specifier: ^1.0.0-beta.23
+        version: 1.0.0-beta.23
     devDependencies:
       js-yaml:
         specifier: ^5.4.3
@@ -334,8 +334,8 @@ importers:
   packages/tmdbc:
     dependencies:
       breadc:
-        specifier: ^1.0.0-beta.18
-        version: 1.0.0-beta.18
+        specifier: ^1.0.0-beta.23
+        version: 1.0.0-beta.23
 
 packages:
 
@@ -363,17 +363,17 @@ packages:
     resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
     hasBin: true
 
-  '@breadc/color@1.0.0-beta.18':
-    resolution: {integrity: sha512-vClJTkTXJSScmk9kzX0N4C0a0a282X9fb0KYU/2emaHvseAUidrh7FBrueE3vzfHTuYiE2o4PHBfPTr0wOBsdQ==}
+  '@breadc/color@1.0.0-beta.23':
+    resolution: {integrity: sha512-6wimyFSbdQbv3WiGkiOEnv+ZwA/5sr2ecgJK0SP+iYccHlPfTatJOcvqeAriF8fwzeJR1GnNcFFQ1tGs9YDM+w==}
 
-  '@breadc/core@1.0.0-beta.18':
-    resolution: {integrity: sha512-PMAB7Gwh8M1+/yYb8gK5mjUzPSjMtaJrpA6e0hPIm0V0+rukNLOczul26Gn47Ivbju/XyL3PK0UDapnuI8difQ==}
+  '@breadc/core@1.0.0-beta.23':
+    resolution: {integrity: sha512-oXbU503ivyZXdji10iHasd2EcvgZp9UFLjjsMtjOEhwKga6QJAlmNdT53raRoH4in/NKFTR/LXxFuM/hNdo9FQ==}
 
-  '@breadc/death@1.0.0-beta.18':
-    resolution: {integrity: sha512-cunyKh7QPgY6mSmazqikkQ1n7QFHiTPP885H093QY/mCTKLyvIFM6MsT8yo6J3CeLtBzN30EiEVRqMlJT3ZMbA==}
+  '@breadc/death@1.0.0-beta.23':
+    resolution: {integrity: sha512-clXAeTn9XwNuAmSHk/QBt1HKC/N09uyrj7Nqf/008FW03LRUfrQXgMuU8AOoe0pnmampg3y1sjYDdOyVMpmokA==}
 
-  '@breadc/tui@1.0.0-beta.18':
-    resolution: {integrity: sha512-q3d2OkuoLsT9aYHroUqfbBo1yX5TCtbFvi7e4P857m7MDAZisfpOHY9/mXd59u4bH69vcC4rmrfYZ5YIO8GqvQ==}
+  '@breadc/tui@1.0.0-beta.23':
+    resolution: {integrity: sha512-vusx4tRnxv+racZIHye8ALkk0oATwTjjOHtvqvbtLlvJvkV5LadiAwhqWSTU4MIKCer/Fj/nnG4up3kbbXssvQ==}
 
   '@clack/core@1.4.3':
     resolution: {integrity: sha512-/kr3UWNtdJfxZtPgDqUOmG2pvwlmcLGheex5yiZKdwbzZJxhV+HMNR9QNmyY5cGwTNV6LrR7Jtp+KjhUAP1qBQ==}
@@ -1708,6 +1708,9 @@ packages:
   '@speed-highlight/core@1.2.24':
     resolution: {integrity: sha512-qeW2e1l78afw8VhRPfPQ1Gjj+KU5XFQ/OFV5ti6eTa9bruO7mJyZtA4vw0ofqmA3tKCkROE9xLk3VZoeRc98nw==}
 
+  '@standard-schema/spec@1.1.0':
+    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
+
   '@turbo/darwin-64@2.10.12':
     resolution: {integrity: sha512-9nKgKoF6ZOUsM+or0OtNf+TTJSfGvDNP7ZFv/ZGWVwOSCkumyctQiTeHwB4UNljHTnC41AqylgbunLDHoccNrA==}
     cpu: [x64]
@@ -2036,8 +2039,8 @@ packages:
     resolution: {integrity: sha512-ScQ4IuvIEF1TMlP7Zt+vjJ//9zlPb2SDcxWxM3bk8s6t6GGdJ7KO1dCcTidOPJKePW30LE/2cT7wCyPho9/Wxg==}
     engines: {node: 20 || >=22}
 
-  breadc@1.0.0-beta.18:
-    resolution: {integrity: sha512-L/gKQSCc0yY1VtV/y4y4EKI52FVSX0gLRy29rV6jd+S1xrIQTxV8cBtAY75r542lB2clNh1kxMGB8ia9yjz33A==}
+  breadc@1.0.0-beta.23:
+    resolution: {integrity: sha512-JfLvs/cWBEXxBw2w6rUwfewGmv3b0erkSQa79UCFIBT/41f16yTOS/uYd71/BStY617HTJS/XRZ45QTA3dkFxg==}
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
@@ -2953,9 +2956,6 @@ packages:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
 
-  std-env@4.2.0:
-    resolution: {integrity: sha512-oCUKSupKTHX53EyjDtuZQ64pjLJ6yYCtpmEw0goYxtjG9KpbRe8KAsl2tBUGU9DyMcJ0RwJ8GqJAFzMXcXW1Rw==}
-
   std-env@4.3.0:
     resolution: {integrity: sha512-OtU/EgQ1kIm5KwqQpBC6ZEMXrZRui11w8zgfTWp8cdO9B8OaPsbA8bTHO2P+HNo1VlUTGMVBwPhydu6poeXiag==}
 
@@ -3355,20 +3355,19 @@ snapshots:
     dependencies:
       css-tree: 3.2.1
 
-  '@breadc/color@1.0.0-beta.18': {}
+  '@breadc/color@1.0.0-beta.23': {}
 
-  '@breadc/core@1.0.0-beta.18':
+  '@breadc/core@1.0.0-beta.23':
     dependencies:
-      '@breadc/color': 1.0.0-beta.18
+      '@standard-schema/spec': 1.1.0
 
-  '@breadc/death@1.0.0-beta.18': {}
+  '@breadc/death@1.0.0-beta.23': {}
 
-  '@breadc/tui@1.0.0-beta.18':
+  '@breadc/tui@1.0.0-beta.23':
     dependencies:
-      '@breadc/color': 1.0.0-beta.18
-      '@breadc/death': 1.0.0-beta.18
+      '@breadc/color': 1.0.0-beta.23
+      '@breadc/death': 1.0.0-beta.23
       fast-string-width: 3.0.2
-      std-env: 4.2.0
 
   '@clack/core@1.4.3':
     dependencies:
@@ -4214,6 +4213,8 @@ snapshots:
 
   '@speed-highlight/core@1.2.24': {}
 
+  '@standard-schema/spec@1.1.0': {}
+
   '@turbo/darwin-64@2.10.12':
     optional: true
 
@@ -4424,12 +4425,13 @@ snapshots:
     dependencies:
       balanced-match: 4.0.4
 
-  breadc@1.0.0-beta.18:
+  breadc@1.0.0-beta.23:
     dependencies:
-      '@breadc/color': 1.0.0-beta.18
-      '@breadc/core': 1.0.0-beta.18
-      '@breadc/death': 1.0.0-beta.18
-      '@breadc/tui': 1.0.0-beta.18
+      '@breadc/color': 1.0.0-beta.23
+      '@breadc/core': 1.0.0-beta.23
+      '@breadc/death': 1.0.0-beta.23
+      '@breadc/tui': 1.0.0-beta.23
+      fast-string-width: 3.0.2
 
   buffer-from@1.1.2: {}
 
@@ -5351,8 +5353,6 @@ snapshots:
       source-map: 0.6.1
 
   source-map@0.6.1: {}
-
-  std-env@4.2.0: {}
 
   std-env@4.3.0: {}
 
