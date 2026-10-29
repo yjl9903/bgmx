@@ -254,8 +254,8 @@ importers:
   apps/bgmx:
     dependencies:
       '@animegarden/client':
-        specifier: ^0.5.4
-        version: 0.5.4
+        specifier: ^0.5.5
+        version: 0.5.5
       '@clack/prompts':
         specifier: ^1.7.0
         version: 1.7.0
@@ -342,9 +342,9 @@ importers:
 
 packages:
 
-  '@animegarden/client@0.5.4':
-    resolution: {integrity: sha512-Q5jgWoChJskTgwki7CyaPGeK5Vl3o9hEre8o1wPDwT8Ojh/w935ljdNiWaf+cuWBQnasLrXC/00mh4wHVbzZaA==}
-    engines: {node: '>=v18.16.0'}
+  '@animegarden/client@0.5.5':
+    resolution: {integrity: sha512-eydoynNs/7+aVvrRPihMi79mqs5r+9h+DLI+4ngZg5pOTfgUbBg57Me32w6K/hC1prxk+ktcQiSrgbfH9xjQvg==}
+    engines: {node: '>=v24.0.0'}
 
   '@asamuzakjp/css-color@6.0.7':
     resolution: {integrity: sha512-vC/bk1Lz7Tn/EfU9/apOTBk80/8dyGyWMowPoV1tJ52muDGsDqt2HPT2klrFUiY60MQmQv9q8yIht15JnBgDGw==}
@@ -1983,9 +1983,9 @@ packages:
     resolution: {integrity: sha512-TQf59BsZnytt8GdJKLPfUZ54g/iaUL2OWDSFCCvMOhsHduDQxO8xC4PNeyIkVcA5KwL2phPSv0douC0fgWzmnA==}
     engines: {node: '>= 20'}
 
-  anipar@0.5.4:
-    resolution: {integrity: sha512-cDoeqMtYehuOZhMgDfMXSchUTXg9EUh7csrwHnPTu0lpDSJwl4Dgbima3rD5E908iKKhEx8/vdTiFJXV4va0HQ==}
-    engines: {node: '>=v18.16.0'}
+  anipar@0.5.5:
+    resolution: {integrity: sha512-wyb2YsIoRw+TBr61Th27j+/bbuCQN+A5VFAghIWtPdddSv3vqVEtxYJJnl8ymIufKW2eMTVDOBF49myCvwyl4A==}
+    engines: {node: '>=v24.0.0'}
 
   ansi-colors@4.1.3:
     resolution: {integrity: sha512-/6w/C21Pm1A7aZitlI5Ni/2J6FFQN8i1Cvz3kHABAAbw93v/NlvKdVOqz7CCWz/3iv/JplRSEEZ83XION15ovw==}
@@ -2927,9 +2927,6 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
-  simptrad@0.2.0:
-    resolution: {integrity: sha512-SADENHX3KNuTLThG/LQCZvIywDOwCFTC2aLufwmSgjVbHUEZKIjRzleb28J856kL4ozkKptv08eR3GyJFRCnMg==}
-
   simptrad@0.3.0:
     resolution: {integrity: sha512-ppFu4RuncoKhXj0wvD2SDZbYKDTGp5JdJrF02AxhUpBsTc8ga5bCYaHZ/QxuZftcsCCoW9tGiMQhhVLQ5euMcw==}
 
@@ -3326,11 +3323,11 @@ packages:
 
 snapshots:
 
-  '@animegarden/client@0.5.4':
+  '@animegarden/client@0.5.5':
     dependencies:
-      anipar: 0.5.4
+      anipar: 0.5.5
       ohash: 2.0.12
-      simptrad: 0.2.0
+      simptrad: 0.3.0
       zod: 3.25.76
 
   '@asamuzakjp/css-color@6.0.7':
@@ -4386,7 +4383,7 @@ snapshots:
 
   agent-base@9.0.0: {}
 
-  anipar@0.5.4: {}
+  anipar@0.5.5: {}
 
   ansi-colors@4.1.3: {}
 
@@ -5328,8 +5325,6 @@ snapshots:
       '@img/sharp-win32-x64': 0.35.2
 
   signal-exit@4.1.0: {}
-
-  simptrad@0.2.0: {}
 
   simptrad@0.3.0: {}
 

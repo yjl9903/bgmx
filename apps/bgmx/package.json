@@ -40,7 +40,7 @@
     "test:ci": "vitest --run"
   },
   "dependencies": {
-    "@animegarden/client": "^0.5.4",
+    "@animegarden/client": "^0.5.5",
     "@clack/prompts": "^1.7.0",
     "bgmc": "workspace:*",
     "bgmt": "workspace:*",
