@@ -1,12 +1,13 @@
 import 'dotenv/config';
 
-import { breadc } from 'breadc';
+import { breadc, InputError } from 'breadc';
+import { z } from 'zod';
 import { consola } from 'consola';
 import { fetchResources } from '@animegarden/client';
 
 import { version } from '../package.json';
 
-import { formatDatetime, formatSeason, parseBooleanOption, parseSeasonOption } from './utils';
+import { formatDatetime, formatSeason } from './utils';
 import {
   dumpDataBy,
   dumpCalendar,
@@ -36,14 +37,65 @@ import { transformDatabaseSubject } from './transform';
 import { syncBangumi } from './commands/bangumi';
 import { createRevision } from './commands/revision';
 
-const cli = breadc('bgmx', { version, i18n: 'zh' })
+const cli = breadc('bgmx', {
+  version,
+  locale: 'zh',
+  description: {
+    text: '查询番剧条目与周历，同步外部数据并管理条目修订。',
+    examples: [
+      { command: 'bgmx calendar', comment: '查看当前周历' },
+      { command: 'bgmx subject 328609', comment: '查看条目及已启用修订' },
+      { command: 'bgmx sync --help', comment: '查看数据同步命令' }
+    ]
+  }
+})
   .option('--base-url <url>', 'API 地址, 默认值: https://bgm.animes.garden')
   .option('-s, --secret <string>', 'API 密钥');
 
-cli
-  .command('sync subject', '拉取所有 bgmx 条目数据')
+const integer = z.string().trim().min(1, '请输入整数').transform(Number).pipe(z.number().int());
+
+const positiveInteger = integer.pipe(z.number().positive('请输入正整数'));
+
+const seasonMonth = integer.pipe(
+  z.union([z.literal(1), z.literal(4), z.literal(7), z.literal(10)])
+);
+
+const sync = cli
+  .group('sync', {
+    summary: '同步条目与周历数据',
+    text: '从 bgmx、Bangumi 或 yuc.wiki 获取条目和周历，整理为本地数据或发布到服务端。',
+    examples: [
+      {
+        command: 'bgmx sync subject --out-dir data/subject',
+        comment: '导出 bgmx 条目'
+      },
+      {
+        command: 'bgmx sync yuc --year 2026 --month 10',
+        comment: '抓取季度周历并生成本地会话文件'
+      }
+    ]
+  })
+  .option('--retry <number>', '重试次数，默认 3；负数表示无限重试', {
+    default: '3',
+    cast: integer
+  });
+
+sync
+  .command('subject', {
+    summary: '导出全部 bgmx 条目',
+    text: '从服务端分页读取所有条目，导出完整数据，按开播年份和月份组织文件；没有开播日期的条目放入 tbd。',
+    examples: [
+      {
+        command: 'bgmx sync subject',
+        comment: '导出到默认目录'
+      },
+      {
+        command: 'bgmx sync subject --out-dir backup/subject',
+        comment: '导出到指定目录'
+      }
+    ]
+  })
   .option('--out-dir <directory>', '输出目录, 默认值: data/subject')
-  .option('--retry <number>', '重试次数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
   .action(async (options) => {
     const subjects: ReturnType<typeof transformDatabaseSubject>[] = [];
 
@@ -70,13 +122,28 @@ cli
     );
   });
 
-cli
-  .command('sync bangumi', '拉取并更新所有 bangumi 条目数据')
+sync
+  .command('bangumi', {
+    summary: '导出并按需刷新 Bangumi 条目',
+    text: '读取服务端已有的 Bangumi 条目，并检查 bangumi-data 中的条目映射。导出条目数据，同时将缺失映射和请求失败记录到日志。',
+    examples: [
+      {
+        command: 'bgmx sync bangumi',
+        comment: '导出已有数据并生成检查日志'
+      },
+      {
+        command: 'bgmx sync bangumi --update-server --concurrency 3',
+        comment: '使用 SECRET 环境变量中的密钥刷新数据'
+      }
+    ]
+  })
   .option('--update-server', '是否更新服务端数据, 默认值: false', { default: false })
   .option('--log <file>', '日志文件, 默认值: sync-bangumi.md')
   .option('--out-dir <directory>', '输出目录, 默认值: data/bangumi')
-  .option('--concurrency <number>', '并发数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
-  .option('--retry <number>', '重试次数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
+  .option('--concurrency <number>', '并发数，默认 3', {
+    default: '3',
+    cast: positiveInteger
+  })
   .action(async (options) => {
     const secret = options.secret ?? process.env.SECRET;
     if (!secret && options.updateServer) {
@@ -137,13 +204,24 @@ cli
     }
   });
 
-cli
-  .command('sync tmdb', '拉取并更新所有 tmdb 条目数据')
+sync
+  .command('tmdb', {
+    summary: '同步 TMDB 条目（尚未实现）',
+    text: '此命令目前只保留参数入口，尚未执行 TMDB 数据抓取、文件导出或服务端更新。',
+    examples: [
+      {
+        command: 'bgmx sync tmdb --help',
+        comment: '查看预留参数'
+      }
+    ]
+  })
   .option('--update-server', '是否更新服务端数据, 默认值: false', { default: false })
   .option('--log <file>', '日志文件, 默认值: sync-tmdb.md')
   .option('--out-dir <directory>', '输出目录, 默认值: data/tmdb')
-  .option('--concurrency <number>', '并发数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
-  .option('--retry <number>', '重试次数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
+  .option('--concurrency <number>', '并发数，默认 3', {
+    default: '3',
+    cast: positiveInteger
+  })
   .action(async (options) => {
     const secret = options.secret ?? process.env.SECRET;
     if (!secret && options.updateServer) {
@@ -151,18 +229,35 @@ cli
     }
   });
 
-cli
-  .command('sync yuc', '拉取并更新 yuc.wiki 周历数据')
+sync
+  .command('yuc', {
+    summary: '抓取并按需发布 yuc.wiki 周历',
+    text: '抓取季度周历并匹配条目 ID，整理为可继续编辑的 YAML 会话文件。发布时补齐服务端缺失条目，并提交周历及其活跃状态。',
+    examples: [
+      {
+        command: 'bgmx sync yuc --year 2026 --month 10',
+        comment: '抓取季度周历并保存会话'
+      },
+      {
+        command: 'bgmx sync yuc --session yuc-2026-10.yaml --update-server',
+        comment: '使用 SECRET 环境变量中的密钥上传已整理的会话'
+      },
+      {
+        command: 'bgmx sync yuc --session yuc-2026-10.yaml --update-server --no-update-active',
+        comment: '上传周历并将季度设为非活跃'
+      }
+    ]
+  })
   .option('--session <file>', `会话文件, 默认值: yuc-{year}-{month}.yaml`)
   .option('--force-overwrite', '强制覆盖会话文件数据, 默认值: false')
-  .option('--year <year>', '年份, 默认值: ' + new Date().getFullYear())
-  .option('--month <month>', '月份, 可选值: 1, 4, 7, 10')
-  .option('--update-server', '是否更新服务端数据, 默认值: false', { default: false })
-  .option('--update-active <boolean>', '是否更新该季度周历 active 状态', {
-    default: true,
-    cast: parseBooleanOption
+  .option('--year <year>', '年份, 默认值: ' + new Date().getFullYear(), {
+    cast: positiveInteger
   })
-  .option('--retry <number>', '重试次数, 默认值: 3', { cast: (v) => (v ? +v : 3) })
+  .option('--month <month>', '月份, 可选值: 1, 4, 7, 10', { cast: seasonMonth })
+  .option('--update-server', '是否更新服务端数据, 默认值: false', { default: false })
+  .option('--[no-]update-active', '更新该季度周历 active 状态，默认启用', {
+    default: true
+  })
   .action(async (options) => {
     const secret = options.secret ?? process.env.SECRET;
     if (!secret && options.updateServer) {
@@ -170,8 +265,8 @@ cli
     }
 
     const data = await fetchYucData({
-      year: options.year ? +options.year : undefined,
-      month: options.month ? +options.month : undefined,
+      year: options.year,
+      month: options.month,
       session: options.session,
       force: options.forceOverwrite
     });
@@ -313,15 +408,39 @@ cli
   });
 
 cli
-  .command('calendar', '拉取当前周历数据')
+  .command('calendar', {
+    summary: '拉取当前周历数据',
+    text: '查询番剧周历，按星期和播出平台展示条目，并支持导出 JSON 数据。',
+    examples: [
+      { command: 'bgmx calendar --season 2026-04 2026-07', comment: '查询多个季度' },
+      {
+        command: 'bgmx calendar --season 2026-04 --season 2026-07',
+        comment: '重复选项也可累积季度'
+      },
+      { command: 'bgmx calendar --out calendar.json --full', comment: '导出完整条目数据' }
+    ]
+  })
   .option('--out <file>', '输出目标文件')
   .option('--version <version>', '输出文件版本号')
   .option('--full', '输出完整 subject 条目')
-  .option('--season <season>', '指定季度，可重复或用逗号分隔，例如 2026-04,2026-07')
+  .option('--season <...season>', '指定季度，支持多个值、重复选项或逗号分隔', {
+    cast: z
+      .array(z.string())
+      .transform((values) =>
+        values.flatMap((value) => value.split(',').map((season) => season.trim()))
+      )
+      .pipe(
+        z.array(
+          z
+            .string()
+            .regex(/^\d{4}-(01|04|07|10)$/, '季度格式应为 YYYY-01、YYYY-04、YYYY-07 或 YYYY-10')
+        )
+      )
+  })
   .action(async (options) => {
     const resp = await fetchCalendar({
       baseURL: options.baseUrl,
-      seasons: parseSeasonOption(options.season)
+      seasons: options.season
     });
 
     printCalendar(resp.calendar, resp.web, resp);
@@ -336,7 +455,27 @@ cli
   });
 
 cli
-  .command('subject <subject_id>', '查询当前生效的 bgmx 条目及已启用修订')
+  .command('subject', {
+    summary: '查询或管理 bgmx 条目',
+    text: '查看条目当前生效的数据和已启用修订，或刷新、删除服务端条目。',
+    examples: [
+      {
+        command: 'bgmx subject 328609',
+        comment: '查看条目及生效修订'
+      },
+      {
+        command: 'bgmx subject 328609 --post',
+        comment: '使用 SECRET 环境变量中的密钥刷新条目'
+      },
+      {
+        command: 'bgmx subject 328609 --delete',
+        comment: '使用 SECRET 环境变量中的密钥删除条目'
+      }
+    ]
+  })
+  .argument('<subject_id>', '条目 ID', {
+    cast: positiveInteger
+  })
   .option('--post', '更新 bgmx 条目')
   .option('--delete', '删除 bgmx 条目及其关联数据')
   .action(async (subjectId, options) => {
@@ -347,7 +486,7 @@ cli
     }
 
     if (options.delete) {
-      await deleteSubject(+subjectId, {
+      await deleteSubject(subjectId, {
         baseURL: options.baseUrl,
         secret
       });
@@ -356,7 +495,7 @@ cli
     }
 
     if (options.post) {
-      const updated = await refreshSubject(+subjectId, {
+      const updated = await refreshSubject(subjectId, {
         baseURL: options.baseUrl,
         secret
       });
@@ -364,7 +503,7 @@ cli
       return;
     }
 
-    const resp = await fetchSubject(+subjectId, {
+    const resp = await fetchSubject(subjectId, {
       baseURL: options.baseUrl,
       secret
     });
@@ -373,11 +512,23 @@ cli
   });
 
 cli
-  .command('subject revision <subject_id>', '创建 bgmx 条目修订')
+  .command('subject revision', {
+    summary: '交互式创建条目修订',
+    text: '先显示条目当前数据，再通过交互提示编辑搜索关键词或时间范围等字段，完成后显示更新后的条目。',
+    examples: [
+      {
+        command: 'bgmx subject revision 328609',
+        comment: '使用 SECRET 环境变量中的密钥编辑搜索条件'
+      }
+    ]
+  })
+  .argument('<subject_id>', '条目 ID', {
+    cast: positiveInteger
+  })
   .action(async (subjectId, options) => {
     const secret = options.secret ?? process.env.SECRET;
 
-    const resp = await fetchSubject(+subjectId, {
+    const resp = await fetchSubject(subjectId, {
       baseURL: options.baseUrl,
       secret
     });
@@ -398,11 +549,23 @@ cli
   });
 
 cli
-  .command('subject revision list <subject_id>', '查询 bgmx 条目的全部修订（包括未启用）')
+  .command('subject revision list', {
+    summary: '查看条目的全部修订',
+    text: '按条目 ID 查询修订记录，包括当前未启用的修订。可从输出中获取修订 ID，再使用 enable、disable 或 delete 管理对应记录。',
+    examples: [
+      {
+        command: 'bgmx subject revision list 328609',
+        comment: '列出条目的修订记录'
+      }
+    ]
+  })
+  .argument('<subject_id>', '条目 ID', {
+    cast: positiveInteger
+  })
   .action(async (subjectId, options) => {
     const secret = options.secret ?? process.env.SECRET;
 
-    const resp = await fetchRevisions(+subjectId, {
+    const resp = await fetchRevisions(subjectId, {
       baseURL: options.baseUrl,
       secret
     });
@@ -413,10 +576,25 @@ cli
   });
 
 cli
-  .command('subject revision disable <subject_id> <revision_id>', '禁用某个 bgmx 条目的修订')
+  .command('subject revision disable', {
+    summary: '禁用条目修订',
+    text: '停用一条修订，保留记录以便之后重新启用，完成后显示更新后的条目。',
+    examples: [
+      {
+        command: 'bgmx subject revision disable 328609 1',
+        comment: '停用修订 1，密钥从 SECRET 环境变量读取'
+      }
+    ]
+  })
+  .argument('<subject_id>', '条目 ID', {
+    cast: positiveInteger
+  })
+  .argument('<revision_id>', '修订 ID', {
+    cast: positiveInteger
+  })
   .action(async (subjectId, revisionId, options) => {
     const secret = options.secret ?? process.env.SECRET;
-    const updated = await disableRevision(+subjectId, +revisionId, {
+    const updated = await disableRevision(subjectId, revisionId, {
       baseURL: options.baseUrl,
       secret
     });
@@ -424,10 +602,25 @@ cli
   });
 
 cli
-  .command('subject revision enable <subject_id> <revision_id>', '启用某个 bgmx 条目的修订')
+  .command('subject revision enable', {
+    summary: '启用条目修订',
+    text: '启用一条修订，使其参与生成条目当前数据，完成后显示更新后的条目。',
+    examples: [
+      {
+        command: 'bgmx subject revision enable 328609 1',
+        comment: '启用修订 1，密钥从 SECRET 环境变量读取'
+      }
+    ]
+  })
+  .argument('<subject_id>', '条目 ID', {
+    cast: positiveInteger
+  })
+  .argument('<revision_id>', '修订 ID', {
+    cast: positiveInteger
+  })
   .action(async (subjectId, revisionId, options) => {
     const secret = options.secret ?? process.env.SECRET;
-    const updated = await enableRevision(+subjectId, +revisionId, {
+    const updated = await enableRevision(subjectId, revisionId, {
       baseURL: options.baseUrl,
       secret
     });
@@ -435,10 +628,25 @@ cli
   });
 
 cli
-  .command('subject revision delete <subject_id> <revision_id>', '永久删除某个 bgmx 条目的修订')
+  .command('subject revision delete', {
+    summary: '删除条目修订',
+    text: '永久删除一条修订，完成后显示更新后的条目。若只想暂停应用该修订，可使用 disable 保留记录。',
+    examples: [
+      {
+        command: 'bgmx subject revision delete 328609 1',
+        comment: '删除修订 1，密钥从 SECRET 环境变量读取'
+      }
+    ]
+  })
+  .argument('<subject_id>', '条目 ID', {
+    cast: positiveInteger
+  })
+  .argument('<revision_id>', '修订 ID', {
+    cast: positiveInteger
+  })
   .action(async (subjectId, revisionId, options) => {
     const secret = options.secret ?? process.env.SECRET;
-    const updated = await deleteRevision(+subjectId, +revisionId, {
+    const updated = await deleteRevision(subjectId, revisionId, {
       baseURL: options.baseUrl,
       secret
     });
@@ -446,11 +654,23 @@ cli
   });
 
 cli
-  .command('garden <subject_id>', '查询条目对应的 AnimeGarden 资源')
+  .command('garden', {
+    summary: '查询条目对应的 AnimeGarden 资源',
+    text: '读取条目当前的搜索条件，包括包含词、排除词、关键词及发布时间范围，再查询 AnimeGarden。逐行输出匹配资源的标题和发布时间。',
+    examples: [
+      {
+        command: 'bgmx garden 328609',
+        comment: '查询条目对应的资源'
+      }
+    ]
+  })
+  .argument('<subject_id>', '条目 ID', {
+    cast: positiveInteger
+  })
   .action(async (subjectId, options) => {
     const secret = options.secret ?? process.env.SECRET;
 
-    const { subject } = await fetchSubject(+subjectId, {
+    const { subject } = await fetchSubject(subjectId, {
       baseURL: options.baseUrl,
       secret
     });
@@ -469,12 +689,22 @@ cli
   });
 
 cli
-  .command('bangumi subject <id>', '查询并更新 bangumi 条目')
+  .command('bangumi subject', {
+    summary: '刷新并查看 Bangumi 条目',
+    text: '请求服务端刷新缓存中的 Bangumi 条目数据，并显示刷新结果。',
+    examples: [
+      {
+        command: 'bgmx bangumi subject 328609',
+        comment: '使用 SECRET 环境变量中的密钥刷新并查看条目'
+      }
+    ]
+  })
+  .argument('<subject_id>', 'Bangumi 条目 ID', { cast: positiveInteger })
   .option('--post', '刷新并更新服务端条目')
   .action(async (id, options) => {
     const secret = options.secret ?? process.env.SECRET;
 
-    const resp = await fetchAndUpdateBangumiSubject(+id, {
+    const resp = await fetchAndUpdateBangumiSubject(id, {
       baseURL: options.baseUrl,
       secret
     });
@@ -486,4 +716,15 @@ if (process.stdin.isTTY) {
   consola.wrapConsole();
 }
 
-await cli.run(process.argv.slice(2)).catch((err) => console.error(err));
+await cli.run(process.argv.slice(2)).catch((error: unknown) => {
+  if (error instanceof InputError) {
+    for (const issue of error.issues) {
+      const input =
+        'option' in issue ? issue.option.spec : 'argument' in issue ? issue.argument.name : '';
+      console.error(`${input ? `${input}: ` : ''}${issue.message}`);
+    }
+  } else {
+    console.error(error);
+  }
+  process.exitCode = 1;
+});

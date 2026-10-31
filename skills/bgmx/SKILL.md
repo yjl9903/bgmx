@@ -120,7 +120,7 @@ subject ids, uploading the calendar, marking a season active, or cancelling an a
      --month 7 \
      --session yuc-2026-07.yaml \
      --update-server \
-     --update-active true
+     --update-active
    ```
 8. Verify the uploaded season:
    ```bash
@@ -146,7 +146,7 @@ Use this when the user asks to deactivate a season without deleting its calendar
      --month 7 \
      --session yuc-2026-07.yaml \
      --update-server \
-     --update-active false
+     --no-update-active
    ```
 3. Verify active calendar state:
    ```bash
