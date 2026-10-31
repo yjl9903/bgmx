@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@animegarden/client": "^0.5.5",
-    "@clack/prompts": "^1.7.0",
+    "@clack/prompts": "^1.8.1",
     "bgmc": "workspace:*",
     "bgmt": "workspace:*",
     "breadc": "^1.0.0-beta.23",
