@@ -1,10 +1,14 @@
 import { z } from 'zod';
 import { Hono } from 'hono';
 
-import type { AppEnv } from '../env';
+import type { AppEnv, Context } from '../env';
 import type { Bangumi, SubjectRelation } from '../schema/types';
 
-import { fetchAndUpdateBangumiSubject, fetchAndUpdateRelatedBangumiSubjects } from '../bangumi';
+import {
+  fetchAndUpdateBangumiSubject,
+  fetchAndUpdateSingleBangumiSubject,
+  fetchAndUpdateRelatedBangumiSubjects
+} from '../bangumi';
 import {
   createSubjectRevision,
   deleteSubjectRevision,
@@ -37,21 +41,59 @@ function getAnimeRelations(relations: Bangumi['subjects']) {
   return relations.filter((relation) => relation.type === 2);
 }
 
+async function loadRelationState(c: Context, relations: Bangumi['subjects']) {
+  const animeRelations = getAnimeRelations(relations);
+  const relatedSubjectIds = [...new Set(animeRelations.map((relation) => relation.id))];
+  const relatedSubjectDetails =
+    relatedSubjectIds.length > 0 ? await fetchSubjectDetailsByIds(c, relatedSubjectIds) : [];
+  const relatedDetailsById = new Map(
+    relatedSubjectDetails.map((relatedDetail) => [relatedDetail.subject.id, relatedDetail])
+  );
+
+  const relationsToRefresh = animeRelations.filter((relation) => {
+    const relatedDetail = relatedDetailsById.get(relation.id);
+    return !relatedDetail || isSubjectStale({ updated_at: relatedDetail.bangumi_updated_at });
+  });
+
+  return { animeRelations, relatedDetailsById, relationsToRefresh };
+}
+
+function runInBackground(c: Context, backgroundTask: Promise<void>) {
+  // Workers must keep the invocation alive after returning the response.
+  // The Node server has no execution context; the already-handled task runs normally.
+  let executionContext;
+  try {
+    executionContext = c.executionCtx;
+  } catch {
+    return;
+  }
+  executionContext.waitUntil(backgroundTask);
+}
+
 // 查询数据库中的单个 subject
 router.get(
   '/subject/:id',
   zValidator('param', z.object({ id: z.coerce.number().int().gt(0) })),
+  zValidator('query', z.object({ refresh: z.literal('wait').optional() })),
   publicCache(),
   async (c) => {
     const requestId = c.get('requestId');
     const subjectId = c.req.valid('param').id;
+    const shouldWaitForRefresh = c.req.valid('query').refresh === 'wait';
+
+    if (shouldWaitForRefresh) {
+      c.header('Cache-Control', 'no-store');
+    }
 
     try {
-      let detail = await fetchSubjectDetailById(c, subjectId);
+      let subjectDetail = await fetchSubjectDetailById(c, subjectId);
 
-      if (!detail || isSubjectStale({ updated_at: detail.bangumi_updated_at })) {
-        const refreshed = await fetchAndUpdateBangumiSubject(c, subjectId);
-        if (!refreshed.ok) {
+      if (
+        !subjectDetail ||
+        (shouldWaitForRefresh && isSubjectStale({ updated_at: subjectDetail.bangumi_updated_at }))
+      ) {
+        const refreshResult = await fetchAndUpdateSingleBangumiSubject(c, subjectId);
+        if (!refreshResult.ok) {
           return c.json(
             {
               ok: false,
@@ -61,10 +103,10 @@ router.get(
           );
         }
 
-        detail = await fetchSubjectDetailById(c, subjectId);
+        subjectDetail = await fetchSubjectDetailById(c, subjectId);
       }
 
-      if (!detail) {
+      if (!subjectDetail) {
         return c.json(
           {
             ok: false,
@@ -74,48 +116,56 @@ router.get(
         );
       }
 
-      const animeRelations = getAnimeRelations(detail.relations);
-      const relatedSubjectIds = [...new Set(animeRelations.map((relation) => relation.id))];
-      let relatedDetails =
-        relatedSubjectIds.length > 0 ? await fetchSubjectDetailsByIds(c, relatedSubjectIds) : [];
-      let relatedById = new Map(relatedDetails.map((item) => [item.subject.id, item]));
-      const staleRelations = animeRelations.filter((relation) => {
-        const related = relatedById.get(relation.id);
-        return !related || isSubjectStale({ updated_at: related.bangumi_updated_at });
-      });
+      let relationState = await loadRelationState(c, subjectDetail.relations);
 
-      if (staleRelations.length > 0) {
-        const refreshed = await fetchAndUpdateRelatedBangumiSubjects(c, staleRelations);
-        if (!refreshed.ok) {
-          return c.json(
-            {
-              ok: false,
-              error: 'Failed to refresh subject relations'
-            },
-            502
-          );
-        }
+      const shouldRefreshSubjectInBackground =
+        !shouldWaitForRefresh && isSubjectStale({ updated_at: subjectDetail.bangumi_updated_at });
 
-        relatedDetails = await fetchSubjectDetailsByIds(c, relatedSubjectIds);
-        relatedById = new Map(relatedDetails.map((item) => [item.subject.id, item]));
+      if (shouldRefreshSubjectInBackground || relationState.relationsToRefresh.length > 0) {
+        const refreshSubjectData = async () => {
+          let relationsToRefresh = relationState.relationsToRefresh;
+
+          if (shouldRefreshSubjectInBackground) {
+            const refreshResult = await fetchAndUpdateSingleBangumiSubject(c, subjectId);
+            if (!refreshResult.ok) throw refreshResult.error;
+            // Refresh relations from the new upstream data, including newly added links.
+            relationsToRefresh = (await loadRelationState(c, refreshResult.data.subjects))
+              .relationsToRefresh;
+          }
+
+          if (relationsToRefresh.length > 0) {
+            const refreshResult = await fetchAndUpdateRelatedBangumiSubjects(c, relationsToRefresh);
+            if (!refreshResult.ok) throw refreshResult.error;
+          }
+
+          if (shouldWaitForRefresh)
+            relationState = await loadRelationState(c, subjectDetail.relations);
+        };
+
+        const refreshTask = refreshSubjectData().catch((error) => {
+          console.error('[bgmw] failed to refresh subject data', error, { requestId, subjectId });
+        });
+
+        if (shouldWaitForRefresh) await refreshTask;
+        else runInBackground(c, refreshTask);
       }
 
-      const relations = animeRelations.map((relation): SubjectRelation => {
-        const related = relatedById.get(relation.id);
-        if (!related) {
-          throw new Error(`Related subject ${relation.id} not found after refresh`);
-        }
+      const relations = relationState.animeRelations.flatMap((relation): SubjectRelation[] => {
+        const relatedDetail = relationState.relatedDetailsById.get(relation.id);
+        if (!relatedDetail) return [];
 
-        const { id, title, alias, poster, onair_date } = related.subject;
+        const { id, title, alias, poster, onair_date } = relatedDetail.subject;
 
-        return {
-          id,
-          title,
-          alias,
-          poster,
-          onair_date,
-          relation: relation.relation
-        };
+        return [
+          {
+            id,
+            title,
+            alias,
+            poster,
+            onair_date,
+            relation: relation.relation
+          }
+        ];
       });
 
       const revisions = await fetchSubjectRevisions(c, subjectId);
@@ -125,7 +175,7 @@ router.get(
           ok: true,
           data: {
             revisions,
-            subject: detail.subject,
+            subject: subjectDetail.subject,
             relations
           }
         },

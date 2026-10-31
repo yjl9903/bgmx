@@ -21,6 +21,7 @@ vi.mock('../src/subject/database', () => ({
 
 vi.mock('../src/bangumi', () => ({
   fetchAndUpdateBangumiSubject: vi.fn(),
+  fetchAndUpdateSingleBangumiSubject: vi.fn(),
   fetchAndUpdateRelatedBangumiSubjects: vi.fn()
 }));
 
@@ -38,7 +39,11 @@ import {
   updateSubject,
   updateSubjectRevision
 } from '../src/subject/database';
-import { fetchAndUpdateBangumiSubject, fetchAndUpdateRelatedBangumiSubjects } from '../src/bangumi';
+import {
+  fetchAndUpdateBangumiSubject,
+  fetchAndUpdateSingleBangumiSubject,
+  fetchAndUpdateRelatedBangumiSubjects
+} from '../src/bangumi';
 import { subjectRoute } from '../src/routes/subject';
 import { PUBLIC_CACHE_CONTROL } from '../src/routes/middlewares/cache';
 
@@ -76,6 +81,26 @@ function createSubjectDetail(id: number, bangumi_updated_at = new Date()) {
   };
 }
 
+function createExecutionContext() {
+  const tasks: Promise<unknown>[] = [];
+  return {
+    tasks,
+    props: {},
+    waitUntil: vi.fn((task: Promise<unknown>) => tasks.push(task)),
+    passThroughOnException: vi.fn()
+  };
+}
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
 describe('subject route cache headers', () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -89,7 +114,7 @@ describe('subject route cache headers', () => {
 
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
-    expect(fetchAndUpdateBangumiSubject).not.toHaveBeenCalled();
+    expect(fetchAndUpdateSingleBangumiSubject).not.toHaveBeenCalled();
     expect(fetchSubjectRevisions).toHaveBeenCalledWith(expect.anything(), 1);
   });
 
@@ -172,29 +197,199 @@ describe('subject route cache headers', () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(createSubjectDetail(404));
     vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
-    vi.mocked(fetchAndUpdateBangumiSubject).mockResolvedValueOnce({ ok: true, data: {} } as any);
+    vi.mocked(fetchAndUpdateSingleBangumiSubject).mockResolvedValueOnce({
+      ok: true,
+      data: {}
+    } as any);
 
     const resp = await createTestApp().request('/subject/404');
 
     expect(resp.status).toBe(200);
     expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
-    expect(fetchAndUpdateBangumiSubject).toHaveBeenCalledOnce();
+    expect(fetchAndUpdateSingleBangumiSubject).toHaveBeenCalledOnce();
+    expect(fetchAndUpdateBangumiSubject).not.toHaveBeenCalled();
   });
 
-  it('does not return stale subject when refresh fails', async () => {
+  it('returns stale data before background refresh finishes and refreshes newly added relations', async () => {
+    const pending = deferred<any>();
+    const executionCtx = createExecutionContext();
+    const detail = createSubjectDetail(1, new Date('2026-01-01'));
+    vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce(detail);
+    vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
+    vi.mocked(fetchAndUpdateSingleBangumiSubject).mockReturnValueOnce(pending.promise);
+    vi.mocked(fetchSubjectDetailsByIds).mockResolvedValueOnce([]);
+    vi.mocked(fetchAndUpdateRelatedBangumiSubjects).mockResolvedValueOnce({ ok: true, data: [] });
+
+    const resp = await createTestApp().request('/subject/1', {}, undefined, executionCtx);
+    const json = (await resp.json()) as any;
+    expect(resp.status).toBe(200);
+    expect(resp.headers.get('Cache-Control')).toBe(PUBLIC_CACHE_CONTROL);
+    expect(json.data.subject.title).toBe(detail.subject.title);
+    expect(executionCtx.waitUntil).toHaveBeenCalledOnce();
+    expect(fetchAndUpdateRelatedBangumiSubjects).not.toHaveBeenCalled();
+
+    const relation = { id: 20, type: 2, name: 'anime', name_cn: '动画', relation: '续集' };
+    pending.resolve({ ok: true, data: { subjects: [relation] } });
+    await Promise.all(executionCtx.tasks);
+    expect(fetchAndUpdateRelatedBangumiSubjects).toHaveBeenCalledWith(expect.anything(), [
+      relation
+    ]);
+    expect(fetchSubjectDetailById).toHaveBeenCalledOnce();
+  });
+
+  it.each(['result', 'throw'])('handles background main refresh failure (%s)', async (failure) => {
+    const pending = deferred<any>();
+    const executionCtx = createExecutionContext();
+    vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce(
+      createSubjectDetail(1, new Date('2026-01-01'))
+    );
+    vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
+    vi.mocked(fetchAndUpdateSingleBangumiSubject).mockReturnValueOnce(pending.promise);
+
+    const resp = await createTestApp().request('/subject/1', {}, undefined, executionCtx);
+    expect(resp.status).toBe(200);
+    if (failure === 'throw') pending.reject(new Error('offline'));
+    else pending.resolve({ ok: false, error: new Error('offline') });
+    await expect(Promise.all(executionCtx.tasks)).resolves.toEqual([undefined]);
+  });
+
+  it('returns stored relations while missing and stale relations refresh in the background', async () => {
+    const pending = deferred<any>();
+    const executionCtx = createExecutionContext();
+    const relations = [20, 30].map((id) => ({
+      id,
+      type: 2,
+      name: 'anime',
+      name_cn: '动画',
+      relation: '续集'
+    }));
+    vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce({
+      ...createSubjectDetail(1),
+      relations
+    });
+    vi.mocked(fetchSubjectDetailsByIds).mockResolvedValueOnce([
+      { subject: createSubject(20), bangumi_updated_at: new Date('2026-01-01') }
+    ]);
+    vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
+    vi.mocked(fetchAndUpdateRelatedBangumiSubjects).mockReturnValueOnce(pending.promise);
+
+    const resp = await createTestApp().request('/subject/1', {}, undefined, executionCtx);
+    const json = (await resp.json()) as any;
+    expect(resp.status).toBe(200);
+    expect(json.data.relations.map((r: any) => r.id)).toEqual([20]);
+    expect(fetchAndUpdateSingleBangumiSubject).not.toHaveBeenCalled();
+    expect(fetchAndUpdateRelatedBangumiSubjects).toHaveBeenCalledWith(expect.anything(), relations);
+    expect(executionCtx.waitUntil).toHaveBeenCalledOnce();
+    pending.reject(new Error('offline'));
+    await expect(Promise.all(executionCtx.tasks)).resolves.toEqual([undefined]);
+  });
+
+  it.each(['result', 'throw'])(
+    'preserves the main subject and stored relations on awaited relation failure (%s)',
+    async (failure) => {
+      const relations = [20, 30].map((id) => ({
+        id,
+        type: 2,
+        name: 'anime',
+        name_cn: '动画',
+        relation: '续集'
+      }));
+      vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce({
+        ...createSubjectDetail(1),
+        relations
+      });
+      vi.mocked(fetchSubjectDetailsByIds).mockResolvedValueOnce([
+        { subject: createSubject(20), bangumi_updated_at: new Date('2026-01-01') }
+      ]);
+      vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
+      if (failure === 'throw')
+        vi.mocked(fetchAndUpdateRelatedBangumiSubjects).mockRejectedValueOnce(new Error('offline'));
+      else
+        vi.mocked(fetchAndUpdateRelatedBangumiSubjects).mockResolvedValueOnce({
+          ok: false,
+          error: 'offline'
+        });
+
+      const resp = await createTestApp().request('/subject/1?refresh=wait');
+      const json = (await resp.json()) as any;
+      expect(resp.status).toBe(200);
+      expect(json.data.subject.id).toBe(1);
+      expect(json.data.relations.map((r: any) => r.id)).toEqual([20]);
+    }
+  );
+
+  it('does not force refresh fresh data in wait mode', async () => {
+    vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce(createSubjectDetail(1));
+    vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
+    const resp = await createTestApp().request('/subject/1?refresh=wait');
+    expect(resp.status).toBe(200);
+    expect(resp.headers.get('Cache-Control')).toBe('no-store');
+    expect(fetchAndUpdateSingleBangumiSubject).not.toHaveBeenCalled();
+    expect(fetchAndUpdateRelatedBangumiSubjects).not.toHaveBeenCalled();
+  });
+
+  it('returns 502 if a missing main subject cannot be fetched', async () => {
+    vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce(undefined);
+    vi.mocked(fetchAndUpdateSingleBangumiSubject).mockResolvedValueOnce({
+      ok: false,
+      error: 'offline'
+    });
+    const resp = await createTestApp().request('/subject/1');
+    expect(resp.status).toBe(502);
+    expect(fetchAndUpdateRelatedBangumiSubjects).not.toHaveBeenCalled();
+  });
+
+  it('rejects an invalid refresh mode', async () => {
+    const resp = await createTestApp().request('/subject/1?refresh=invalid');
+    expect(await resp.json()).toMatchObject({ ok: false, error: 'ZodError' });
+    expect(fetchSubjectDetailById).not.toHaveBeenCalled();
+  });
+
+  it('waits for an explicit refresh and returns the updated main subject', async () => {
+    const pending = deferred<any>();
+    const started = deferred<void>();
+    const executionCtx = createExecutionContext();
+    vi.mocked(fetchSubjectDetailById)
+      .mockResolvedValueOnce(createSubjectDetail(1, new Date('2026-01-01')))
+      .mockResolvedValueOnce({
+        ...createSubjectDetail(1),
+        subject: { ...createSubject(1), title: 'Updated' }
+      });
+    vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
+    vi.mocked(fetchAndUpdateSingleBangumiSubject).mockImplementationOnce(() => {
+      started.resolve();
+      return pending.promise;
+    });
+    let returned = false;
+    const request = Promise.resolve(
+      createTestApp().request('/subject/1?refresh=wait', {}, undefined, executionCtx)
+    ).then((resp) => {
+      returned = true;
+      return resp;
+    });
+    await started.promise;
+    expect(returned).toBe(false);
+    pending.resolve({ ok: true, data: { subjects: [] } });
+    const resp = await request;
+    expect(resp.status).toBe(200);
+    expect(await resp.json()).toMatchObject({ data: { subject: { title: 'Updated' } } });
+    expect(executionCtx.waitUntil).not.toHaveBeenCalled();
+  });
+
+  it('returns 502 when an explicitly awaited main refresh fails', async () => {
     vi.mocked(fetchSubjectDetailById).mockResolvedValueOnce(
       createSubjectDetail(1, new Date('2026-01-01T00:00:00.000Z'))
     );
-    vi.mocked(fetchAndUpdateBangumiSubject).mockResolvedValueOnce({
+    vi.mocked(fetchAndUpdateSingleBangumiSubject).mockResolvedValueOnce({
       ok: false,
       error: new Error('upstream failed')
     });
 
-    const resp = await createTestApp().request('/subject/1');
+    const resp = await createTestApp().request('/subject/1?refresh=wait');
     const json = (await resp.json()) as any;
 
     expect(resp.status).toBe(502);
-    expect(resp.headers.get('Cache-Control')).toBeNull();
+    expect(resp.headers.get('Cache-Control')).toBe('no-store');
     expect(json).toEqual({ ok: false, error: 'Failed to refresh subject' });
     expect(fetchSubjectRevisions).not.toHaveBeenCalled();
   });
@@ -206,7 +401,7 @@ describe('subject route cache headers', () => {
         ...createSubjectDetail(1),
         relations: [{ id: 20, type: 2, name: 'anime', name_cn: '动画', relation: '前传' }]
       });
-    vi.mocked(fetchAndUpdateBangumiSubject).mockResolvedValueOnce({
+    vi.mocked(fetchAndUpdateSingleBangumiSubject).mockResolvedValueOnce({
       ok: true,
       data: {}
     } as any);
@@ -215,11 +410,11 @@ describe('subject route cache headers', () => {
     ]);
     vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
 
-    const resp = await createTestApp().request('/subject/1');
+    const resp = await createTestApp().request('/subject/1?refresh=wait');
     const json = (await resp.json()) as any;
 
     expect(resp.status).toBe(200);
-    expect(fetchAndUpdateBangumiSubject).toHaveBeenCalledOnce();
+    expect(fetchAndUpdateSingleBangumiSubject).toHaveBeenCalledOnce();
     expect(json.data.relations[0]).toMatchObject({ id: 20, relation: '前传' });
   });
 
@@ -244,7 +439,7 @@ describe('subject route cache headers', () => {
     });
     vi.mocked(fetchSubjectRevisions).mockResolvedValueOnce([]);
 
-    const resp = await createTestApp().request('/subject/1');
+    const resp = await createTestApp().request('/subject/1?refresh=wait');
     const json = (await resp.json()) as any;
 
     expect(resp.status).toBe(200);

@@ -1,10 +1,10 @@
 import type { RelatedSubject } from 'bgmc';
 
 import type { Context } from '../env';
-
-import { updateSubject, fetchSubjectRevisions } from '../subject';
 import type { Bangumi as DatabaseBangumi } from '../schema/types';
+
 import { bangumis } from '../schema/subject';
+import { updateSubject, fetchSubjectRevisions } from '../subject';
 
 import { client } from './client';
 
@@ -20,7 +20,7 @@ export type FetchAndUpdateBangumiSubjectResult =
       error: any;
     };
 
-async function fetchAndUpdateSingleBangumiSubject(
+export async function fetchAndUpdateSingleBangumiSubject(
   ctx: Context,
   bgmId: number
 ): Promise<FetchAndUpdateBangumiSubjectResult> {
