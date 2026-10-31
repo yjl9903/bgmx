@@ -182,7 +182,7 @@ importers:
         specifier: latest
         version: 12.3.0
       drizzle-kit:
-        specifier: ^0.31.11
+        specifier: ^0.31.10
         version: 0.31.11
       prettier:
         specifier: ^3.9.10
