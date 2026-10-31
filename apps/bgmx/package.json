@@ -47,7 +47,6 @@
     "breadc": "^1.0.0-beta.23",
     "consola": "^3.4.2",
     "date-fns": "^4.4.0",
-    "dotenv": "^17.4.2",
     "fastest-levenshtein": "^1.0.16",
     "fs-extra": "^11.4.0",
     "jsdom": "^30.0.1",

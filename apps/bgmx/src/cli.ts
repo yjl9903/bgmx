@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import { loadEnvFile } from 'node:process';
 
 import { breadc, InputError } from 'breadc';
 import { z } from 'zod';
@@ -36,6 +36,14 @@ import {
 import { transformDatabaseSubject } from './transform';
 import { syncBangumi } from './commands/bangumi';
 import { createRevision } from './commands/revision';
+
+try {
+  loadEnvFile();
+} catch (error) {
+  if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+    throw error;
+  }
+}
 
 const cli = breadc('bgmx', {
   version,
