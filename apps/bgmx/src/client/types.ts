@@ -13,7 +13,7 @@ export type {
   CalendarUpdateResult,
   Revision as DatabaseRevision,
   RevisionDetail
-} from '../../../bgmw/src/schema/types';
+} from '../types';
 
 export type FetchOptions = {
   /**

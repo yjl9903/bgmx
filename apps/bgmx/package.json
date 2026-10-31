@@ -21,6 +21,7 @@
     ".": "./dist/index.mjs",
     "./cli": "./dist/cli.mjs",
     "./client": "./dist/client.mjs",
+    "./types": "./dist/types.mjs",
     "./package.json": "./package.json"
   },
   "types": "dist/index.d.mts",
@@ -34,7 +35,9 @@
   "scripts": {
     "build": "tsdown",
     "format": "prettier --write 'src/**/*.ts'",
-    "release": "release-it"
+    "release": "release-it",
+    "typecheck": "tsc --noEmit",
+    "test:ci": "vitest --run"
   },
   "dependencies": {
     "@animegarden/client": "^0.5.4",

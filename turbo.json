@@ -2,40 +2,21 @@
   "$schema": "https://turborepo.org/schema.json",
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
     },
     "typecheck": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "src/**/*.ts",
-        "test/**/*.ts"
-      ]
+      "dependsOn": ["^build"]
     },
     "test:ci": {
-      "dependsOn": [
-        "build",
-        "typecheck"
-      ],
-      "inputs": [
-        "src/**/*.ts",
-        "test/**/*.ts"
-      ]
+      "dependsOn": ["build", "typecheck"]
     },
     "format": {
-      "inputs": [
-        "src/**/*.ts",
-        "test/**/*.ts"
-      ]
+      "inputs": ["src/**/*.ts", "test/**/*.ts"]
     },
     "dev": {
       "cache": false
     }
-  }
+  },
+  "globalDependencies": ["tsconfig.base.json"]
 }

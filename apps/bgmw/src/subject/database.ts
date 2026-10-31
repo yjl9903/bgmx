@@ -34,7 +34,7 @@ export async function fetchSubjectById(ctx: Context, subjectId: number) {
 export async function fetchSubjectDetailById(ctx: Context, subjectId: number) {
   const database = ctx.get('database');
 
-  const [detail] = await database
+  const details = await database
     .select({
       subject: subjectsSchema,
       relations: bangumisSchema.subjects,
@@ -45,7 +45,7 @@ export async function fetchSubjectDetailById(ctx: Context, subjectId: number) {
     .where(eq(subjectsSchema.id, subjectId))
     .limit(1);
 
-  return detail;
+  return details.at(0);
 }
 
 export async function fetchSubjectDetailsByIds(ctx: Context, subjectIds: number[]) {

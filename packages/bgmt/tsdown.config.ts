@@ -5,5 +5,5 @@ export default defineConfig({
     index: 'src/index.ts',
     cdn: 'src/cdn/index.ts'
   },
-  exports: true,
+  exports: true
 });
