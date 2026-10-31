@@ -290,8 +290,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tmdbc
       undici:
-        specifier: ^8.10.2
-        version: 8.10.2
+        specifier: ^8.12.3
+        version: 8.12.3
       yaml:
         specifier: ^2.9.1
         version: 2.9.1
@@ -2821,10 +2821,6 @@ packages:
     resolution: {integrity: sha512-03KrMbjIFDWQR5RNPrSw3bd1r12JpyFQl9/yxjUbJtqkjmllqC5lFjZh6ujeuJCKr8EOQvRW872Oy/az+nLYxg==}
     engines: {node: '>=20.18.1'}
 
-  undici@8.10.2:
-    resolution: {integrity: sha512-/y4/bH9YNU5hi9NIrpOuvGXFcxrj3CMrV+/AYpowAYTpHn8gX/XPFjNy766FPoYY0miQhdW977JFWKGNhBdwyQ==}
-    engines: {node: '>=22.19.0'}
-
   undici@8.12.3:
     resolution: {integrity: sha512-+fdndUTwBP86cVjihTp21hZHo7d6oj1c/47XPA3lL8mM0XHs+C4EkcjmgRsFnFk2f/UONGDy9ItBItmXsLOQHw==}
     engines: {node: '>=22.19.0'}
@@ -5049,8 +5045,6 @@ snapshots:
   undici@7.29.1: {}
 
   undici@7.30.1: {}
-
-  undici@8.10.2: {}
 
   undici@8.12.3: {}
 
