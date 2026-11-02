@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 
 import type { AppEnv } from './env';
@@ -13,6 +14,16 @@ export const createApp = () => {
   const app = new Hono<AppEnv>();
 
   app.use('*', logger());
+  app.use(
+    '*',
+    cors({
+      origin: '*',
+      allowMethods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowHeaders: ['Authorization', 'Content-Type'],
+      exposeHeaders: ['X-Request-Id', 'X-Response-Timestamp'],
+      maxAge: 86400
+    })
+  );
 
   app.use('*', async (c, next) => {
     const responseTimestamp = new Date();
